@@ -2,13 +2,14 @@
 #include "SleepService.h"
 #include <Input/Input.h>
 #include <Input/I2cExpander.h>
-#include <Nibble.h>
+#include "../Pins.hpp"
+
 
 BatteryService* BatteryService::instance = nullptr;
 
 BatteryService::BatteryService(Display& display) : display(&display), canvas(display.getBaseSprite())
 {
-	averageVoltage = (float)(analogRead(A0)) / 1024.0 * 1000.0;
+	averageVoltage = 1000;
 	voltageSum = 0;
 	measurementCounter = 0;
 	showWarning = 0;
@@ -18,7 +19,7 @@ BatteryService::BatteryService(Display& display) : display(&display), canvas(dis
 	if(averageVoltage < 650.0 && !showShutdown)
 	{
 		measurementCounter = measurementsSize + 1;
-		voltageSum = (averageVoltage*1024.0/1000.0) * measurementCounter;
+//		voltageSum = (averageVoltage*1024.0/1000.0) * measurementCounter;
 	}
 }
 
@@ -75,7 +76,7 @@ void BatteryService::loop(uint _time)
 
 	if (measurementCounter > measurementsSize)
 	{
-		averageVoltage = (voltageSum/measurementsSize) / 1024.0 * 1000.0;
+//		averageVoltage = (voltageSum/measurementsSize) / 1024.0 * 1000.0;
 		voltageSum = 0;
 		measurementCounter = 0;
 
@@ -107,7 +108,7 @@ void BatteryService::loop(uint _time)
 		}
 	}
 	measurementCounter++;
-	voltageSum+=analogRead(A0);
+//	voltageSum+=analogRead(A0);
 }
 void BatteryService::bindInput(){
 	auto warningLambda = [](){

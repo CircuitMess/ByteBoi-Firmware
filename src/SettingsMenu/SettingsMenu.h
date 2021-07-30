@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 #include <CircuitOS.h>
-#include <Nibble.h>
+#include "../Pins.hpp"
 #include <Input/Input.h>
 #include <Loop/LoopManager.h>
 #include <Support/Context.h>

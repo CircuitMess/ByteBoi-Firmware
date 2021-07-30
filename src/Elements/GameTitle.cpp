@@ -39,6 +39,6 @@ void GameTitle::draw(){
 	canvas->setTextSize(2);
 	canvas->setTextFont(1);
 	canvas->setTextColor(TFT_WHITE);
-	canvas->setCursor(0, currentY);
-	canvas->printCenter(text);
+	canvas->setTextDatum(textdatum_t::middle_center);
+	canvas->drawString(text, canvas->width()/2, currentY);
 }

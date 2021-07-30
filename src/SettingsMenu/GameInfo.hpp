@@ -17,7 +17,7 @@ struct GameInfo {
 
 const GameInfo SettingsInfo {
 		"Settings",
-		"Change your Nibble's settings.",
+		"Change your ByteBoi's settings.",
 		settingsIcon,
 		[](Display& display) -> Context* { return new SettingsMenu::SettingsMenu(display); }
 };

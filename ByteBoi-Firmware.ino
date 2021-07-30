@@ -1,20 +1,19 @@
 #include <Arduino.h>
 #include <CircuitOS.h>
-#include <Nibble.h>
+
 #include <Loop/LoopManager.h>
 #include <Support/Context.h>
 #include <Input/Input.h>
+#include <Input/InputI2C.h>
 #include <Input/I2cExpander.h>
 #include <Audio/Piezo.h>
+#include <WiFi.h>
+#include "src/Pins.hpp"
 
 #include "src/Launcher.h"
 #include "src/Services/BatteryService.h"
 #include "src/Services/SleepService.h"
 #include "src/SettingsMenu/SettingsStruct.hpp"
-#include "src/HardwareTest.h"
-#include "src/SerialID.h"
-
-#include <ESP8266WiFi.h>
 
 Launcher* launcher;
 BatteryService* batteryService;
@@ -25,11 +24,30 @@ Display* display;
 void setup(){
 	Serial.begin(115200);
 	Serial.println();
-	Nibble.begin();
-	display = Nibble.getDisplay();
+
+	if(psramFound()){
+		Serial.printf("PSRAM init: %s, free: %d B\n", psramInit() ? "Yes" : "No", ESP.getFreePsram());
+	}else{
+		Serial.println("No PSRAM detected");
+	}
+
+	display = new Display(160, 120, -1, 3);
+	I2cExpander* expander = new I2cExpander();
+
+	display->begin();
+	display->getBaseSprite()->clear(TFT_RED);
+	display->commit();
+	expander->begin(0x74, 14, 33);
+	expander->pinMode(BL_PIN, OUTPUT);
+	expander->pinWrite(BL_PIN, 0);
+
+	Input* input = new InputI2C(expander);
+	input->preregisterButtons({ BTN_A, BTN_B, BTN_C, BTN_UP, BTN_DOWN, BTN_RIGHT, BTN_LEFT });
+	Piezo.begin(BUZZ_PIN);
+
 
 	WiFi.mode(WIFI_OFF);
-	WiFi.forceSleepBegin();
+	btStop();
 
 	Piezo.begin(BUZZ_PIN);
 
@@ -42,19 +60,19 @@ void setup(){
 	}
 
 #ifdef DEBUG_FLAG
-	LoopManager::addListener(new SerialID);
+/*	LoopManager::addListener(new SerialID);
 
 	for(uint8_t i = 0; i < 7; i++)
 	{
-		Nibble.getExpander()->pinMode(i, INPUT_PULLUP);
+		ByteBoi.getExpander()->pinMode(i, INPUT_PULLUP);
 	}
-	uint8_t portRead = Nibble.getExpander()->portRead() & 0b01111111;
+	uint8_t portRead = ByteBoi.getExpander()->portRead() & 0b01111111;
 
 	if(!portRead && !settings()->calibrated)
 	{
-		HardwareTest test(*Nibble.getDisplay());
+		HardwareTest test(*ByteBoi.getDisplay());
 		test.start();
-	}
+	}*/
 
 #endif
 
@@ -63,7 +81,7 @@ void setup(){
 	batteryService = new BatteryService(*display);
 	sleepService = new SleepService(*display);
 
-	LoopManager::addListener(batteryService);
+//	LoopManager::addListener(batteryService);
 	LoopManager::addListener(Input::getInstance());
 
 	launcher = new Launcher(display, batteryService);
@@ -72,7 +90,7 @@ void setup(){
 	launcher->unpack();
 	launcher->start();
 	sleepService->start();
-	LoopManager::addListener(sleepService);
+//	LoopManager::addListener(sleepService);
 }
 
 void loop(){

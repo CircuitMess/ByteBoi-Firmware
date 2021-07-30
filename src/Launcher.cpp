@@ -1,15 +1,16 @@
 #include "Launcher.h"
-#include <Nibble.h>
+#include "Pins.hpp"
+
 #include <Input/Input.h>
 
 #include "Splash.h"
 #include "GameScroller.h"
 #include "Elements/Logo.h"
 #include "Elements/GameTitle.h"
-#include "Games/Bonk/GameInfo.hpp"
-#include "Games/SpaceRocks/GameInfo.hpp"
-#include "Games/Snake/GameInfo.hpp"
-#include "Games/Invaderz/GameInfo.hpp"
+//#include "Games/Bonk/GameInfo.hpp"
+//#include "Games/SpaceRocks/GameInfo.hpp"
+//#include "Games/Snake/GameInfo.hpp"
+//#include "Games/Invaderz/GameInfo.hpp"
 #include "SettingsMenu/GameInfo.hpp"
 #include "../GameInfo.hpp"
 #include "Services/BatteryService.h"
@@ -22,20 +23,27 @@ Context* runningContext = nullptr;
 bool exitingGame = false;
 
 const GameInfo games[] = {
-	InvaderzInfo, BonkInfo, SpaceRocksInfo, SnakeInfo, SettingsInfo
+	//InvaderzInfo, BonkInfo, SpaceRocksInfo, SnakeInfo,
+	SettingsInfo
 };
 
 Launcher* instance = nullptr;
 
-Launcher::Launcher(Display* display, BatteryService* batteryService) : Context(*display), display(display), canvas(display->getBaseSprite()),
-		scroller(new GameScroller(canvas, games, sizeof(games) / sizeof(GameInfo))), logo(new Logo(canvas)), title(new GameTitle(canvas)), batteryService(batteryService)
+Launcher::Launcher(Display* display, BatteryService* batteryService) : Context(*display), batteryService(batteryService), display(display)
 {
+	canvas = display->getBaseSprite();
+	if(canvas == nullptr){
+	}
+
+	scroller = new GameScroller(canvas, games, sizeof(games) / sizeof(GameInfo));
+	logo = new Logo(canvas);
+	title = new GameTitle(canvas);
+
+
 	instance = this;
 	canvas->setChroma(TFT_TRANSPARENT);
-
 	splash = new Splash(display->getBaseSprite(), logo, title, scroller);
 	menu = new Menu(*display);
-
 	SleepService::getInstance()->addOnSleepCallback([](){
 		instance->menu->stop(true);
 	});
@@ -55,6 +63,8 @@ void Launcher::start(){
 	if(splash == nullptr){
 		bindInput();
 	}
+	draw();
+	screen.commit();
 	LoopManager::addListener(this);
 }
 
@@ -110,12 +120,15 @@ void Launcher::bindInput(){
 		Piezo.tone(500, 50);
 	});
 }
+uint32_t drawTime1 = 0;
 
-void Launcher::loop(uint micros){
+void Launcher::loop(uint _micros){
+	uint32_t t = micros();
 	if(splash){
-		splash->loop(micros);
+		splash->loop(_micros);
 
 		if(splash->done()){
+			Serial.println("splash done");
 			delete splash;
 			splash = nullptr;
 
@@ -124,11 +137,16 @@ void Launcher::loop(uint micros){
 			title->change(games[selectedGame].title);
 		}
 	}else{
-		logo->loop(micros);
+		logo->loop(_micros);
 	}
 
 	draw();
+	canvas->setTextColor(TFT_WHITE);
+	canvas->setTextSize(1);
+	canvas->setCursor(130, 10);
+	canvas->println((1000000.0 / (float)drawTime1));
 	screen.commit();
+	drawTime1 = micros() - t;
 }
 
 void Launcher::draw(){
@@ -149,4 +167,5 @@ void Launcher::draw(){
 	{
 		canvas->drawMonochromeIcon(battery3, 120, 0, 8, 12, 1, TFT_WHITE);
 	}
+
 }

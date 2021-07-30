@@ -21,4 +21,5 @@ void Logo::splash(float f){
 
 void Logo::draw(){
 	canvas->drawIcon(logo, x, currentY, width, height);
+//canvas->pushImage(x, currentY, width, height, logo);
 }

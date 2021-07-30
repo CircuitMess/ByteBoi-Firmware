@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.15)
-project(Nibble-Launcher)
-set(PORT /dev/ttyUSB0)
-set(DEVICE cm:esp8266:nibble)
+project(ByteBoi-Firmware)
+set(PORT /dev/ttyS3)
+set(DEVICE cm:esp32:wheelson)
 set(CMAKE_CXX_STANDARD 11)
 
 if(WIN32 OR CYGWIN)
@@ -17,29 +17,43 @@ if(WIN32 OR CYGWIN)
     endif()
 else()
     set(Arduino15 ~/.arduino15)
-    set(ArduinoLibs ~/Arduino/libraries)
+    set(ArduinoLibs /mnt/c/Users/emilg/Documents/Arduino/libraries)
 endif()
 
-include_directories(${Arduino15}/packages/cm/hardware/esp8266/1.0.0/cores/esp8266)
+# Include directories
+include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.1/libraries/Wire/src)
+include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.1/libraries/FS/src)
+include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.1/libraries/SD/src)
+include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.1/libraries/SPI/src)
+include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.1/libraries/WiFi/src)
+include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.1/libraries/SPIFFS/src)
 
-include_directories(${Arduino15}/packages/cm/hardware/esp8266/1.0.0/libraries/CircuitOS/src)
-include_directories(${Arduino15}/packages/cm/hardware/esp8266/1.0.0/libraries/TFT_eSPI)
-include_directories(${Arduino15}/packages/cm/hardware/esp8266/1.0.0/libraries/TFT_eSPI/Extensions)
-include_directories(${Arduino15}/packages/cm/hardware/esp8266/1.0.0/libraries/Nibble/src)
-include_directories(${Arduino15}/packages/cm/hardware/esp8266/1.0.0/libraries/ESP8266WiFi/src)
 
-AUX_SOURCE_DIRECTORY(src SOURCES)
-AUX_SOURCE_DIRECTORY(src/Elements SOURCES)
-AUX_SOURCE_DIRECTORY(src/SettingsMenu SOURCES)
-AUX_SOURCE_DIRECTORY(src/SettingsMenu/Elements SOURCES)
-AUX_SOURCE_DIRECTORY(src/Services SOURCES)
+include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.1/libraries/CircuitOS/src)
+include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.1/libraries/TFT_eSPI)
+include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.1/libraries/TFT_eSPI/Extensions)
+include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.1/libraries/U8g2_for_TFT_eSPI/src)
+include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.1/libraries/JPEGDecoder/src)
+include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.1/libraries/Wheelson-Library/src)
+include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.1/libraries/OpenCV-ESP32/src)
 
+include_directories(${ArduinoLibs}/LovyanGFX/src)
+
+# Source directories
+file(GLOB_RECURSE SOURCES "src/**.cpp" "src/**.c" "src/**.hpp" "src/**.h")
+
+
+# Defines
 add_definitions(-DDEBUG)
-add_definitions(-DCIRCUITOS_LITTLEFS)
-add_definitions(-DCIRCUITOS_TONE)
-add_definitions(-DCIRCUITOS_LOWRAM)
+add_definitions(-DESP32)
+add_definitions(-DCIRCUITOS_FREERTOS)
+add_definitions(-DCIRCUITOS_I2S)
+add_definitions(-DCIRCUITOS_LOVYANGFX)
+
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build)
+set(BUILD ${ROOT}/build)
+
 SET_SOURCE_FILES_PROPERTIES(${CMAKE_PROJECT_NAME}.ino PROPERTIES LANGUAGE CXX)
 
 add_custom_command(OUTPUT ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_PROJECT_NAME}.ino.elf
