@@ -11,7 +11,7 @@ GameScroller::GameScroller(Sprite* canvas, const GameInfo gameDefs[], uint8_t ga
 	for(int i = 0; i < gameCount; i++){
 		games.push_back(new GameImage(canvas, gameDefs[i].icon));
 		games.back()->setX(-width);
-		games.back()->setY(37);
+		games.back()->setY(35);
 	}
 
 	// repos();

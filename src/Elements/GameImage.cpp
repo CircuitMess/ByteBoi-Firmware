@@ -7,6 +7,7 @@ GameImage::GameImage(Sprite* canvas, const uint16_t* icon) : canvas(canvas), ico
 }
 
 void GameImage::draw() const {
+//	canvas->pushImage(x, y, 30, 30, (lgfx::rgb565_t*)icon, TFT_BLACK);
 	canvas->drawIcon(icon, x, y, 30, 30, 2, TFT_BLACK);
 }
 

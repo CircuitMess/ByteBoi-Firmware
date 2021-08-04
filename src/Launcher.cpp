@@ -7,12 +7,11 @@
 #include "GameScroller.h"
 #include "Elements/Logo.h"
 #include "Elements/GameTitle.h"
-//#include "Games/Bonk/GameInfo.hpp"
-//#include "Games/SpaceRocks/GameInfo.hpp"
-//#include "Games/Snake/GameInfo.hpp"
-//#include "Games/Invaderz/GameInfo.hpp"
+#include "Games/BonK/GameInfo.hpp"
+#include "Games/SpaceRocks/GameInfo.hpp"
+#include "Games/Snake/GameInfo.hpp"
+#include "Games/Invaderz/GameInfo.hpp"
 #include "SettingsMenu/GameInfo.hpp"
-#include "../GameInfo.hpp"
 #include "Services/BatteryService.h"
 #include <Audio/Piezo.h>
 #include "Menu.h"
@@ -22,20 +21,20 @@
 Context* runningContext = nullptr;
 bool exitingGame = false;
 
-const GameInfo games[] = {
-	//InvaderzInfo, BonkInfo, SpaceRocksInfo, SnakeInfo,
-	SettingsInfo
-};
 
 Launcher* instance = nullptr;
 
 Launcher::Launcher(Display* display, BatteryService* batteryService) : Context(*display), batteryService(batteryService), display(display)
 {
-	canvas = display->getBaseSprite();
-	if(canvas == nullptr){
-	}
+	canvas = screen.getSprite();
 
-	scroller = new GameScroller(canvas, games, sizeof(games) / sizeof(GameInfo));
+	games[0] = InvaderzInfo;
+	games[1] = SpaceRocksInfo;
+	games[2] = BonkInfo;
+	games[3] = SnakeInfo;
+	games[4] = SettingsInfo;
+
+	scroller = new GameScroller(canvas, &games[0], sizeof(games) / sizeof(GameInfo));
 	logo = new Logo(canvas);
 	title = new GameTitle(canvas);
 
@@ -109,7 +108,7 @@ void Launcher::bindInput(){
 		Display* display = instance->display;
 		uint8_t index = instance->selectedGame;
 
-		Context* game = games[index].launch(*display);
+		Context* game = instance->games[index].launch(*display);
 		game->push(instance);
 	});
 
@@ -123,12 +122,12 @@ void Launcher::bindInput(){
 uint32_t drawTime1 = 0;
 
 void Launcher::loop(uint _micros){
-	uint32_t t = micros();
+
+	int t = micros();
 	if(splash){
 		splash->loop(_micros);
 
 		if(splash->done()){
-			Serial.println("splash done");
 			delete splash;
 			splash = nullptr;
 
@@ -141,10 +140,10 @@ void Launcher::loop(uint _micros){
 	}
 
 	draw();
-	canvas->setTextColor(TFT_WHITE);
-	canvas->setTextSize(1);
-	canvas->setCursor(130, 10);
-	canvas->println((1000000.0 / (float)drawTime1));
+//	canvas->setTextColor(TFT_WHITE);
+//	canvas->setTextSize(1);
+//	canvas->setCursor(130, 10);
+//	canvas->println((1000000.0 / (float)drawTime1));
 	screen.commit();
 	drawTime1 = micros() - t;
 }
@@ -155,17 +154,14 @@ void Launcher::draw(){
 	title->draw();
 	logo->draw();
 
-	if(batteryService->getVoltage() > 780)
-	{
-		canvas->drawMonochromeIcon(battery1, 120, 0, 8, 12, 1, TFT_WHITE);
+	if(batteryService->getVoltage() > 780){
+		canvas->drawBitmap(screen.getWidth() - 8, 0, battery1, 8, 12, TFT_WHITE);
 	}
-	else if(batteryService->getVoltage() <= 780 && batteryService->getVoltage() >= 700)
-	{
-		canvas->drawMonochromeIcon(battery2, 120, 0, 8, 12, 1, TFT_WHITE);
+	else if(batteryService->getVoltage() <= 780 && batteryService->getVoltage() >= 700){
+		canvas->drawBitmap(screen.getWidth() - 8, 0, battery2, 8, 12, TFT_WHITE);
 	}
-	else if(batteryService->getVoltage() < 700)
-	{
-		canvas->drawMonochromeIcon(battery3, 120, 0, 8, 12, 1, TFT_WHITE);
+	else if(batteryService->getVoltage() < 700){
+		canvas->drawBitmap(screen.getWidth() - 8, 0, battery3, 8, 12, TFT_WHITE);
 	}
 
 }

@@ -17,6 +17,6 @@
 #define BTN_C 6
 
 #define BUZZ_PIN 12
-#define BL_PIN 8
+#define BL_PIN 21
 
 #endif //NIBBLE_PINS_HPP

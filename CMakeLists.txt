@@ -20,6 +20,16 @@ else()
     set(ArduinoLibs /mnt/c/Users/emilg/Documents/Arduino/libraries)
 endif()
 
+include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.1/cores/esp32)
+include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.1/tools/sdk)
+include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.1/tools/sdk/include)
+include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.1/tools/sdk/include/esp32)
+include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.1/tools/sdk/include/freertos)
+include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.1/tools/sdk/include/spi_flash)
+include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.1/tools/sdk/include/nvs_flash)
+include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.1/tools/sdk/include/driver)
+include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.1/tools/sdk/include/driver/driver)
+
 # Include directories
 include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.1/libraries/Wire/src)
 include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.1/libraries/FS/src)
@@ -30,9 +40,6 @@ include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.1/libraries/SPIF
 
 
 include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.1/libraries/CircuitOS/src)
-include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.1/libraries/TFT_eSPI)
-include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.1/libraries/TFT_eSPI/Extensions)
-include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.1/libraries/U8g2_for_TFT_eSPI/src)
 include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.1/libraries/JPEGDecoder/src)
 include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.1/libraries/Wheelson-Library/src)
 include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.1/libraries/OpenCV-ESP32/src)

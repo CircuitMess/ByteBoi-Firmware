@@ -9,7 +9,7 @@
 #include <Audio/Piezo.h>
 #include <WiFi.h>
 #include "src/Pins.hpp"
-
+#include <SPIFFS.h>
 #include "src/Launcher.h"
 #include "src/Services/BatteryService.h"
 #include "src/Services/SleepService.h"
@@ -24,7 +24,6 @@ Display* display;
 void setup(){
 	Serial.begin(115200);
 	Serial.println();
-
 	if(psramFound()){
 		Serial.printf("PSRAM init: %s, free: %d B\n", psramInit() ? "Yes" : "No", ESP.getFreePsram());
 	}else{
@@ -35,11 +34,11 @@ void setup(){
 	I2cExpander* expander = new I2cExpander();
 
 	display->begin();
-	display->getBaseSprite()->clear(TFT_RED);
-	display->commit();
-	expander->begin(0x74, 14, 33);
-	expander->pinMode(BL_PIN, OUTPUT);
-	expander->pinWrite(BL_PIN, 0);
+	expander->begin(0x74, 23, 22);
+//	expander->pinMode(BL_PIN, OUTPUT);
+//	expander->pinWrite(BL_PIN, 0);
+pinMode(21, OUTPUT);
+	digitalWrite(21, LOW);
 
 	Input* input = new InputI2C(expander);
 	input->preregisterButtons({ BTN_A, BTN_B, BTN_C, BTN_UP, BTN_DOWN, BTN_RIGHT, BTN_LEFT });
@@ -58,6 +57,7 @@ void setup(){
 		settings()->calibrated = false;
 		Settings::store();
 	}
+
 
 #ifdef DEBUG_FLAG
 /*	LoopManager::addListener(new SerialID);
@@ -81,7 +81,7 @@ void setup(){
 	batteryService = new BatteryService(*display);
 	sleepService = new SleepService(*display);
 
-//	LoopManager::addListener(batteryService);
+	LoopManager::addListener(batteryService);
 	LoopManager::addListener(Input::getInstance());
 
 	launcher = new Launcher(display, batteryService);
@@ -90,7 +90,7 @@ void setup(){
 	launcher->unpack();
 	launcher->start();
 	sleepService->start();
-//	LoopManager::addListener(sleepService);
+	LoopManager::addListener(sleepService);
 }
 
 void loop(){

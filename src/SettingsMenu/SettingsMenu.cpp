@@ -14,7 +14,7 @@ Vector<SettingsMenu::Setting> settingsVector = {
 
 SettingsMenu::SettingsMenu* SettingsMenu::SettingsMenu::instance = nullptr;
 SettingsMenu::SettingsMenu::SettingsMenu(Display& display) :
-		Context(display), display(&display), canvas(display.getBaseSprite()),
+		Context(display), display(&display), canvas(screen.getSprite()),
 		layout(new LinearLayout(&screen, VERTICAL))
 {
 	instance = this;

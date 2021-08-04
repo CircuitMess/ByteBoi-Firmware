@@ -1,7 +1,7 @@
 #include "Logo.h"
 
 #include <Display/Sprite.h>
-
+#include <Display/LovyanGFX_setup.h>
 #include "../Bitmaps/logo.hpp"
 
 Logo::Logo(Sprite* canvas) : canvas(canvas), x((canvas->width() - width) / 2), currentY(startY){
@@ -20,6 +20,5 @@ void Logo::splash(float f){
 }
 
 void Logo::draw(){
-	canvas->drawIcon(logo, x, currentY, width, height);
-//canvas->pushImage(x, currentY, width, height, logo);
+	canvas->pushImage(x, currentY, width, height, (lgfx::rgb565_t*)logo, 0x2001);
 }

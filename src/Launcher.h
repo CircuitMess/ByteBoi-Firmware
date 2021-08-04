@@ -11,6 +11,8 @@ class GameTitle;
 class GameScroller;
 class Splash;
 class Menu;
+#include "../GameInfo.hpp"
+
 
 class BatteryService;
 extern Context* runningContext;
@@ -43,6 +45,8 @@ private:
 	void bindInput();
 
 	BatteryService* batteryService;
+	GameInfo games[5];
+
 };
 
 #endif //BYTEBOI_LAUNCHER_H

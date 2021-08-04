@@ -17,12 +17,12 @@ public:
 	void draw();
 
 private:
-	const uint8_t width = 80;
-	const uint8_t height = 20;
-	const int8_t x;
-	const int8_t y;
+	uint8_t width = 80;
+	uint8_t height = 20;
+	int8_t x;
+	int8_t y;
 	const float speed = 220;
-	const uint8_t overHide = 10;
+	const uint8_t overHide = 5;
 
 	Sprite* canvas;
 	const char* text = nullptr;

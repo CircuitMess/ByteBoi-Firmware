@@ -3,8 +3,12 @@
 #include <Display/Sprite.h>
 #include <Loop/LoopManager.h>
 
-GameTitle::GameTitle(Sprite* canvas) : canvas(canvas), x((canvas->width() - width) / 2), y(canvas->height() - height - 4), currentY(y){
+GameTitle::GameTitle(Sprite* canvas) : canvas(canvas), x((canvas->width() - width) / 2){
 	currentY = canvas->height() + overHide;
+	canvas->setTextSize(2);
+	canvas->setTextFont(1);
+	height = canvas->fontHeight();
+	y = currentY = canvas->height() - height + 5;
 }
 
 void GameTitle::change(const char* newText){
@@ -18,10 +22,10 @@ void GameTitle::change(const char* newText){
 }
 
 void GameTitle::loop(uint micros){
-	currentY += speed * (micros / 1000000.0f) * (state == DOWN ? 1.0f : -1.0f);
+	currentY += speed * (micros / 1000000.0f) * (state == DOWN ? 0.75f : -0.75f);
 
-	if(state == DOWN && currentY >= canvas->height() + overHide){
-		currentY = canvas->height() + overHide; // correction for first invoke, when micros is exceptionally yuge
+	if(state == DOWN && currentY >= canvas->height() - overHide + height){
+		currentY = canvas->height() - overHide + height; // correction for first invoke, when micros is exceptionally yuge
 
 		text = changeTo;
 		state = UP;
@@ -35,7 +39,6 @@ void GameTitle::loop(uint micros){
 void GameTitle::draw(){
 	if(text == nullptr) return;
 	if(currentY > canvas->height()) return;
-
 	canvas->setTextSize(2);
 	canvas->setTextFont(1);
 	canvas->setTextColor(TFT_WHITE);
