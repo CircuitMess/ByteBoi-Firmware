@@ -34,11 +34,9 @@ void setup(){
 	I2cExpander* expander = new I2cExpander();
 
 	display->begin();
-	expander->begin(0x74, 23, 22);
-//	expander->pinMode(BL_PIN, OUTPUT);
-//	expander->pinWrite(BL_PIN, 0);
-pinMode(21, OUTPUT);
-	digitalWrite(21, LOW);
+	expander->begin(0x74, 14, 33);
+	expander->pinMode(BL_PIN, OUTPUT);
+	expander->pinWrite(BL_PIN, 0);
 
 	Input* input = new InputI2C(expander);
 	input->preregisterButtons({ BTN_A, BTN_B, BTN_C, BTN_UP, BTN_DOWN, BTN_RIGHT, BTN_LEFT });
@@ -57,7 +55,6 @@ pinMode(21, OUTPUT);
 		settings()->calibrated = false;
 		Settings::store();
 	}
-
 
 #ifdef DEBUG_FLAG
 /*	LoopManager::addListener(new SerialID);
