@@ -22,7 +22,7 @@ Context* runningContext = nullptr;
 bool exitingGame = false;
 
 
-Launcher* instance = nullptr;
+Launcher* Launcher::instance = nullptr;
 
 Launcher::Launcher(Display* display, BatteryService* batteryService) : Context(*display), batteryService(batteryService), display(display)
 {
@@ -42,13 +42,12 @@ Launcher::Launcher(Display* display, BatteryService* batteryService) : Context(*
 	instance = this;
 	canvas->setChroma(TFT_TRANSPARENT);
 	splash = new Splash(display->getBaseSprite(), logo, title, scroller);
-	menu = new Menu(*display);
 	SleepService::getInstance()->addOnSleepCallback([](){
-		instance->menu->stop(true);
+//		instance->menu->stop(true);
 	});
 
 	BatteryService::getInstance()->setModalCallback([](){
-		instance->menu->stop(true);
+//		instance->menu->stop(true);
 	});
 }
 
@@ -113,9 +112,12 @@ void Launcher::bindInput(){
 	});
 
 	Input::getInstance()->setBtnPressCallback(BTN_C, [](){
-		if(exitingGame || runningContext == nullptr || runningContext == instance || BatteryService::getInstance()->modalShown()) return;
-
-		instance->menu->toggle(runningContext);
+//		if(exitingGame || runningContext == nullptr || runningContext == instance || BatteryService::getInstance()->modalShown()
+//		|| Context::getCurrentContext() == instance->menu)
+//		return;
+		Serial.println("BUTTON C PRESSED");
+		instance->menu = new Menu(Context::getCurrentContext());
+		instance->menu->push(Context::getCurrentContext());
 		Piezo.tone(500, 50);
 	});
 }
@@ -143,6 +145,7 @@ void Launcher::loop(uint _micros){
 //	canvas->setTextColor(TFT_WHITE);
 //	canvas->setTextSize(1);
 //	canvas->setCursor(130, 10);
+//	canvas->println(digitalRead(34));
 //	canvas->println((1000000.0 / (float)drawTime1));
 	screen.commit();
 	drawTime1 = micros() - t;

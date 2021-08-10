@@ -25,7 +25,7 @@ SettingsMenu::SettingsMenu::SettingsMenu(Display& display) :
 
 	layout->setWHType(PARENT, PARENT);
 	layout->setPadding(3);
-	layout->setGutter(14);
+	layout->setGutter(7);
 	layout->reflow();
 	screen.addChild(layout);
 	for (uint8_t i = 0; i < settingsVector.size(); i++)
@@ -64,7 +64,7 @@ void SettingsMenu::SettingsMenu::loop(uint _time)
 		}
 	}
 	draw();
-	display->commit();
+	screen.commit();
 }
 void SettingsMenu::SettingsMenu::start()
 {

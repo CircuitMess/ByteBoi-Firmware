@@ -28,6 +28,7 @@ public:
 	void draw() override;
 
 private:
+	static Launcher* instance;
 	Display* display;
 	Sprite* canvas;
 
@@ -36,7 +37,7 @@ private:
 	GameScroller* scroller;
 	Splash* splash;
 
-	Menu* menu;
+	Menu* menu = nullptr;
 
 	uint8_t selectedGame = 0;
 	void prev();

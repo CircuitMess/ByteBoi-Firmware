@@ -6,7 +6,7 @@
 GameTitle::GameTitle(Sprite* canvas) : canvas(canvas), x((canvas->width() - width) / 2){
 	currentY = canvas->height() + overHide;
 	canvas->setTextSize(2);
-	canvas->setTextFont(1);
+	canvas->setFont(&fonts::Font0);
 	height = canvas->fontHeight();
 	y = currentY = canvas->height() - height + 5;
 }
@@ -40,8 +40,11 @@ void GameTitle::draw(){
 	if(text == nullptr) return;
 	if(currentY > canvas->height()) return;
 	canvas->setTextSize(2);
-	canvas->setTextFont(1);
+	canvas->setFont(&fonts::Font0);
 	canvas->setTextColor(TFT_WHITE);
 	canvas->setTextDatum(textdatum_t::middle_center);
-	canvas->drawString(text, canvas->width()/2, currentY);
+	uint32_t textWidth = canvas->textWidth(text);
+	canvas->setCursor((canvas->width() - textWidth) / 2, currentY);
+	canvas->print(text);
+//	canvas->drawString(text, canvas->width()/2, currentY);
 }

@@ -26,7 +26,7 @@ void SettingsMenu::NumericSettingElement::draw()
 		getSprite()->setTextColor(TFT_YELLOW);
 	}
 	getSprite()->setTextSize(1);
-	getSprite()->setTextFont(2);
+	getSprite()->setFont(&fonts::Font2);
 	getSprite()->setTextWrap(0);
 	getSprite()->print(setting->label.c_str());
 	getSprite()->print(": ");

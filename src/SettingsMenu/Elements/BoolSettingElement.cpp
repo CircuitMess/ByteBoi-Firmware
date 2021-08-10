@@ -17,7 +17,7 @@ void SettingsMenu::BoolSettingElement::draw()
 	getSprite()->setCursor(getTotalX() + 2, getTotalY() - 1);
 	getSprite()->setTextColor(TFT_WHITE);
 	getSprite()->setTextSize(1);
-	getSprite()->setTextFont(2);
+	getSprite()->setFont(&fonts::Font2);
 	getSprite()->setTextWrap(0);
 	if(active)
 	{

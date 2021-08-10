@@ -7,20 +7,19 @@
 #include <UI/TextElement.h>
 #include <Loop/LoopListener.h>
 #include "Elements/Switch.h"
-
+#include <Support/Modal.h>
 class Sprite;
 class Context;
 
-class Menu : public LoopListener {
+class Menu : public LoopListener, public Modal {
 public:
-	Menu(Display& display);
-
+	Menu(Context* currentContext);
+	virtual ~Menu();
 	void loop(uint micros) override;
-	void draw();
+	void draw() override;
 
-	void start(Context* currentContext);
-	void stop(bool immediate = false);
-	void toggle(Context* currentContext);
+	void start() override;
+	void stop() override;
 
 private:
 	static Menu* instance;
@@ -28,7 +27,6 @@ private:
 	Sprite* canvas;
 	Context* currentContext = nullptr;
 
-	Screen screen;
 	LinearLayout layout;
 	TextElement exit;
 	LinearLayout audioLayout;

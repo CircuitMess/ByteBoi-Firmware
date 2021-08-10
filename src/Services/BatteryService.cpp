@@ -136,7 +136,7 @@ void BatteryService::drawWarning()
 	canvas->drawRect(xOffset, yOffset, warningWidth, warningHeight, TFT_BLACK);
 	canvas->drawRect(xOffset + 1, yOffset + 1, warningWidth - 2, warningHeight - 2, TFT_BLACK);
 	canvas->setCursor(xOffset + 1, yOffset + 3);
-	canvas->setTextFont(2);
+	canvas->setFont(&fonts::Font2);
 	canvas->setTextSize(1);
 	canvas->setTextColor(TFT_BLACK);
 	canvas->printCenter("WARNING!");
@@ -162,7 +162,7 @@ void BatteryService::drawShutdown()
 	canvas->drawRect(xOffset, yOffset, warningWidth, warningHeight, TFT_BLACK);
 	canvas->drawRect(xOffset + 1, yOffset + 1, warningWidth - 2, warningHeight - 2, TFT_BLACK);
 	canvas->setCursor(xOffset + 1, yOffset + 3);
-	canvas->setTextFont(2);
+	canvas->setFont(&fonts::Font2);
 	canvas->setTextSize(1);
 	canvas->setTextColor(TFT_BLACK);
 	canvas->printCenter("WARNING!");

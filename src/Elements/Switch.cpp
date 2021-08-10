@@ -31,7 +31,7 @@ void Switch::draw(){
 	canvas->fillRect(getTotalX() + getWidth() / 2 - 1, getTotalY(), 2, getHeight(), TFT_WHITE);
 
 	canvas->setTextSize(1);
-	canvas->setTextFont(1);
+	canvas->setFont(&fonts::Font0);
 	canvas->setTextColor(TFT_WHITE);
 
 	canvas->setCursor(getTotalX() + 7, getTotalY() + 7);

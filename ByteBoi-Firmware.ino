@@ -20,7 +20,7 @@ BatteryService* batteryService;
 SleepService* sleepService;
 
 Display* display;
-
+I2cExpander* expander;
 void setup(){
 	Serial.begin(115200);
 	Serial.println();
@@ -29,14 +29,25 @@ void setup(){
 	}else{
 		Serial.println("No PSRAM detected");
 	}
+	pinMode(36, INPUT);
+	pinMode(34, INPUT);
 
 	display = new Display(160, 120, -1, 3);
-	I2cExpander* expander = new I2cExpander();
+	expander = new I2cExpander();
 
 	display->begin();
-	expander->begin(0x74, 14, 33);
-	expander->pinMode(BL_PIN, OUTPUT);
-	expander->pinWrite(BL_PIN, 0);
+	expander->begin(0x74, 23, 22);
+	expander->pinMode(LED_R, OUTPUT);
+	expander->pinMode(LED_G, OUTPUT);
+	expander->pinMode(LED_B, OUTPUT);
+	expander->pinWrite(LED_R, HIGH);
+	expander->pinWrite(LED_G, HIGH);
+	expander->pinWrite(LED_B, HIGH);
+//	expander->begin(0x74, 14, 33);
+//	expander->pinMode(BL_PIN, OUTPUT);
+//	expander->pinWrite(BL_PIN, 0);
+	pinMode(21, OUTPUT);
+	digitalWrite(21, LOW);
 
 	Input* input = new InputI2C(expander);
 	input->preregisterButtons({ BTN_A, BTN_B, BTN_C, BTN_UP, BTN_DOWN, BTN_RIGHT, BTN_LEFT });
@@ -73,6 +84,7 @@ void setup(){
 
 #endif
 
+
 	Piezo.setMute(!settings()->audio);
 
 	batteryService = new BatteryService(*display);
@@ -83,6 +95,7 @@ void setup(){
 
 	launcher = new Launcher(display, batteryService);
 	runningContext = launcher;
+
 
 	launcher->unpack();
 	launcher->start();
