@@ -21,6 +21,7 @@ SleepService* sleepService;
 
 Display* display;
 I2cExpander* expander;
+
 void setup(){
 	Serial.begin(115200);
 	Serial.println();
@@ -43,11 +44,11 @@ void setup(){
 	expander->pinWrite(LED_R, HIGH);
 	expander->pinWrite(LED_G, HIGH);
 	expander->pinWrite(LED_B, HIGH);
+	expander->pinMode(BL_PIN, OUTPUT);
+	expander->pinWrite(BL_PIN, LOW);
 //	expander->begin(0x74, 14, 33);
 //	expander->pinMode(BL_PIN, OUTPUT);
 //	expander->pinWrite(BL_PIN, 0);
-	pinMode(21, OUTPUT);
-	digitalWrite(21, LOW);
 
 	Input* input = new InputI2C(expander);
 	input->preregisterButtons({ BTN_A, BTN_B, BTN_C, BTN_UP, BTN_DOWN, BTN_RIGHT, BTN_LEFT });
