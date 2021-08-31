@@ -2,11 +2,15 @@
 #define GAME_INFO
 #include <CircuitOS.h>
 #include <Display/Display.h>
+#include <FS.h>
+
 class Context;
 struct GameInfo {
 	const char* title;
 	const char* description;
-	const uint16_t* icon;
+    fs::File (*icon)();
 	Context* (*launch)(Display& display);
 };
+
+
 #endif
