@@ -14,6 +14,7 @@
 #include "src/Services/BatteryService.h"
 #include "src/Services/SleepService.h"
 #include "src/SettingsMenu/SettingsStruct.hpp"
+#include <SPIFFS.h>
 
 Launcher* launcher;
 BatteryService* batteryService;
@@ -30,6 +31,11 @@ void setup(){
 	}else{
 		Serial.println("No PSRAM detected");
 	}
+	if(!SPIFFS.begin()){
+		Serial.println("SPIFFS error");
+		for(;;);
+	}
+
 	pinMode(36, INPUT);
 	pinMode(34, INPUT);
 
@@ -46,12 +52,12 @@ void setup(){
 	expander->pinWrite(LED_B, HIGH);
 	expander->pinMode(BL_PIN, OUTPUT);
 	expander->pinWrite(BL_PIN, LOW);
-//	expander->begin(0x74, 14, 33);
-//	expander->pinMode(BL_PIN, OUTPUT);
-//	expander->pinWrite(BL_PIN, 0);
+	//expander->begin(0x74, 14, 33);
+	//expander->pinMode(BL_PIN, OUTPUT);
+	//expander->pinWrite(BL_PIN, true);
 
 	Input* input = new InputI2C(expander);
-	input->preregisterButtons({ BTN_A, BTN_B, BTN_C, BTN_UP, BTN_DOWN, BTN_RIGHT, BTN_LEFT });
+	input->preregisterButtons({BTN_A, BTN_B, BTN_C, BTN_UP, BTN_DOWN, BTN_RIGHT, BTN_LEFT});
 	Piezo.begin(BUZZ_PIN);
 
 
@@ -69,19 +75,19 @@ void setup(){
 	}
 
 #ifdef DEBUG_FLAG
-/*	LoopManager::addListener(new SerialID);
+	/*	LoopManager::addListener(new SerialID);
 
-	for(uint8_t i = 0; i < 7; i++)
-	{
-		ByteBoi.getExpander()->pinMode(i, INPUT_PULLUP);
-	}
-	uint8_t portRead = ByteBoi.getExpander()->portRead() & 0b01111111;
+		for(uint8_t i = 0; i < 7; i++)
+		{
+			ByteBoi.getExpander()->pinMode(i, INPUT_PULLUP);
+		}
+		uint8_t portRead = ByteBoi.getExpander()->portRead() & 0b01111111;
 
-	if(!portRead && !settings()->calibrated)
-	{
-		HardwareTest test(*ByteBoi.getDisplay());
-		test.start();
-	}*/
+		if(!portRead && !settings()->calibrated)
+		{
+			HardwareTest test(*ByteBoi.getDisplay());
+			test.start();
+		}*/
 
 #endif
 
@@ -93,15 +99,18 @@ void setup(){
 
 	LoopManager::addListener(batteryService);
 	LoopManager::addListener(Input::getInstance());
-
 	launcher = new Launcher(display, batteryService);
+
 	runningContext = launcher;
 
 
 	launcher->unpack();
+
 	launcher->start();
+
 	sleepService->start();
 	LoopManager::addListener(sleepService);
+
 }
 
 void loop(){
