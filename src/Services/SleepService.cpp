@@ -1,7 +1,7 @@
 #include "SleepService.h"
 #include <Input/Input.h>
 #include <Input/I2cExpander.h>
-#include "../Pins.hpp"
+#include <ByteBoi.h>
 
 #include <Loop/LoopManager.h>
 #include "../SettingsMenu/SettingsStruct.hpp"

@@ -1,7 +1,5 @@
 #include "Menu.h"
-
-#include "Pins.hpp"
-
+#include <ByteBoi.h>
 #include <Display/Sprite.h>
 #include <Support/Context.h>
 #include <Input/Input.h>

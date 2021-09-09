@@ -1,8 +1,7 @@
 #include "Launcher.h"
-#include "Pins.hpp"
+#include <ByteBoi.h>
 
 #include <Input/Input.h>
-
 #include "Splash.h"
 #include "GameScroller.h"
 #include "Elements/Logo.h"

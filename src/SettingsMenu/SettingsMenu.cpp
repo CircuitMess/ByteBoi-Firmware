@@ -5,6 +5,7 @@
 #include "SettingsStruct.hpp"
 #include <Audio/Piezo.h>
 #include "../Services/SleepService.h"
+#include <ByteBoi.h>
 
 Vector<SettingsMenu::Setting> settingsVector = {
 	SettingsMenu::Setting(SettingsMenu::Setting::Type::NUMERIC, new SettingsMenu::NumericSettingParams(Vector<int>{0, 10, 30, 60, 300}), std::string("Sleep"), nullptr),

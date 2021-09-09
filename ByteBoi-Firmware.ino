@@ -8,7 +8,7 @@
 #include <Input/I2cExpander.h>
 #include <Audio/Piezo.h>
 #include <WiFi.h>
-#include "src/Pins.hpp"
+#include <ByteBoi.h>
 #include <SPIFFS.h>
 #include "src/Launcher.h"
 #include "src/Services/BatteryService.h"

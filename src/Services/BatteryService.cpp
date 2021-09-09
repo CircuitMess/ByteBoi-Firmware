@@ -2,7 +2,8 @@
 #include "SleepService.h"
 #include <Input/Input.h>
 #include <Input/I2cExpander.h>
-#include "../Pins.hpp"
+#include <ByteBoi.h>
+
 
 
 BatteryService* BatteryService::instance = nullptr;
