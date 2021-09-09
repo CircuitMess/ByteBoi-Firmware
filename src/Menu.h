@@ -26,6 +26,7 @@ private:
 
 	Sprite* canvas;
 	Context* currentContext = nullptr;
+	Color* backgroundBuffer = nullptr;
 
 	LinearLayout layout;
 	TextElement exit;
