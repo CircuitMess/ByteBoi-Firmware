@@ -1,17 +1,17 @@
 #include "GameScroller.h"
-
 #include <Display/Sprite.h>
 #include <Loop/LoopManager.h>
-
 #include "Elements/GameImage.h"
 
 GameScroller::GameScroller(Sprite* canvas, const GameInfo gameDefs[], uint8_t gameCount) : canvas(canvas),
 		origin((canvas->width() - width) / 2){
 
 	for(int i = 0; i < gameCount; i++){
-		games.push_back(new GameImage(canvas, gameDefs[i].icon));
+		games.push_back(new GameImage(canvas, gameDefs[i].icon()));
 		games.back()->setX(-width);
 		games.back()->setY(35);
+		Serial.printf("%d icon ok\n", i);
+		delay(5);
 	}
 
 	// repos();
