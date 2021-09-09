@@ -1,24 +1,26 @@
 cmake_minimum_required(VERSION 3.15)
 project(ByteBoi-Firmware)
-set(PORT /dev/ttyS3)
+set(PORT COM3)
 set(DEVICE cm:esp32:wheelson)
 set(CMAKE_CXX_STANDARD 11)
 
-if(WIN32 OR CYGWIN)
+set(ROOT ${CMAKE_SOURCE_DIR})
+if (WIN32 OR CYGWIN)
     set(Arduino15 $ENV{APPDATA}/../Local/Arduino15)
-    set(ArduinoLibs $ENV{USERPROFILE}/Documents/Arduino/libraries)
+    set(ArduinoLibs $ENV{USERPROFILE}/OneDrive/Documents/Arduino/libraries)
 
     string(REPLACE "\\" "/" Arduino15 ${Arduino15})
     string(REPLACE "\\" "/" ArduinoLibs ${ArduinoLibs})
 
-    if(${CYGWIN})
+    if (CYGWIN)
         string(REGEX REPLACE "^([A-Za-z]):" "/cygdrive/\\1" Arduino15 ${Arduino15})
         string(REGEX REPLACE "^([A-Za-z]):" "/cygdrive/\\1" ArduinoLibs ${ArduinoLibs})
-    endif()
-else()
+        string(REGEX REPLACE "^/cygdrive/([A-Za-z])" "\\1:/" ROOT ${ROOT})
+    endif ()
+else ()
     set(Arduino15 ~/.arduino15)
-    set(ArduinoLibs /mnt/c/Users/emilg/Documents/Arduino/libraries)
-endif()
+    set(ArduinoLibs ~/Arduino/libraries)
+endif ()
 
 include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.4/cores/esp32)
 include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.4/tools/sdk)
@@ -37,11 +39,8 @@ include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.4/libraries/SD/s
 include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.4/libraries/SPI/src)
 include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.4/libraries/WiFi/src)
 include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.4/libraries/SPIFFS/src)
-
-
 include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.4/libraries/CircuitOS/src)
 include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.4/libraries/JPEGDecoder/src)
-include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.4/libraries/Wheelson-Library/src)
 include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.4/libraries/OpenCV-ESP32/src)
 
 include_directories(${ArduinoLibs}/LovyanGFX/src)
