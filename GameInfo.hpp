@@ -3,12 +3,17 @@
 #include <CircuitOS.h>
 #include <Display/Display.h>
 #include <FS.h>
+#include <SPIFFS.h>
 
 class Context;
+extern fs::File globalFile;
+
+
+
 struct GameInfo {
 	const char* title;
 	const char* description;
-    fs::File (*icon)();
+    void (*icon)();
 	Context* (*launch)(Display& display);
 };
 
