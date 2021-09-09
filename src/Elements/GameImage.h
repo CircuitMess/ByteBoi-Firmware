@@ -3,12 +3,16 @@
 
 #include <Arduino.h>
 #include <CircuitOS.h>
+#include <Display/Color.h>
+#include <FS.h>
 
 class Sprite;
 
 class GameImage {
 public:
-	GameImage(Sprite* canvas, const uint16_t* icon);
+	GameImage(Sprite* canvas,fs::File icon);
+
+	virtual ~GameImage();
 
 	int16_t getX() const;
 	int16_t getY() const;
@@ -20,7 +24,8 @@ public:
 private:
 	int16_t x;
 	int16_t y;
-	const uint16_t* icon;
+	fs::File icon;
+	Color* appIconBuffer = nullptr;
 
 	Sprite* canvas;
 };

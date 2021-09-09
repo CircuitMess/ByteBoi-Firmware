@@ -18,6 +18,6 @@ struct GameInfo {
 const GameInfo SettingsInfo {
 		"Settings",
 		"Change your ByteBoi's settings.",
-		[]() -> fs::File { return SPIFFS.open("/castle.raw"); },
+		[]() -> fs::File { return SPIFFS.open("/MainMenu/castle.raw"); },
 		[](Display& display) -> Context* { return new SettingsMenu::SettingsMenu(display); }
 };
