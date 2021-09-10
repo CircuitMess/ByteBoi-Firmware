@@ -23,17 +23,10 @@ bool exitingGame = false;
 
 Launcher* Launcher::instance = nullptr;
 
-Launcher::Launcher(Display* display, BatteryService* batteryService) : Context(*display), batteryService(batteryService), display(display)
-{
+Launcher::Launcher(Display* display, BatteryService* batteryService) : Context(*display), batteryService(batteryService), display(display){
 	canvas = screen.getSprite();
 
-	games[0] = InvaderzInfo;
-	games[1] = SpaceRocksInfo;
-	games[2] = BonkInfo;
-	games[3] = SnakeInfo;
-	games[4] = SettingsInfo;
-
-	scroller = new GameScroller(canvas, &games[0], sizeof(games) / sizeof(GameInfo));
+	scroller = new GameScroller(canvas);
 	logo = new Logo(canvas);
 	title = new GameTitle(canvas);
 
@@ -76,7 +69,7 @@ void Launcher::stop()
 void Launcher::prev(){
 	uint8_t selecting = instance->scroller->prev();
 	if(selecting != selectedGame){
-		instance->title->change(games[selecting].title);
+		instance->title->change(ByteBoi.getGameNames()[selecting].c_str());
 	}
 	selectedGame = selecting;
 }
@@ -84,7 +77,7 @@ void Launcher::prev(){
 void Launcher::next(){
 	uint8_t selecting = instance->scroller->next();
 	if(selecting != selectedGame){
-		instance->title->change(games[selecting].title);
+		instance->title->change(ByteBoi.getGameNames()[selecting].c_str());
 	}
 	selectedGame = selecting;
 }
@@ -134,7 +127,7 @@ void Launcher::loop(uint _micros){
 
 			bindInput();
 			scroller->splash(1);
-			title->change(games[selectedGame].title);
+			title->change(ByteBoi.getGameNames()[selectedGame].c_str());
 		}
 	}else{
 		logo->loop(_micros);

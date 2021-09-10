@@ -3,18 +3,20 @@
 #include <Loop/LoopManager.h>
 #include "Elements/GameImage.h"
 #include "../GameInfo.hpp"
+#include <ByteBoi.h>
 
-GameScroller::GameScroller(Sprite* canvas, const GameInfo gameDefs[], uint8_t gameCount) : canvas(canvas),
-		origin((canvas->width() - width) / 2){
+GameScroller::GameScroller(Sprite* canvas) : canvas(canvas),
+		origin((canvas->width() - width) / 2), gameNames(ByteBoi.scanGames()){
 
-	for(int i = 0; i < gameCount; i++){
-		gameDefs[i].icon();
-		games.push_back(new GameImage(canvas, globalFile));
+	for(int i = 0; i < gameNames.size(); i++){
+		games.push_back(new GameImage(canvas, gameNames[i].c_str()));
 		games.back()->setX(-width);
 		games.back()->setY(35);
-		Serial.printf("%d icon ok\n", i);
-		delay(5);
 	}
+
+	getCGame()->loadImage();
+	getLGame()->loadImage();
+	getRGame()->loadImage();
 
 	// repos();
 }
@@ -41,6 +43,8 @@ uint8_t GameScroller::prev(){
 	}else{
 		delta = 1;
 		multiplier = 1;
+		getLLGame()->loadImage();
+		getRRGame()->releaseImage();
 		getLLGame()->setX(origin - 2 * width - 2 * gutter);
 		LoopManager::addListener(this);
 	}
@@ -64,6 +68,8 @@ uint8_t GameScroller::next(){
 	}else{
 		delta = 1;
 		multiplier = 1;
+		getLLGame()->releaseImage();
+		getLLGame()->loadImage();
 		getRRGame()->setX(origin + 2 * width + 2 * gutter);
 		LoopManager::addListener(this);
 	}

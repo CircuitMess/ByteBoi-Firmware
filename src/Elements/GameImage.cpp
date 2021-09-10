@@ -3,19 +3,14 @@
 #include <Display/Color.h>
 #include <FS.h>
 #include <SPIFFS.h>
+#include <ByteBoi.h>
 
-GameImage::GameImage(Sprite* canvas, File icon) : canvas(canvas), icon(icon){
-appIconBuffer = static_cast<Color*>(ps_malloc(64 * 64 * 2));
-	if(appIconBuffer == nullptr){
-		Serial.println("MainMenuApp picture unpack error");
-		return;
-	}
-	icon.read(reinterpret_cast<uint8_t*>(appIconBuffer), 64 * 64 * 2);
-	icon.close();
+GameImage::GameImage(Sprite* canvas, const char* game) : canvas(canvas), game(game){
+
 }
 
 GameImage::~GameImage(){
-	free(appIconBuffer);
+	releaseImage();
 }
 
 
@@ -41,4 +36,20 @@ void GameImage::setY(int16_t y){
 	GameImage::y = y;
 }
 
+void GameImage::loadImage(){
+	appIconBuffer = static_cast<Color*>(ps_malloc(64 * 64 * 2));
+	if(appIconBuffer == nullptr){
+		Serial.println("MainMenuApp picture unpack error");
+		return;
+	}
+	fs::File icon = ByteBoi.getIcon(game);
+	icon.read(reinterpret_cast<uint8_t*>(appIconBuffer), 64 * 64 * 2);
+	icon.close();
+}
 
+void GameImage::releaseImage(){
+	if(appIconBuffer != nullptr){
+		free(appIconBuffer);
+		appIconBuffer = nullptr;
+	}
+}

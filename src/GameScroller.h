@@ -13,7 +13,7 @@ class GameImage;
 
 class GameScroller : public LoopListener {
 public:
-	GameScroller(Sprite* canvas, const GameInfo gameDefs[], uint8_t gameCount);
+	GameScroller(Sprite* canvas);
 
 	void draw();
 	void loop(uint micros);
@@ -50,6 +50,9 @@ private:
 	GameImage* getRGame();
 	GameImage* getLLGame();
 	GameImage* getRRGame();
+
+	std::vector<std::string> &gameNames;
+
 };
 
 

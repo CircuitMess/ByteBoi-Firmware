@@ -10,7 +10,7 @@ class Sprite;
 
 class GameImage {
 public:
-	GameImage(Sprite* canvas,fs::File icon);
+	GameImage(Sprite* canvas, const char* game);
 
 	virtual ~GameImage();
 
@@ -20,12 +20,14 @@ public:
 	void setY(int16_t y);
 
 	void draw() const;
+	void loadImage();
+	void releaseImage();
 
 private:
 	int16_t x;
 	int16_t y;
-	fs::File icon;
 	Color* appIconBuffer = nullptr;
+	const char* game;
 
 	Sprite* canvas;
 };
