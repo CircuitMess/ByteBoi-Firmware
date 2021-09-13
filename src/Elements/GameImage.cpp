@@ -37,7 +37,10 @@ void GameImage::setY(int16_t y){
 }
 
 void GameImage::loadImage(){
-	appIconBuffer = static_cast<Color*>(ps_malloc(64 * 64 * 2));
+	if(appIconBuffer == nullptr){
+		appIconBuffer = static_cast<Color*>(ps_malloc(64 * 64 * 2));
+	}else return;
+
 	if(appIconBuffer == nullptr){
 		Serial.println("MainMenuApp picture unpack error");
 		return;

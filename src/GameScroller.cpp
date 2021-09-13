@@ -29,9 +29,10 @@ void GameScroller::splash(float f){
 
 uint8_t GameScroller::prev(){
 	if(scrolling() && direction == PREV){
-		multiplier = min(2, multiplier+1);
-		queued = true;
-		return (selectedGame < 2) ? games.size() - 2 + selectedGame : selectedGame - 2;
+//		multiplier = min(2, multiplier+1);
+//		queued = true;
+//		return (selectedGame < 2) ? games.size() - 2 + selectedGame : selectedGame - 2;
+		return selectedGame;
 	}
 
 	direction = PREV;
@@ -43,8 +44,8 @@ uint8_t GameScroller::prev(){
 	}else{
 		delta = 1;
 		multiplier = 1;
-		getLLGame()->loadImage();
 		getRRGame()->releaseImage();
+		getLLGame()->loadImage();
 		getLLGame()->setX(origin - 2 * width - 2 * gutter);
 		LoopManager::addListener(this);
 	}
@@ -54,9 +55,9 @@ uint8_t GameScroller::prev(){
 
 uint8_t GameScroller::next(){
 	if(scrolling() && direction == NEXT){
-		multiplier = min(2, multiplier+1);
-		queued = true;
-		return (selectedGame + 2) % games.size();
+//		multiplier = min(2, multiplier+1);
+//		queued = true;
+		return selectedGame;
 	}
 
 	direction = NEXT;
@@ -68,8 +69,11 @@ uint8_t GameScroller::next(){
 	}else{
 		delta = 1;
 		multiplier = 1;
+
 		getLLGame()->releaseImage();
-		getLLGame()->loadImage();
+		getRRGame()->loadImage();
+//		Serial.printf("loaded in next: %d\n", (selectedGame + 2) % games.size());
+
 		getRRGame()->setX(origin + 2 * width + 2 * gutter);
 		LoopManager::addListener(this);
 	}
@@ -84,6 +88,8 @@ void GameScroller::draw(){
 
 	if(scrolling()){
 		if(direction == NEXT){
+//			Serial.print("drawing: ");
+//			Serial.println((selectedGame + 2) % games.size());
 			getRRGame()->draw();
 		}else{
 			getLLGame()->draw();
@@ -109,6 +115,9 @@ void GameScroller::loop(uint micros){
 	if(delta >= (width + gutter)){
 		if(direction == NEXT){
 			selectNext();
+//			getLLGame()->releaseImage();
+//			getRRGame()->loadImage();
+//			Serial.printf("loaded in loop: %d\n", (selectedGame + 2) % games.size());
 		}else{
 			selectPrev();
 		}
