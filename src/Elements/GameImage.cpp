@@ -5,7 +5,7 @@
 #include <SPIFFS.h>
 #include <ByteBoi.h>
 
-GameImage::GameImage(Sprite* canvas, const char* game) : canvas(canvas), game(game){
+GameImage::GameImage(Sprite* canvas, size_t gameIndex) : canvas(canvas), index(gameIndex){
 
 }
 
@@ -45,7 +45,7 @@ void GameImage::loadImage(){
 		Serial.println("MainMenuApp picture unpack error");
 		return;
 	}
-	fs::File icon = ByteBoi.getIcon(game);
+	fs::File icon = ByteBoi.getIcon(index);
 	icon.read(reinterpret_cast<uint8_t*>(appIconBuffer), 64 * 64 * 2);
 	icon.close();
 }

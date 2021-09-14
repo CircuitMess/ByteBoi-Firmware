@@ -69,7 +69,7 @@ void Launcher::stop()
 void Launcher::prev(){
 	uint8_t selecting = instance->scroller->prev();
 	if(selecting != selectedGame){
-		instance->title->change(ByteBoi.getGameNames()[selecting].c_str());
+		instance->title->change(ByteBoi.getGameName(selecting));
 	}
 	selectedGame = selecting;
 }
@@ -77,7 +77,7 @@ void Launcher::prev(){
 void Launcher::next(){
 	uint8_t selecting = instance->scroller->next();
 	if(selecting != selectedGame){
-		instance->title->change(ByteBoi.getGameNames()[selecting].c_str());
+		instance->title->change(ByteBoi.getGameName(selecting));
 	}
 	selectedGame = selecting;
 }
@@ -127,7 +127,7 @@ void Launcher::loop(uint _micros){
 
 			bindInput();
 			scroller->splash(1);
-			title->change(ByteBoi.getGameNames()[selectedGame].c_str());
+			title->change(ByteBoi.getGameName(selectedGame));
 		}
 	}else{
 		logo->loop(_micros);

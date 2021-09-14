@@ -6,10 +6,9 @@
 #include <ByteBoi.h>
 
 GameScroller::GameScroller(Sprite* canvas) : canvas(canvas),
-		origin((canvas->width() - width) / 2), gameNames(ByteBoi.scanGames()){
-
-	for(int i = 0; i < gameNames.size(); i++){
-		games.push_back(new GameImage(canvas, gameNames[i].c_str()));
+		origin((canvas->width() - width) / 2), gameNames(ByteBoi.getGameProperties()){
+	for(size_t i = 0; i < gameNames.size(); i++){
+		games.push_back(new GameImage(canvas,i));
 		games.back()->setX(-width);
 		games.back()->setY(35);
 	}

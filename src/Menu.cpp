@@ -23,7 +23,7 @@ Menu::Menu(Context* currentContext) : Modal(*currentContext, 130, 57), canvas(sc
 		return;
 	}
 
-	fs::File backgroundFile = CompressedFile::open(SPIFFS.open("/background.raw.hs"), 13, 12);
+	fs::File backgroundFile = CompressedFile::open(SPIFFS.open("/launcher/background.raw.hs"), 13, 12);
 
 	backgroundFile.read(reinterpret_cast<uint8_t*>(backgroundBuffer), 160 * 120 * 2);
 	backgroundFile.close();

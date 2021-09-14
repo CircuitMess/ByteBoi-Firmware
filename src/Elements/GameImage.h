@@ -10,7 +10,7 @@ class Sprite;
 
 class GameImage {
 public:
-	GameImage(Sprite* canvas, const char* game);
+	GameImage(Sprite* canvas, size_t gameIndex);
 
 	virtual ~GameImage();
 
@@ -27,7 +27,7 @@ private:
 	int16_t x;
 	int16_t y;
 	Color* appIconBuffer = nullptr;
-	const char* game;
+	size_t index = 0;
 
 	Sprite* canvas;
 };

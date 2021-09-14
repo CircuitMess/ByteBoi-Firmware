@@ -10,6 +10,7 @@
 class Sprite;
 class Launcher;
 class GameImage;
+#include <Properties.h>
 
 class GameScroller : public LoopListener {
 public:
@@ -51,7 +52,7 @@ private:
 	GameImage* getLLGame();
 	GameImage* getRRGame();
 
-	std::vector<std::string> &gameNames;
+	const std::vector<cppproperties::Properties> &gameNames;
 
 };
 

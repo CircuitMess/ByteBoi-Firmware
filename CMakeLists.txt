@@ -45,6 +45,7 @@ include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.4/libraries/Open
 
 include_directories(${ArduinoLibs}/LovyanGFX/src)
 include_directories(${ArduinoLibs}/ByteBoi-Library/src)
+include_directories(${ArduinoLibs}/cpp-properties/src)
 
 # Source directories
 file(GLOB_RECURSE SOURCES "src/**.cpp" "src/**.c" "src/**.hpp" "src/**.h")
