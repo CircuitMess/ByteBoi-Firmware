@@ -96,11 +96,7 @@ void Launcher::bindInput(){
 	Input::getInstance()->setBtnPressCallback(BTN_A, [](){
 		if(instance->scroller->scrolling()) return;
 
-		Display* display = instance->display;
-		uint8_t index = instance->selectedGame;
-
-		Context* game = instance->games[index].launch(*display);
-		game->push(instance);
+		ByteBoi.loadGame(instance->selectedGame);
 	});
 
 	Input::getInstance()->setBtnPressCallback(BTN_C, [](){
