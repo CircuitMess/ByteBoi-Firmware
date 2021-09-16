@@ -6,15 +6,16 @@
 #include <Loop/LoopListener.h>
 #include <Util/Vector.h>
 #include "../GameInfo.hpp"
+#include <Properties.h>
 
 class Sprite;
 class Launcher;
 class GameImage;
-#include <Properties.h>
 
 class GameScroller : public LoopListener {
 public:
 	GameScroller(Sprite* canvas);
+	~GameScroller();
 
 	void draw();
 	void loop(uint micros);
@@ -51,9 +52,7 @@ private:
 	GameImage* getRGame();
 	GameImage* getLLGame();
 	GameImage* getRRGame();
-
-	const std::vector<cppproperties::Properties> &gameNames;
-
+	uint8_t *genericIcon = nullptr;
 };
 
 

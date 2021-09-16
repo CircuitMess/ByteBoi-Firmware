@@ -6,18 +6,25 @@
 #include <ByteBoi.h>
 
 GameScroller::GameScroller(Sprite* canvas) : canvas(canvas),
-		origin((canvas->width() - width) / 2), gameNames(ByteBoi.getGameProperties()){
-	for(size_t i = 0; i < gameNames.size(); i++){
-		games.push_back(new GameImage(canvas,i));
+		origin((canvas->width() - width) / 2){
+	genericIcon = (uint8_t*)ps_malloc(64*64*2);
+	SPIFFS.open("/launcher/genericGame.raw").read(genericIcon, 64*64*2);
+
+	for(size_t i = 0; i < ByteBoi.getGameProperties().size(); i++){
+		GameImage* gameImage = new GameImage(canvas, i, genericIcon);
+		gameImage->loadImage();
+		games.push_back(gameImage);
 		games.back()->setX(-width);
 		games.back()->setY(35);
 	}
 
-	getCGame()->loadImage();
-	getLGame()->loadImage();
-	getRGame()->loadImage();
-
 	// repos();
+}
+
+GameScroller::~GameScroller(){
+	for(auto game: games){
+		delete game;
+	}
 }
 
 void GameScroller::splash(float f){
@@ -28,10 +35,9 @@ void GameScroller::splash(float f){
 
 uint8_t GameScroller::prev(){
 	if(scrolling() && direction == PREV){
-//		multiplier = min(2, multiplier+1);
-//		queued = true;
-//		return (selectedGame < 2) ? games.size() - 2 + selectedGame : selectedGame - 2;
-		return selectedGame;
+		multiplier = min(2, multiplier+1);
+		queued = true;
+		return (selectedGame < 2) ? games.size() - 2 + selectedGame : selectedGame - 2;
 	}
 
 	direction = PREV;
@@ -43,8 +49,6 @@ uint8_t GameScroller::prev(){
 	}else{
 		delta = 1;
 		multiplier = 1;
-		getRRGame()->releaseImage();
-		getLLGame()->loadImage();
 		getLLGame()->setX(origin - 2 * width - 2 * gutter);
 		LoopManager::addListener(this);
 	}
@@ -54,9 +58,9 @@ uint8_t GameScroller::prev(){
 
 uint8_t GameScroller::next(){
 	if(scrolling() && direction == NEXT){
-//		multiplier = min(2, multiplier+1);
-//		queued = true;
-		return selectedGame;
+		multiplier = min(2, multiplier+1);
+		queued = true;
+		return (selectedGame + 2) % games.size();
 	}
 
 	direction = NEXT;
@@ -68,11 +72,6 @@ uint8_t GameScroller::next(){
 	}else{
 		delta = 1;
 		multiplier = 1;
-
-		getLLGame()->releaseImage();
-		getRRGame()->loadImage();
-//		Serial.printf("loaded in next: %d\n", (selectedGame + 2) % games.size());
-
 		getRRGame()->setX(origin + 2 * width + 2 * gutter);
 		LoopManager::addListener(this);
 	}
@@ -87,8 +86,6 @@ void GameScroller::draw(){
 
 	if(scrolling()){
 		if(direction == NEXT){
-//			Serial.print("drawing: ");
-//			Serial.println((selectedGame + 2) % games.size());
 			getRRGame()->draw();
 		}else{
 			getLLGame()->draw();
@@ -114,9 +111,6 @@ void GameScroller::loop(uint micros){
 	if(delta >= (width + gutter)){
 		if(direction == NEXT){
 			selectNext();
-//			getLLGame()->releaseImage();
-//			getRRGame()->loadImage();
-//			Serial.printf("loaded in loop: %d\n", (selectedGame + 2) % games.size());
 		}else{
 			selectPrev();
 		}

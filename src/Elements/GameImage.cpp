@@ -5,7 +5,7 @@
 #include <SPIFFS.h>
 #include <ByteBoi.h>
 
-GameImage::GameImage(Sprite* canvas, size_t gameIndex) : canvas(canvas), index(gameIndex){
+GameImage::GameImage(Sprite* canvas, size_t gameIndex, uint8_t* genericIcon) : canvas(canvas), index(gameIndex), genericIcon((Color*)genericIcon){
 
 }
 
@@ -15,9 +15,7 @@ GameImage::~GameImage(){
 
 
 void GameImage::draw() const {
-//	canvas->pushImage(x, y, 64, 64, (lgfx::rgb565_t*)appIconBuffer, TFT_BLACK);
-
-	canvas->drawIcon(appIconBuffer, x, y, 64, 64, 1, TFT_BLACK);
+	canvas->drawIcon((appIconBuffer == nullptr) ? genericIcon : appIconBuffer, x, y, 64, 64, 1, TFT_BLACK);
 }
 
 int16_t GameImage::getX() const{
