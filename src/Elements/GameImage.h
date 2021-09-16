@@ -7,10 +7,8 @@
 #include <FS.h>
 
 class Sprite;
-class GameImageLoader;
 
 class GameImage {
-	friend GameImageLoader;
 public:
 	GameImage(Sprite* canvas, size_t gameIndex, uint8_t* genericIcon);
 

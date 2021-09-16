@@ -15,6 +15,7 @@
 #include "src/Services/SleepService.h"
 #include "src/SettingsMenu/SettingsStruct.hpp"
 #include <SPIFFS.h>
+#include "src/GameManager.h"
 
 Launcher* launcher;
 BatteryService* batteryService;
@@ -30,6 +31,7 @@ void setup(){
 	Serial.println(ByteBoi.inFirmware());
 
 	ByteBoi.begin();
+	GameManager::scanGames();
 	display = ByteBoi.getDisplay();
 	expander = ByteBoi.getExpander();
 

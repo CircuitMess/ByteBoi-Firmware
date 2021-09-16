@@ -1,21 +1,17 @@
 #include "Launcher.h"
-#include <ByteBoi.h>
-
+#include "GameManager.h"
 #include <Input/Input.h>
 #include "Splash.h"
 #include "GameScroller.h"
 #include "Elements/Logo.h"
 #include "Elements/GameTitle.h"
-#include "Games/BonK/GameInfo.hpp"
-#include "Games/SpaceRocks/GameInfo.hpp"
-#include "Games/Snake/GameInfo.hpp"
-#include "Games/Invaderz/GameInfo.hpp"
-#include "SettingsMenu/GameInfo.hpp"
 #include "Services/BatteryService.h"
 #include <Audio/Piezo.h>
 #include "Menu.h"
 #include "Bitmaps/battery.hpp"
 #include "Services/SleepService.h"
+#include <Loop/LoopManager.h>
+#include <ByteBoi.h>
 
 Context* runningContext = nullptr;
 bool exitingGame = false;
@@ -69,7 +65,7 @@ void Launcher::stop()
 void Launcher::prev(){
 	uint8_t selecting = instance->scroller->prev();
 	if(selecting != selectedGame){
-		instance->title->change(ByteBoi.getGameName(selecting));
+		instance->title->change(GameManager::getGameName(selecting));
 	}
 	selectedGame = selecting;
 }
@@ -77,7 +73,7 @@ void Launcher::prev(){
 void Launcher::next(){
 	uint8_t selecting = instance->scroller->next();
 	if(selecting != selectedGame){
-		instance->title->change(ByteBoi.getGameName(selecting));
+		instance->title->change(GameManager::getGameName(selecting));
 	}
 	selectedGame = selecting;
 }
@@ -96,7 +92,7 @@ void Launcher::bindInput(){
 	Input::getInstance()->setBtnPressCallback(BTN_A, [](){
 		if(instance->scroller->scrolling()) return;
 
-		ByteBoi.loadGame(instance->selectedGame);
+		GameManager::loadGame(instance->selectedGame);
 	});
 
 	Input::getInstance()->setBtnPressCallback(BTN_C, [](){
@@ -123,7 +119,7 @@ void Launcher::loop(uint _micros){
 
 			bindInput();
 			scroller->splash(1);
-			title->change(ByteBoi.getGameName(selectedGame));
+			title->change(GameManager::getGameName(selectedGame));
 		}
 	}else{
 		logo->loop(_micros);
@@ -132,8 +128,12 @@ void Launcher::loop(uint _micros){
 	draw();
 //	canvas->setTextColor(TFT_WHITE);
 //	canvas->setTextSize(1);
+//	canvas->setCursor(120, 10);
+//	canvas->println(GameManager::getExpander()->pinRead(8));
+//	canvas->setCursor(100, 10);
+//	canvas->println(GameManager::getExpander()->pinRead(10));
 //	canvas->setCursor(130, 10);
-//	canvas->println(digitalRead(34));
+//	canvas->println(analogRead(36));
 //	canvas->println((1000000.0 / (float)drawTime1));
 	screen.commit();
 	drawTime1 = micros() - t;

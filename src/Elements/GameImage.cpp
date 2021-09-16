@@ -3,7 +3,7 @@
 #include <Display/Color.h>
 #include <FS.h>
 #include <SPIFFS.h>
-#include <ByteBoi.h>
+#include "../GameManager.h"
 
 GameImage::GameImage(Sprite* canvas, size_t gameIndex, uint8_t* genericIcon) : canvas(canvas), index(gameIndex), genericIcon((Color*)genericIcon){
 
@@ -43,7 +43,7 @@ void GameImage::loadImage(){
 		Serial.println("MainMenuApp picture unpack error");
 		return;
 	}
-	fs::File icon = ByteBoi.getIcon(index);
+	fs::File icon = GameManager::getIcon(index);
 	icon.read(reinterpret_cast<uint8_t*>(appIconBuffer), 64 * 64 * 2);
 	icon.close();
 }
