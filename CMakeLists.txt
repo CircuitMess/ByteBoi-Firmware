@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.15)
 project(ByteBoi-Firmware)
 set(PORT COM3)
-set(DEVICE cm:esp32:wheelson)
+set(DEVICE cm:esp32:byteboi)
 set(CMAKE_CXX_STANDARD 11)
 
 set(ROOT ${CMAKE_SOURCE_DIR})
@@ -42,8 +42,8 @@ include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.4/libraries/SPIF
 include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.4/libraries/CircuitOS/src)
 include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.4/libraries/JPEGDecoder/src)
 include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.4/libraries/OpenCV-ESP32/src)
+include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.4/libraries/LovyanGFX/src)
 
-include_directories(${ArduinoLibs}/LovyanGFX/src)
 include_directories(${ArduinoLibs}/ByteBoi-Library/src)
 include_directories(${ArduinoLibs}/cpp-properties/src)
 
@@ -55,8 +55,10 @@ file(GLOB_RECURSE SOURCES "src/**.cpp" "src/**.c" "src/**.hpp" "src/**.h")
 add_definitions(-DDEBUG)
 add_definitions(-DESP32)
 add_definitions(-DCIRCUITOS_FREERTOS)
-add_definitions(-DCIRCUITOS_I2S)
+add_definitions(-DCIRCUITOS_NVS)
 add_definitions(-DCIRCUITOS_LOVYANGFX)
+add_definitions(-DCIRCUITOS_PIEZO_ESP32)
+add_definitions(-DCIRCUITOS_PIEZO_ESP32_PWM_CHANNEL=0)
 
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build)
