@@ -13,7 +13,8 @@
 #include "src/Launcher.h"
 #include "src/Services/BatteryService.h"
 #include "src/Services/SleepService.h"
-#include "src/SettingsMenu/SettingsStruct.hpp"
+#include <Settings.h>
+#include <Util/Settings.h>
 #include <SPIFFS.h>
 
 Launcher* launcher;
@@ -58,21 +59,13 @@ void setup(){
 
 	Input* input = new InputI2C(expander);
 	input->preregisterButtons({BTN_A, BTN_B, BTN_C, BTN_UP, BTN_DOWN, BTN_RIGHT, BTN_LEFT});
-	Piezo.begin(BUZZ_PIN);
+	Piezo.begin(SPEAKER_PIN);
 
 
 	WiFi.mode(WIFI_OFF);
 	btStop();
 
-	Piezo.begin(BUZZ_PIN);
-
-	if(!Settings::init(new SettingsStruct, sizeof(SettingsStruct))){
-		settings()->shutdownTime = 300; //5 minutes
-		settings()->sleepTime = 30; //30 seconds
-		settings()->audio = true; //audio on
-		settings()->calibrated = false;
-		Settings::store();
-	}
+	Settings.begin();
 
 #ifdef DEBUG_FLAG
 	/*	LoopManager::addListener(new SerialID);
@@ -83,7 +76,7 @@ void setup(){
 		}
 		uint8_t portRead = ByteBoi.getExpander()->portRead() & 0b01111111;
 
-		if(!portRead && !settings()->calibrated)
+		if(!portRead && !Settings.get().calibrated)
 		{
 			HardwareTest test(*ByteBoi.getDisplay());
 			test.start();
@@ -92,7 +85,7 @@ void setup(){
 #endif
 
 
-	Piezo.setMute(!settings()->audio);
+	Piezo.setMute(!Settings.get().volume);
 
 	batteryService = new BatteryService(*display);
 	sleepService = new SleepService(*display);

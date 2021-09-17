@@ -5,7 +5,7 @@
 #include <Input/Input.h>
 #include <Loop/LoopManager.h>
 #include <Audio/Piezo.h>
-#include "SettingsMenu/SettingsStruct.hpp"
+#include <Settings.h>
 #include "Services/BatteryService.h"
 #include <SPIFFS.h>
 #include <FS/CompressedFile.h>
@@ -29,7 +29,7 @@ Menu::Menu(Context* currentContext) : Modal(*currentContext, 130, 57), canvas(sc
 	backgroundFile.close();
 
 	buildUI();
-	audioSwitch.set(settings()->audio, true);
+	audioSwitch.set(Settings.get().volume, true);
 }
 Menu::~Menu(){
 	free(backgroundBuffer);
@@ -39,12 +39,12 @@ Menu::~Menu(){
 void Menu::start(){
 	selectElement(0);
 	bindInput();
-	audioSwitch.set(settings()->audio, true);
+	audioSwitch.set(Settings.get().volume, true);
 	LoopManager::addListener(this);
 }
 
 void Menu::stop(){
-	Settings::store();
+	Settings.store();
 	releaseInput();
 	LoopManager::removeListener(this);
 
@@ -61,8 +61,8 @@ void Menu::bindInput(){
 		if(instance == nullptr) return;
 		if(instance->selectedElement == 0){
 			instance->audioSwitch.toggle();
-			settings()->audio = instance->audioSwitch.getState();
-			Piezo.setMute(!settings()->audio);
+			Settings.get().volume = instance->audioSwitch.getState();
+			Piezo.setMute(!Settings.get().volume);
 			Piezo.tone(500, 50);
 		}else{
 			instance->pop();
@@ -84,8 +84,8 @@ void Menu::bindInput(){
 	Input::getInstance()->setBtnPressCallback(BTN_RIGHT, [](){
 		if(instance == nullptr) return;
 		if(instance->selectedElement == 0){
-			settings()->audio = 1;
-			Piezo.setMute(!settings()->audio);
+			Settings.get().volume = 1;
+			Piezo.setMute(!Settings.get().volume);
 			if(instance->audioSwitch.getState() == false)
 			{
 				Piezo.tone(500, 50);
@@ -98,8 +98,8 @@ void Menu::bindInput(){
 		if(instance == nullptr) return;
 		if(instance->selectedElement == 0){
 			instance->audioSwitch.set(false);
-			settings()->audio = 0;
-			Piezo.setMute(!settings()->audio);
+			Settings.get().volume = 0;
+			Piezo.setMute(!Settings.get().volume);
 			Piezo.tone(500, 50);
 		}
 	});

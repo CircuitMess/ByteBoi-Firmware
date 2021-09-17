@@ -1,11 +1,10 @@
 #include "SettingsMenu.h"
-#include "Setting.hpp"
+#include <ByteBoi.h>
 #include "Elements/NumericSettingElement.h"
 #include "Elements/BoolSettingElement.h"
-#include "SettingsStruct.hpp"
 #include <Audio/Piezo.h>
 #include "../Services/SleepService.h"
-#include <ByteBoi.h>
+#include <Settings.h>
 
 Vector<SettingsMenu::Setting> settingsVector = {
 	SettingsMenu::Setting(SettingsMenu::Setting::Type::NUMERIC, new SettingsMenu::NumericSettingParams(Vector<int>{0, 10, 30, 60, 300}), std::string("Sleep"), nullptr),
@@ -20,9 +19,9 @@ SettingsMenu::SettingsMenu::SettingsMenu(Display& display) :
 {
 	instance = this;
 
-	settingsVector[0].storeLocation = &(settings()->sleepTime);
-	settingsVector[1].storeLocation = &(settings()->shutdownTime);
-	settingsVector[2].storeLocation = &(settings()->audio);
+	settingsVector[0].storeLocation = &(Settings.get().sleepTime);
+	settingsVector[1].storeLocation = &(Settings.get().shutdownTime);
+	settingsVector[2].storeLocation = &(Settings.get().volume);
 
 	layout->setWHType(PARENT, PARENT);
 	layout->setPadding(3);
@@ -71,8 +70,8 @@ void SettingsMenu::SettingsMenu::start()
 {
 	runningContext = this;
 	Input::getInstance()->setBtnPressCallback(BTN_B, [](){
-		Settings::store();
-		Piezo.setMute(!settings()->audio);
+		Settings.store();
+		Piezo.setMute(!Settings.get().volume);
 		SleepService::getInstance()->start();
 		instance->pop();
 	});
