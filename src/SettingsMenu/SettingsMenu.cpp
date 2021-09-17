@@ -95,9 +95,6 @@ void SettingsMenu::SettingsMenu::start()
 			Piezo.tone(150, 50);
 		}
 	});
-	Input::getInstance()->setBtnPressCallback(BTN_C, [](){
-		instance->pop();
-	});
 	setElementCallbacks();
 	LoopManager::addListener(this);
 }
