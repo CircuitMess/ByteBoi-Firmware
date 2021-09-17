@@ -104,6 +104,7 @@ void Launcher::bindInput(){
 		Context* game = instance->games[index].launch(*display);
 		game->push(instance);
 	});
+}
 
 uint32_t drawTime1 = 0;
 
