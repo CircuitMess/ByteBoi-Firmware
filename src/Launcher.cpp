@@ -6,10 +6,6 @@
 #include "GameScroller.h"
 #include "Elements/Logo.h"
 #include "Elements/GameTitle.h"
-#include "Games/BonK/GameInfo.hpp"
-#include "Games/SpaceRocks/GameInfo.hpp"
-#include "Games/Snake/GameInfo.hpp"
-#include "Games/Invaderz/GameInfo.hpp"
 #include "SettingsMenu/GameInfo.hpp"
 #include "Services/BatteryService.h"
 #include <Audio/Piezo.h>
@@ -27,10 +23,10 @@ Launcher::Launcher(Display* display, BatteryService* batteryService) : Context(*
 {
 	canvas = screen.getSprite();
 
-	games[0] = InvaderzInfo;
-	games[1] = SpaceRocksInfo;
-	games[2] = BonkInfo;
-	games[3] = SnakeInfo;
+	games[0] = SettingsInfo;
+	games[1] = SettingsInfo;
+	games[2] = SettingsInfo;
+	games[3] = SettingsInfo;
 	games[4] = SettingsInfo;
 
 	scroller = new GameScroller(canvas, &games[0], sizeof(games) / sizeof(GameInfo));

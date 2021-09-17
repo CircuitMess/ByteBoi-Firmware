@@ -1,5 +1,5 @@
 #ifndef NIBBLE_BOOLSETTINGELEMENT_H
-#define NIBBLE_BOOLSETTINGELEMENT_H,
+#define NIBBLE_BOOLSETTINGELEMENT_H
 #include "SettingElement.h"
 #include "../Setting.hpp"
 namespace SettingsMenu
