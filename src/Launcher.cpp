@@ -9,7 +9,6 @@
 #include "SettingsMenu/GameInfo.hpp"
 #include "Services/BatteryService.h"
 #include <Audio/Piezo.h>
-#include "Menu.h"
 #include "Bitmaps/battery.hpp"
 #include "Services/SleepService.h"
 
@@ -105,17 +104,8 @@ void Launcher::bindInput(){
 		Context* game = instance->games[index].launch(*display);
 		game->push(instance);
 	});
-
-	Input::getInstance()->setBtnPressCallback(BTN_C, [](){
-//		if(exitingGame || runningContext == nullptr || runningContext == instance || BatteryService::getInstance()->modalShown()
-//		|| Context::getCurrentContext() == instance->menu)
-//		return;
-		Serial.println("BUTTON C PRESSED");
-		instance->menu = new Menu(Context::getCurrentContext());
-		instance->menu->push(Context::getCurrentContext());
-		Piezo.tone(500, 50);
-	});
 }
+
 uint32_t drawTime1 = 0;
 
 void Launcher::loop(uint _micros){
