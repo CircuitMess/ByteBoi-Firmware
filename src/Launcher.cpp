@@ -16,10 +16,10 @@
 #include "Menu.h"
 #include "Bitmaps/battery.hpp"
 #include "Services/SleepService.h"
+#include "DescriptionModal.h"
 
 Context* runningContext = nullptr;
 bool exitingGame = false;
-
 
 Launcher* Launcher::instance = nullptr;
 
@@ -71,6 +71,7 @@ void Launcher::stop()
 	Input::getInstance()->removeBtnPressCallback(BTN_RIGHT);
 	Input::getInstance()->removeBtnPressCallback(BTN_LEFT);
 	Input::getInstance()->removeBtnPressCallback(BTN_A);
+	Input::getInstance()->removeBtnPressCallback(BTN_C);
 }
 
 void Launcher::prev(){
@@ -114,10 +115,12 @@ void Launcher::bindInput(){
 //		if(exitingGame || runningContext == nullptr || runningContext == instance || BatteryService::getInstance()->modalShown()
 //		|| Context::getCurrentContext() == instance->menu)
 //		return;
-		Serial.println("BUTTON C PRESSED");
-		instance->menu = new Menu(Context::getCurrentContext());
-		instance->menu->push(Context::getCurrentContext());
-		Piezo.tone(500, 50);
+		if(instance == nullptr) return;
+		DescriptionModal* descriptionModal;
+		uint8_t index = instance->selectedGame;
+		descriptionModal = new DescriptionModal(*instance, instance->games[index].title, instance->games[index].description);
+		descriptionModal->push(instance);
+
 	});
 }
 uint32_t drawTime1 = 0;
