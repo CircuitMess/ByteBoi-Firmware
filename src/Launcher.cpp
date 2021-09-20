@@ -9,13 +9,13 @@
 #include "SettingsMenu/GameInfo.hpp"
 #include "Services/BatteryService.h"
 #include <Audio/Piezo.h>
-#include "Menu.h"
 #include "Bitmaps/battery.hpp"
 #include "Services/SleepService.h"
 #include "DescriptionModal.h"
 
 Context* runningContext = nullptr;
 bool exitingGame = false;
+
 
 Launcher* Launcher::instance = nullptr;
 
@@ -119,6 +119,7 @@ void Launcher::bindInput(){
 
 	});
 }
+
 uint32_t drawTime1 = 0;
 
 void Launcher::loop(uint _micros){

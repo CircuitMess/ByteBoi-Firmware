@@ -10,7 +10,6 @@ class Logo;
 class GameTitle;
 class GameScroller;
 class Splash;
-class Menu;
 #include "../GameInfo.hpp"
 
 
@@ -36,8 +35,6 @@ private:
 	GameTitle* title;
 	GameScroller* scroller;
 	Splash* splash;
-
-	Menu* menu = nullptr;
 
 	uint8_t selectedGame = 0;
 	void prev();
