@@ -9,7 +9,7 @@
 
 class DescriptionModal : public Modal{
 public:
-	DescriptionModal(Context& context, const char* title, const char* description);
+	DescriptionModal(Context& context, const char* title,const char* author, const char* description);
 
 	~DescriptionModal();
 

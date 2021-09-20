@@ -5,7 +5,7 @@
 
 class DescriptionModalItem : public CustomElement {
 public:
-	DescriptionModalItem(ElementContainer* parent, const char* title, const char* description);
+	DescriptionModalItem(ElementContainer* parent, const char* title,const char* author, const char* description);
 
 	virtual ~DescriptionModalItem();
 
@@ -13,6 +13,7 @@ public:
 
 private:
 	const char* title;
+	const char* author;
 	const char* description;
 	void splitPrintSentence(std::string sentence);
 

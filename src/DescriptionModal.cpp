@@ -5,9 +5,9 @@
 
 DescriptionModal* DescriptionModal::instance = nullptr;
 
-DescriptionModal::DescriptionModal(Context& context, const char* title, const char* description) : Modal(context, 80, 80),
+DescriptionModal::DescriptionModal(Context& context, const char* title,const char* author, const char* description) : Modal(context, 80, 80),
 																		 layout(new LinearLayout(&screen, VERTICAL)),
-																		 descriptionText(new DescriptionModalItem(layout,title,description))
+																		 descriptionText(new DescriptionModalItem(layout,title,author,description))
 																		 {
 	instance = this;
 	buildUI();

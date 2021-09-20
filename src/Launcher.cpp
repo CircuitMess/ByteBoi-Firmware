@@ -114,12 +114,11 @@ void Launcher::bindInput(){
 		if(instance == nullptr) return;
 		DescriptionModal* descriptionModal;
 		uint8_t index = instance->selectedGame;
-		descriptionModal = new DescriptionModal(*instance, instance->games[index].title, instance->games[index].description);
+		descriptionModal = new DescriptionModal(*instance, "title", "author","description ");
 		descriptionModal->push(instance);
 
 	});
 }
-
 uint32_t drawTime1 = 0;
 
 void Launcher::loop(uint _micros){
