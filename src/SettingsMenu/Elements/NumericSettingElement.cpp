@@ -3,7 +3,8 @@
 #include <string>
 #include <iostream>
 #include <sstream>
-#include "../SettingsStruct.hpp"
+#include <Settings.h>
+
 SettingsMenu::NumericSettingElement::NumericSettingElement(ElementContainer* parent, Setting* setting) :
 		SettingElement(parent, setting)
 {

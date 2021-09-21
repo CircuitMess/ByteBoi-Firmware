@@ -13,7 +13,8 @@
 #include "src/Launcher.h"
 #include "src/Services/BatteryService.h"
 #include "src/Services/SleepService.h"
-#include "src/SettingsMenu/SettingsStruct.hpp"
+#include <Settings.h>
+#include <Util/Settings.h>
 #include <SPIFFS.h>
 #include "src/GameManagement/GameManager.h"
 
@@ -22,47 +23,16 @@ BatteryService* batteryService;
 SleepService* sleepService;
 
 Display* display;
-I2cExpander* expander;
 
 void setup(){
 	Serial.begin(115200);
-	Serial.println();
-	Serial.print("in firmware: ");
-	Serial.println(ByteBoi.inFirmware());
-
 	ByteBoi.begin();
 	Games.scanGames();
+
+	pinMode(36, INPUT);
+	pinMode(34, INPUT);
+
 	display = ByteBoi.getDisplay();
-	expander = ByteBoi.getExpander();
-
-
-	if(!Settings::init(new SettingsStruct, sizeof(SettingsStruct))){
-		settings()->shutdownTime = 300; //5 minutes
-		settings()->sleepTime = 30; //30 seconds
-		settings()->audio = true; //audio on
-		settings()->calibrated = false;
-		Settings::store();
-	}
-
-#ifdef DEBUG_FLAG
-	/*	LoopManager::addListener(new SerialID);
-
-		for(uint8_t i = 0; i < 7; i++)
-		{
-			ByteBoi.getExpander()->pinMode(i, INPUT_PULLUP);
-		}
-		uint8_t portRead = ByteBoi.getExpander()->portRead() & 0b01111111;
-
-		if(!portRead && !settings()->calibrated)
-		{
-			HardwareTest test(*ByteBoi.getDisplay());
-			test.start();
-		}*/
-
-#endif
-
-
-	Piezo.setMute(!settings()->audio);
 
 	batteryService = new BatteryService(*display);
 	sleepService = new SleepService(*display);

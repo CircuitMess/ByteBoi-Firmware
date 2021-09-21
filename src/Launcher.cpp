@@ -6,7 +6,6 @@
 #include "Elements/GameTitle.h"
 #include "Services/BatteryService.h"
 #include <Audio/Piezo.h>
-#include "Menu.h"
 #include "Bitmaps/battery.hpp"
 #include "Services/SleepService.h"
 #include <Loop/LoopManager.h>
@@ -96,17 +95,8 @@ void Launcher::bindInput(){
 		if(instance->scroller->scrolling()) return;
 		GameLoader::loadGame(Games.getGame(instance->selectedGame));
 	});
-
-	Input::getInstance()->setBtnPressCallback(BTN_C, [](){
-//		if(exitingGame || runningContext == nullptr || runningContext == instance || BatteryService::getInstance()->modalShown()
-//		|| Context::getCurrentContext() == instance->menu)
-//		return;
-		Serial.println("BUTTON C PRESSED");
-		instance->menu = new Menu(Context::getCurrentContext());
-		instance->menu->push(Context::getCurrentContext());
-		Piezo.tone(500, 50);
-	});
 }
+
 uint32_t drawTime1 = 0;
 
 void Launcher::loop(uint _micros){

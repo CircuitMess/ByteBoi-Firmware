@@ -36,8 +36,6 @@ private:
 	GameScroller* scroller;
 	Splash* splash;
 
-	Menu* menu = nullptr;
-
 	uint8_t selectedGame = 0;
 	void prev();
 	void next();

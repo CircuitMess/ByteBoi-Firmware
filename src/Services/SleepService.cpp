@@ -4,7 +4,7 @@
 #include <ByteBoi.h>
 
 #include <Loop/LoopManager.h>
-#include "../SettingsMenu/SettingsStruct.hpp"
+#include <Settings.h>
 #include "BatteryService.h"
 
 SleepService* SleepService::instance = nullptr;
@@ -15,8 +15,8 @@ SleepService::SleepService(Display& display) : display(&display)
 }
 void SleepService::start()
 {
-	if(settings()->sleepTime > 0){
-		setInactivityCallback(settings()->sleepTime*1000000, startLightSleep);
+	if(Settings.get().sleepTime > 0){
+		setInactivityCallback(Settings.get().sleepTime*1000000, startLightSleep);
 	}else{
 		setInactivityCallback(0, nullptr);
 	}
@@ -27,7 +27,7 @@ void SleepService::start()
 }
 void SleepService::startLightSleep()
 {
-	if(settings()->sleepTime == 0)
+	if(Settings.get().sleepTime == 0)
 	{
 		instance->setInactivityCallback(0, nullptr);
 		return;
@@ -49,8 +49,8 @@ void SleepService::startLightSleep()
 
 	Input::getInstance()->setAnyKeyCallback(wakeLightSleep, 1);
 	instance->sleepStatus = 1;
-	if(settings()->shutdownTime > 0){
-		instance->setInactivityCallback(settings()->shutdownTime*1000000, shutdown);
+	if(Settings.get().shutdownTime > 0){
+		instance->setInactivityCallback(Settings.get().shutdownTime*1000000, shutdown);
 	}
 	else
 	{
@@ -73,7 +73,7 @@ void SleepService::wakeLightSleep()
 		runningContext->start();
 	}
 
-	instance->setInactivityCallback(settings()->sleepTime*1000000, startLightSleep);
+	instance->setInactivityCallback(Settings.get().sleepTime*1000000, startLightSleep);
 	Input::getInstance()->setAnyKeyCallback([](){
 		instance->inactivityCheck = 0;
 	});
