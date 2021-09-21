@@ -1,16 +1,19 @@
 #include "Launcher.h"
-#include <ByteBoi.h>
-
 #include <Input/Input.h>
 #include "Splash.h"
 #include "GameScroller.h"
 #include "Elements/Logo.h"
 #include "Elements/GameTitle.h"
-#include "SettingsMenu/GameInfo.hpp"
 #include "Services/BatteryService.h"
 #include <Audio/Piezo.h>
 #include "Bitmaps/battery.hpp"
 #include "Services/SleepService.h"
+#include <Loop/LoopManager.h>
+#include <ByteBoi.h>
+#include "GameManagement/GameManager.h"
+#include "GameManagement/GameLoader.h"
+#include "GameInfo.hpp"
+#include <SD.h>
 
 Context* runningContext = nullptr;
 bool exitingGame = false;
@@ -18,17 +21,10 @@ bool exitingGame = false;
 
 Launcher* Launcher::instance = nullptr;
 
-Launcher::Launcher(Display* display, BatteryService* batteryService) : Context(*display), batteryService(batteryService), display(display)
-{
+Launcher::Launcher(Display* display, BatteryService* batteryService) : Context(*display), batteryService(batteryService), display(display){
 	canvas = screen.getSprite();
 
-	games[0] = SettingsInfo;
-	games[1] = SettingsInfo;
-	games[2] = SettingsInfo;
-	games[3] = SettingsInfo;
-	games[4] = SettingsInfo;
-
-	scroller = new GameScroller(canvas, &games[0], sizeof(games) / sizeof(GameInfo));
+	scroller = new GameScroller(canvas);
 	logo = new Logo(canvas);
 	title = new GameTitle(canvas);
 
@@ -71,7 +67,7 @@ void Launcher::stop()
 void Launcher::prev(){
 	uint8_t selecting = instance->scroller->prev();
 	if(selecting != selectedGame){
-		instance->title->change(games[selecting].title);
+		instance->title->change(Games.getGame(selecting)->name.c_str());
 	}
 	selectedGame = selecting;
 }
@@ -79,7 +75,7 @@ void Launcher::prev(){
 void Launcher::next(){
 	uint8_t selecting = instance->scroller->next();
 	if(selecting != selectedGame){
-		instance->title->change(games[selecting].title);
+		instance->title->change(Games.getGame(selecting)->name.c_str());
 	}
 	selectedGame = selecting;
 }
@@ -97,12 +93,7 @@ void Launcher::bindInput(){
 
 	Input::getInstance()->setBtnPressCallback(BTN_A, [](){
 		if(instance->scroller->scrolling()) return;
-
-		Display* display = instance->display;
-		uint8_t index = instance->selectedGame;
-
-		Context* game = instance->games[index].launch(*display);
-		game->push(instance);
+		GameLoader::loadGame(Games.getGame(instance->selectedGame));
 	});
 }
 
@@ -120,7 +111,7 @@ void Launcher::loop(uint _micros){
 
 			bindInput();
 			scroller->splash(1);
-			title->change(games[selectedGame].title);
+			title->change(Games.getGame(selectedGame)->name.c_str());
 		}
 	}else{
 		logo->loop(_micros);
@@ -129,8 +120,12 @@ void Launcher::loop(uint _micros){
 	draw();
 //	canvas->setTextColor(TFT_WHITE);
 //	canvas->setTextSize(1);
+//	canvas->setCursor(120, 10);
+//	canvas->println(GameManager::getExpander()->pinRead(8));
+//	canvas->setCursor(100, 10);
+//	canvas->println(GameManager::getExpander()->pinRead(10));
 //	canvas->setCursor(130, 10);
-//	canvas->println(digitalRead(34));
+//	canvas->println(analogRead(36));
 //	canvas->println((1000000.0 / (float)drawTime1));
 	screen.commit();
 	drawTime1 = micros() - t;

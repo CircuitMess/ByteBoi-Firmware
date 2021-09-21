@@ -2,21 +2,45 @@
 #include <Display/Sprite.h>
 #include <Loop/LoopManager.h>
 #include "Elements/GameImage.h"
-#include "../GameInfo.hpp"
+#include "GameManagement/GameManager.h"
+#include <SPIFFS.h>
+#include "GameInfo.hpp"
+#include <SD.h>
 
-GameScroller::GameScroller(Sprite* canvas, const GameInfo gameDefs[], uint8_t gameCount) : canvas(canvas),
+GameScroller::GameScroller(Sprite* canvas) : canvas(canvas),
 		origin((canvas->width() - width) / 2){
+	genericIcon = (uint8_t*)ps_malloc(64*64*2);
+	SPIFFS.open("/launcher/genericGame.raw").read(genericIcon, 64*64*2);
 
-	for(int i = 0; i < gameCount; i++){
-		gameDefs[i].icon();
-		games.push_back(new GameImage(canvas, globalFile));
+
+	for(auto info : Games.getGames()){
+		char path[100] = {0};
+		strncat(path, "/", 100);
+		strncat(path, info->name.c_str(), 100);
+		strncat(path, "/", 100);
+		strncat(path, info->icon.c_str(), 100);
+		File file = SD.open(path);
+		uint8_t* buf = genericIcon;
+		if(file){
+			buf = (uint8_t*)ps_malloc(64*64*2);
+			if(file.read(buf, 64*64*2) <= 0){
+				free(buf);
+				buf = genericIcon;
+			}
+		}
+		GameImage* gameImage = new GameImage(canvas, buf);
+		games.push_back(gameImage);
 		games.back()->setX(-width);
 		games.back()->setY(35);
-		Serial.printf("%d icon ok\n", i);
-		delay(5);
 	}
 
 	// repos();
+}
+
+GameScroller::~GameScroller(){
+	for(auto game: games){
+		delete game;
+	}
 }
 
 void GameScroller::splash(float f){
