@@ -11,7 +11,6 @@ class GameTitle;
 class GameScroller;
 class Splash;
 class Menu;
-#include "../GameInfo.hpp"
 
 
 class BatteryService;
@@ -46,7 +45,6 @@ private:
 	void bindInput();
 
 	BatteryService* batteryService;
-	GameInfo games[5];
 
 };
 

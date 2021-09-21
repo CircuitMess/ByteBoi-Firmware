@@ -1,6 +1,5 @@
 #include "GameManager.h"
 #include <SPIFFS.h>
-#include "SD_OTA.h"
 #include <SD.h>
 #include <SPI.h>
 #include <esp_partition.h>
@@ -9,6 +8,11 @@
 #include <iostream>
 #include <utility>
 #include <ByteBoi.h>
+#include <Properties.h>
+#include "../GameInfo.hpp"
+
+GameManager Games;
+using namespace cppproperties;
 
 struct GameDefaultsStruct {
 	const char* name = "Game";
@@ -17,11 +21,17 @@ struct GameDefaultsStruct {
 	const char* resources = "resources";
 } gameDefaults;
 
-std::vector<Properties> GameManager::games;
-using namespace cppproperties;
 
+std::string getValueOrDefault(Properties& props, const char* key, const char* defaultValue){
+	if(props.GetProperty(key, defaultValue).empty()){
+		return defaultValue;
+	}
+	std::string s = props.GetProperty("Name", gameDefaults.name);
+	s.erase(remove(s.begin(), s.end(), '\r'), s.end());
+	return s;
+}
 void GameManager::loadGame(size_t index){
-	if(!ByteBoiImpl::inFirmware()) return;
+/*	if(!ByteBoiImpl::inFirmware()) return;
 	if(index >= games.size()) return;
 
 	if(!SPIFFS.exists(ByteBoiImpl::SPIFFSgameRoot)){
@@ -65,7 +75,7 @@ void GameManager::loadGame(size_t index){
 	strncat(path, "/", 100);
 	strncat(path, getGameBinary(index), 100);
 
-	SD_OTA::updateFromSD(path);
+	SD_OTA::updateFromSD(path);*/
 }
 
 void GameManager::scanGames(){
@@ -92,7 +102,14 @@ void GameManager::scanGames(){
 				strncat(path, "/", 100);
 				strncat(path, binaryPath.c_str(), 100);
 				if(SD.exists(path)){
-					games.push_back(props);
+					auto game = new GameInfo(GameInfo{
+							getValueOrDefault(props, "Name", gameDefaults.name),
+							props.GetProperty("Description"),
+							getValueOrDefault(props, "Icon", gameDefaults.icon),
+							getValueOrDefault(props, "Binary", gameDefaults.binary),
+							getValueOrDefault(props, "Resources", gameDefaults.resources)
+					});
+					games.push_back(game);
 				}
 			}
 		}
@@ -103,45 +120,10 @@ void GameManager::scanGames(){
 	gameFolder.close();
 }
 
-fs::File GameManager::getIcon(size_t index){
-	if(index >= games.size()) return fs::File();
-
-	char path[100] = {0};
-	strncat(path, "/", 100);
-	strncat(path, getGameName(index), 100);
-	strncat(path, "/", 100);
-	if(games[index].GetProperty("Icon", gameDefaults.icon).empty()){
-		strncat(path, gameDefaults.icon, 100);
-	}else{
-		strncat(path, games[index].GetProperty("Icon", gameDefaults.icon).c_str(), 100);
-	}
-	return SD.open(path);
-}
-
-const std::vector<Properties> &GameManager::getGameProperties(){
+const std::vector<GameInfo*> & GameManager::getGames(){
 	return games;
 }
 
-const char* GameManager::getGameName(size_t index){
-	if(index >= games.size()) return nullptr;
-	if(games[index].GetProperty("Name", gameDefaults.name).empty()){
-		return gameDefaults.name;
-	}
-	return games[index].GetProperty("Name", gameDefaults.name).c_str();
-}
-
-const char* GameManager::getGameBinary(size_t index){
-	if(index >= games.size()) return nullptr;
-	if(games[index].GetProperty("Binary", gameDefaults.binary).empty()){
-		return gameDefaults.binary;
-	}
-	return games[index].GetProperty("Binary", gameDefaults.binary).c_str();
-}
-
-const char* GameManager::getGameResources(size_t index){
-	if(index >= games.size()) return nullptr;
-	if(games[index].GetProperty("Resources", gameDefaults.resources).empty()){
-		return gameDefaults.resources;
-	}
-	return games[index].GetProperty("Resources", gameDefaults.resources).c_str();
+GameInfo* GameManager::getGame(int index){
+	return games[index];
 }

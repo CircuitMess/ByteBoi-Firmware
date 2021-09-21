@@ -10,7 +10,7 @@ class Sprite;
 
 class GameImage {
 public:
-	GameImage(Sprite* canvas, size_t gameIndex, uint8_t* genericIcon);
+	GameImage(Sprite* canvas, uint8_t* icon);
 
 	virtual ~GameImage();
 
@@ -20,8 +20,6 @@ public:
 	void setY(int16_t y);
 
 	void draw() const;
-	void releaseImage();
-	void loadImage();
 
 private:
 	int16_t x;
@@ -30,7 +28,6 @@ private:
 	size_t index = 0;
 
 	Sprite* canvas;
-	Color* genericIcon = nullptr;
 };
 
 

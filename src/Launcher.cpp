@@ -1,5 +1,4 @@
 #include "Launcher.h"
-#include "GameManager.h"
 #include <Input/Input.h>
 #include "Splash.h"
 #include "GameScroller.h"
@@ -12,6 +11,10 @@
 #include "Services/SleepService.h"
 #include <Loop/LoopManager.h>
 #include <ByteBoi.h>
+#include "GameManagement/GameManager.h"
+#include "GameManagement/GameLoader.h"
+#include "GameInfo.hpp"
+#include <SD.h>
 
 Context* runningContext = nullptr;
 bool exitingGame = false;
@@ -65,7 +68,7 @@ void Launcher::stop()
 void Launcher::prev(){
 	uint8_t selecting = instance->scroller->prev();
 	if(selecting != selectedGame){
-		instance->title->change(GameManager::getGameName(selecting));
+		instance->title->change(Games.getGame(selecting)->name.c_str());
 	}
 	selectedGame = selecting;
 }
@@ -73,7 +76,7 @@ void Launcher::prev(){
 void Launcher::next(){
 	uint8_t selecting = instance->scroller->next();
 	if(selecting != selectedGame){
-		instance->title->change(GameManager::getGameName(selecting));
+		instance->title->change(Games.getGame(selecting)->name.c_str());
 	}
 	selectedGame = selecting;
 }
@@ -91,8 +94,7 @@ void Launcher::bindInput(){
 
 	Input::getInstance()->setBtnPressCallback(BTN_A, [](){
 		if(instance->scroller->scrolling()) return;
-
-		GameManager::loadGame(instance->selectedGame);
+		GameLoader::loadGame(Games.getGame(instance->selectedGame));
 	});
 
 	Input::getInstance()->setBtnPressCallback(BTN_C, [](){
@@ -119,7 +121,7 @@ void Launcher::loop(uint _micros){
 
 			bindInput();
 			scroller->splash(1);
-			title->change(GameManager::getGameName(selectedGame));
+			title->change(Games.getGame(selectedGame)->name.c_str());
 		}
 	}else{
 		logo->loop(_micros);

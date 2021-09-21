@@ -5,7 +5,6 @@
 #include <CircuitOS.h>
 #include <Loop/LoopListener.h>
 #include <Util/Vector.h>
-#include "../GameInfo.hpp"
 #include <Properties.h>
 
 class Sprite;

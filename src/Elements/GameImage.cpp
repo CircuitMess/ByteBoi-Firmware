@@ -3,19 +3,20 @@
 #include <Display/Color.h>
 #include <FS.h>
 #include <SPIFFS.h>
-#include "../GameManager.h"
+#include "../GameManagement/GameManager.h"
 
-GameImage::GameImage(Sprite* canvas, size_t gameIndex, uint8_t* genericIcon) : canvas(canvas), index(gameIndex), genericIcon((Color*)genericIcon){
+GameImage::GameImage(Sprite* canvas, uint8_t* icon) : canvas(canvas), appIconBuffer((Color*)icon){
 
 }
 
 GameImage::~GameImage(){
-	releaseImage();
+	free(appIconBuffer);
+	appIconBuffer = nullptr;
 }
 
 
 void GameImage::draw() const {
-	canvas->drawIcon((appIconBuffer == nullptr) ? genericIcon : appIconBuffer, x, y, 64, 64, 1, TFT_BLACK);
+	canvas->drawIcon(appIconBuffer, x, y, 64, 64, 1, TFT_BLACK);
 }
 
 int16_t GameImage::getX() const{
@@ -32,25 +33,4 @@ int16_t GameImage::getY() const{
 
 void GameImage::setY(int16_t y){
 	GameImage::y = y;
-}
-
-void GameImage::loadImage(){
-	if(appIconBuffer == nullptr){
-		appIconBuffer = static_cast<Color*>(ps_malloc(64 * 64 * 2));
-	}else return;
-
-	if(appIconBuffer == nullptr){
-		Serial.println("MainMenuApp picture unpack error");
-		return;
-	}
-	fs::File icon = GameManager::getIcon(index);
-	icon.read(reinterpret_cast<uint8_t*>(appIconBuffer), 64 * 64 * 2);
-	icon.close();
-}
-
-void GameImage::releaseImage(){
-	if(appIconBuffer != nullptr){
-		free(appIconBuffer);
-		appIconBuffer = nullptr;
-	}
 }
