@@ -5,7 +5,7 @@
 #include <CircuitOS.h>
 #include <Loop/LoopListener.h>
 #include <Util/Vector.h>
-#include "../GameInfo.hpp"
+#include <Properties.h>
 
 class Sprite;
 class Launcher;
@@ -13,7 +13,8 @@ class GameImage;
 
 class GameScroller : public LoopListener {
 public:
-	GameScroller(Sprite* canvas, const GameInfo gameDefs[], uint8_t gameCount);
+	GameScroller(Sprite* canvas);
+	~GameScroller();
 
 	void draw();
 	void loop(uint micros);
@@ -50,6 +51,7 @@ private:
 	GameImage* getRGame();
 	GameImage* getLLGame();
 	GameImage* getRRGame();
+	uint8_t *genericIcon = nullptr;
 };
 
 

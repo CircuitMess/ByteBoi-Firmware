@@ -16,6 +16,7 @@
 #include <Settings.h>
 #include <Util/Settings.h>
 #include <SPIFFS.h>
+#include "src/GameManagement/GameManager.h"
 
 Launcher* launcher;
 BatteryService* batteryService;
@@ -26,7 +27,8 @@ Display* display;
 void setup(){
 	Serial.begin(115200);
 	ByteBoi.begin();
-
+	ByteBoi.unbindMenu();
+	Games.scanGames();
 
 	pinMode(36, INPUT);
 	pinMode(34, INPUT);
@@ -49,7 +51,6 @@ void setup(){
 
 	sleepService->start();
 	LoopManager::addListener(sleepService);
-
 }
 
 void loop(){

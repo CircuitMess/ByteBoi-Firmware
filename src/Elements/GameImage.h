@@ -10,7 +10,7 @@ class Sprite;
 
 class GameImage {
 public:
-	GameImage(Sprite* canvas,fs::File icon);
+	GameImage(Sprite* canvas, uint8_t* icon);
 
 	virtual ~GameImage();
 
@@ -24,8 +24,8 @@ public:
 private:
 	int16_t x;
 	int16_t y;
-	fs::File icon;
 	Color* appIconBuffer = nullptr;
+	size_t index = 0;
 
 	Sprite* canvas;
 };
