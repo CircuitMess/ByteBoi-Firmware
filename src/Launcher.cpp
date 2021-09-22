@@ -4,10 +4,8 @@
 #include "GameScroller.h"
 #include "Elements/Logo.h"
 #include "Elements/GameTitle.h"
-#include "Services/BatteryService.h"
 #include <Audio/Piezo.h>
 #include "Bitmaps/battery.hpp"
-#include "Services/SleepService.h"
 #include <Loop/LoopManager.h>
 #include <ByteBoi.h>
 #include "GameManagement/GameManager.h"
@@ -21,7 +19,7 @@ bool exitingGame = false;
 
 Launcher* Launcher::instance = nullptr;
 
-Launcher::Launcher(Display* display, BatteryService* batteryService) : Context(*display), batteryService(batteryService), display(display){
+Launcher::Launcher(Display* display) : Context(*display), display(display){
 	canvas = screen.getSprite();
 
 	scroller = new GameScroller(canvas);
@@ -32,13 +30,6 @@ Launcher::Launcher(Display* display, BatteryService* batteryService) : Context(*
 	instance = this;
 	canvas->setChroma(TFT_TRANSPARENT);
 	splash = new Splash(display->getBaseSprite(), logo, title, scroller);
-	SleepService::getInstance()->addOnSleepCallback([](){
-//		instance->menu->stop(true);
-	});
-
-	BatteryService::getInstance()->setModalCallback([](){
-//		instance->menu->stop(true);
-	});
 }
 
 void Launcher::start(){
@@ -121,12 +112,8 @@ void Launcher::loop(uint _micros){
 	draw();
 //	canvas->setTextColor(TFT_WHITE);
 //	canvas->setTextSize(1);
-//	canvas->setCursor(120, 10);
-//	canvas->println(GameManager::getExpander()->pinRead(8));
-//	canvas->setCursor(100, 10);
-//	canvas->println(GameManager::getExpander()->pinRead(10));
 //	canvas->setCursor(130, 10);
-//	canvas->println(analogRead(36));
+//	canvas->println(Battery.getPercentage());
 //	canvas->println((1000000.0 / (float)drawTime1));
 	screen.commit();
 	drawTime1 = micros() - t;
@@ -137,15 +124,15 @@ void Launcher::draw(){
 	scroller->draw();
 	title->draw();
 	logo->draw();
-
-	if(batteryService->getVoltage() > 780){
-		canvas->drawBitmap(screen.getWidth() - 8, 0, battery1, 8, 12, TFT_WHITE);
-	}
-	else if(batteryService->getVoltage() <= 780 && batteryService->getVoltage() >= 700){
-		canvas->drawBitmap(screen.getWidth() - 8, 0, battery2, 8, 12, TFT_WHITE);
-	}
-	else if(batteryService->getVoltage() < 700){
-		canvas->drawBitmap(screen.getWidth() - 8, 0, battery3, 8, 12, TFT_WHITE);
-	}
+//
+//	if(batteryService->getVoltage() > 780){
+//		canvas->drawBitmap(screen.getWidth() - 8, 0, battery1, 8, 12, TFT_WHITE);
+//	}
+//	else if(batteryService->getVoltage() <= 780 && batteryService->getVoltage() >= 700){
+//		canvas->drawBitmap(screen.getWidth() - 8, 0, battery2, 8, 12, TFT_WHITE);
+//	}
+//	else if(batteryService->getVoltage() < 700){
+//		canvas->drawBitmap(screen.getWidth() - 8, 0, battery3, 8, 12, TFT_WHITE);
+//	}
 
 }
