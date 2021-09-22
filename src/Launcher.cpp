@@ -81,6 +81,7 @@ void Launcher::next(){
 }
 
 void Launcher::bindInput(){
+	ByteBoi.bindMenu();
 	Input::getInstance()->setBtnPressCallback(BTN_RIGHT, [](){
 		instance->next();
 		Piezo.tone(800, 50);
