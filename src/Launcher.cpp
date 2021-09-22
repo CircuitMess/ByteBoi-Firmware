@@ -14,6 +14,9 @@
 #include "GameManagement/GameLoader.h"
 #include "GameInfo.hpp"
 #include <SD.h>
+#include <SPIFFS.h>
+#include <FS/CompressedFile.h>
+
 
 Context* runningContext = nullptr;
 bool exitingGame = false;
@@ -23,7 +26,26 @@ Launcher* Launcher::instance = nullptr;
 
 Launcher::Launcher(Display* display, BatteryService* batteryService) : Context(*display), batteryService(batteryService), display(display){
 	canvas = screen.getSprite();
+	backgroundBuffer = static_cast<Color*>(ps_malloc(160 * 120 * 2));
+	if(backgroundBuffer == nullptr){
+		Serial.printf("MainMenu background picture unpack error\n");
+		return;
+	}
 
+	fs::File backgroundFile = CompressedFile::open(SPIFFS.open("/Launcher/mainMenuBg.raw.hs"), 13, 12);
+
+	backgroundFile.read(reinterpret_cast<uint8_t*>(backgroundBuffer), 160 * 120 * 2);
+	backgroundFile.close();
+	iconBuffer = static_cast<Color*>(ps_malloc(93 * 26 * 2));
+	if(iconBuffer == nullptr){
+		Serial.printf("MainMenu background picture unpack error\n");
+		return;
+	}
+
+	fs::File iconFile = SPIFFS.open("/Launcher/ByteBoiLogo.raw");
+
+	iconFile.read(reinterpret_cast<uint8_t*>(iconBuffer), 93 * 26 * 2);
+	iconFile.close();
 	scroller = new GameScroller(canvas);
 	logo = new Logo(canvas);
 	title = new GameTitle(canvas);
@@ -41,6 +63,11 @@ Launcher::Launcher(Display* display, BatteryService* batteryService) : Context(*
 	});
 }
 
+Launcher::~Launcher(){
+	free(backgroundBuffer);
+	free(iconBuffer);
+}
+
 void Launcher::start(){
 	if(runningContext != nullptr && runningContext != this){
 		delete runningContext;
@@ -56,8 +83,7 @@ void Launcher::start(){
 	LoopManager::addListener(this);
 }
 
-void Launcher::stop()
-{
+void Launcher::stop(){
 	LoopManager::removeListener(this);
 	Input::getInstance()->removeBtnPressCallback(BTN_RIGHT);
 	Input::getInstance()->removeBtnPressCallback(BTN_LEFT);
@@ -133,19 +159,19 @@ void Launcher::loop(uint _micros){
 }
 
 void Launcher::draw(){
-	canvas->clear(TFT_BLACK);
+	screen.getSprite()->drawIcon(backgroundBuffer, 0, 0, 160, 120, 1);
 	scroller->draw();
 	title->draw();
-	logo->draw();
+	//logo->draw();
+	screen.getSprite()->drawIcon(iconBuffer, 35, 5, 93, 26, 1);
 
 	if(batteryService->getVoltage() > 780){
 		canvas->drawBitmap(screen.getWidth() - 8, 0, battery1, 8, 12, TFT_WHITE);
-	}
-	else if(batteryService->getVoltage() <= 780 && batteryService->getVoltage() >= 700){
+	}else if(batteryService->getVoltage() <= 780 && batteryService->getVoltage() >= 700){
 		canvas->drawBitmap(screen.getWidth() - 8, 0, battery2, 8, 12, TFT_WHITE);
-	}
-	else if(batteryService->getVoltage() < 700){
+	}else if(batteryService->getVoltage() < 700){
 		canvas->drawBitmap(screen.getWidth() - 8, 0, battery3, 8, 12, TFT_WHITE);
 	}
 
 }
+

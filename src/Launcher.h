@@ -21,6 +21,8 @@ class Launcher : public LoopListener, public Context {
 public:
 	Launcher(Display* display, BatteryService* batteryService);
 
+	virtual ~Launcher();
+
 	void loop(uint micros) override;
 	void start() override;
 	void stop() override;
@@ -41,8 +43,10 @@ private:
 	void next();
 
 	void bindInput();
-
 	BatteryService* batteryService;
+
+	Color* backgroundBuffer = nullptr;
+	Color* iconBuffer = nullptr;
 
 };
 
