@@ -27,6 +27,7 @@ Display* display;
 void setup(){
 	Serial.begin(115200);
 	ByteBoi.begin();
+	ByteBoi.unbindMenu();
 	Games.scanGames();
 
 	pinMode(36, INPUT);
