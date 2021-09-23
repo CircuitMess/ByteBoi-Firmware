@@ -3,7 +3,6 @@
 #include "Elements/NumericSettingElement.h"
 #include "Elements/BoolSettingElement.h"
 #include <Audio/Piezo.h>
-#include "../Services/SleepService.h"
 #include <Settings.h>
 
 Vector<SettingsMenu::Setting> settingsVector = {
@@ -68,11 +67,9 @@ void SettingsMenu::SettingsMenu::loop(uint _time)
 }
 void SettingsMenu::SettingsMenu::start()
 {
-	runningContext = this;
 	Input::getInstance()->setBtnPressCallback(BTN_B, [](){
 		Settings.store();
 		Piezo.setMute(!Settings.get().mute);
-		SleepService::getInstance()->start();
 		instance->pop();
 	});
 	Input::getInstance()->setBtnPressCallback(BTN_UP, [](){

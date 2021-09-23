@@ -4,10 +4,7 @@
 #include "GameScroller.h"
 #include "Elements/Logo.h"
 #include "Elements/GameTitle.h"
-#include "Services/BatteryService.h"
 #include <Audio/Piezo.h>
-#include "Bitmaps/battery.hpp"
-#include "Services/SleepService.h"
 #include <Loop/LoopManager.h>
 #include <ByteBoi.h>
 #include "GameManagement/GameManager.h"
@@ -15,13 +12,9 @@
 #include "GameInfo.hpp"
 #include <SD.h>
 
-Context* runningContext = nullptr;
-bool exitingGame = false;
-
-
 Launcher* Launcher::instance = nullptr;
 
-Launcher::Launcher(Display* display, BatteryService* batteryService) : Context(*display), batteryService(batteryService), display(display){
+Launcher::Launcher(Display* display) : Context(*display), display(display){
 	canvas = screen.getSprite();
 
 	scroller = new GameScroller(canvas);
@@ -32,22 +25,10 @@ Launcher::Launcher(Display* display, BatteryService* batteryService) : Context(*
 	instance = this;
 	canvas->setChroma(TFT_TRANSPARENT);
 	splash = new Splash(display->getBaseSprite(), logo, title, scroller);
-	SleepService::getInstance()->addOnSleepCallback([](){
-//		instance->menu->stop(true);
-	});
 
-	BatteryService::getInstance()->setModalCallback([](){
-//		instance->menu->stop(true);
-	});
 }
 
 void Launcher::start(){
-	if(runningContext != nullptr && runningContext != this){
-		delete runningContext;
-	}
-
-	exitingGame = false;
-	runningContext = this;
 	if(splash == nullptr){
 		bindInput();
 	}
@@ -137,6 +118,7 @@ void Launcher::draw(){
 	title->draw();
 	logo->draw();
 
+/*
 	if(batteryService->getVoltage() > 780){
 		canvas->drawBitmap(screen.getWidth() - 8, 0, battery1, 8, 12, TFT_WHITE);
 	}
@@ -146,5 +128,6 @@ void Launcher::draw(){
 	else if(batteryService->getVoltage() < 700){
 		canvas->drawBitmap(screen.getWidth() - 8, 0, battery3, 8, 12, TFT_WHITE);
 	}
+*/
 
 }
