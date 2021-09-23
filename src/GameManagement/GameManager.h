@@ -8,8 +8,6 @@ struct GameInfo;
 
 class GameManager {
 public:
-	//functions used by the launcher/firmware
-	void loadGame(size_t index);
 	void scanGames();
 	const std::vector<GameInfo*> & getGames();
 	GameInfo* getGame(int index);
