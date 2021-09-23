@@ -106,7 +106,9 @@ void Launcher::bindInput(){
 		if(instance == nullptr) return;
 		DescriptionModal* descriptionModal;
 		uint8_t index = instance->selectedGame;
-		descriptionModal = new DescriptionModal(*instance, "title", "author","description ");
+		descriptionModal = new DescriptionModal(*instance, Games.getGame(instance->selectedGame)->name.c_str(),
+												Games.getGame(instance->selectedGame)->author.c_str(),
+												Games.getGame(instance->selectedGame)->description.c_str());
 		descriptionModal->push(instance);
 
 	});
