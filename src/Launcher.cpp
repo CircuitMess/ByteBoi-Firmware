@@ -31,7 +31,7 @@ Launcher::Launcher(Display* display) : Context(*display), display(display){
 
 Launcher::~Launcher(){
 	free(backgroundBuffer);
-	free(iconBuffer);
+	free(logoBuffer);
 }
 
 void Launcher::start(){
@@ -122,7 +122,7 @@ void Launcher::draw(){
 	scroller->draw();
 	title->draw();
 	//logo->draw();
-	screen.getSprite()->drawIcon(iconBuffer, 35, 5, 93, 26, 1);
+	screen.getSprite()->drawIcon(logoBuffer, 35, 5, 93, 26, 1);
 
 /*
 	if(batteryService->getVoltage() > 780){
@@ -137,7 +137,6 @@ void Launcher::draw(){
 }
 
 void Launcher::init(){
-	Context::init();
 	backgroundBuffer = static_cast<Color*>(ps_malloc(160 * 120 * 2));
 	if(backgroundBuffer == nullptr){
 		Serial.printf("MainMenu background picture unpack error\n");
@@ -148,21 +147,20 @@ void Launcher::init(){
 
 	backgroundFile.read(reinterpret_cast<uint8_t*>(backgroundBuffer), 160 * 120 * 2);
 	backgroundFile.close();
-	iconBuffer = static_cast<Color*>(ps_malloc(93 * 26 * 2));
-	if(iconBuffer == nullptr){
+	logoBuffer = static_cast<Color*>(ps_malloc(93 * 26 * 2));
+	if(logoBuffer == nullptr){
 		Serial.printf("Logo picture unpack error\n");
 		return;
 	}
 
 	fs::File iconFile = SPIFFS.open("/Launcher/ByteBoiLogo.raw");
 
-	iconFile.read(reinterpret_cast<uint8_t*>(iconBuffer), 93 * 26 * 2);
+	iconFile.read(reinterpret_cast<uint8_t*>(logoBuffer), 93 * 26 * 2);
 	iconFile.close();
 }
 
 void Launcher::deinit(){
-	Context::deinit();
 	free(backgroundBuffer);
-	free(iconBuffer);
+	free(logoBuffer);
 }
 
