@@ -22,7 +22,17 @@ DescriptionModal::~DescriptionModal(){
 
 void DescriptionModal::draw(){
 	screen.getSprite()->clear(C_HEX(0x53565c));
-	screen.getSprite()->drawRect(screen.getTotalX(),screen.getTotalY(),80,80,C_HEX(0x9197a1));
+	screen.getSprite()->drawRect(screen.getTotalX(), screen.getTotalY(), 80, 80, C_HEX(0x9197a1));
+	screen.getSprite()->setTextColor(TFT_WHITE);
+	screen.getSprite()->setCursor(40 - screen.getSprite()->textWidth(gameInfo->name.c_str()) / 2, 3);
+	screen.getSprite()->setFont(&adobex11font);
+	screen.getSprite()->print(gameInfo->name.c_str());
+	screen.getSprite()->setTextFont(0);
+	screen.getSprite()->setTextSize(1);
+	screen.getSprite()->setCursor(1, 18);
+	screen.getSprite()->print(gameInfo->author.c_str());
+	screen.getSprite()->setCursor(1, 30);
+	splitPrintSentence(gameInfo->description.c_str());
 	screen.draw();
 }
 
