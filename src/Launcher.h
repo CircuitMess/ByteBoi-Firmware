@@ -13,7 +13,6 @@ class Splash;
 class Menu;
 
 
-class BatteryService;
 extern Context* runningContext;
 extern bool exitingGame;
 

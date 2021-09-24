@@ -15,7 +15,6 @@
 #include <Util/Settings.h>
 #include <SPIFFS.h>
 #include "src/GameManagement/GameManager.h"
-#include "src/BatteryPopup/BatteryPopupService.h"
 
 Launcher* launcher;
 
@@ -28,9 +27,6 @@ void setup(){
 	Games.scanGames();
 	display = ByteBoi.getDisplay();
 
-	BatteryPopup.setTFT(display->getTft());
-	LoopManager::addListener(&BatteryPopup);
-	Input::getInstance()->addListener(&BatteryPopup);
 	Battery.disableShutdown(true);
 
 
