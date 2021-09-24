@@ -13,13 +13,9 @@ class Splash;
 class Menu;
 
 
-class BatteryService;
-extern Context* runningContext;
-extern bool exitingGame;
-
 class Launcher : public LoopListener, public Context {
 public:
-	Launcher(Display* display, BatteryService* batteryService);
+	Launcher(Display* display);
 
 	void loop(uint micros) override;
 	void start() override;
@@ -41,8 +37,6 @@ private:
 	void next();
 
 	void bindInput();
-
-	BatteryService* batteryService;
 
 };
 

@@ -32,6 +32,9 @@ std::string getValueOrDefault(Properties& props, const char* key, const char* de
 }
 
 void GameManager::scanGames(){
+	for(auto game : games){
+		delete game;
+	}
 	games.clear();
 	File root = SD.open("/");
 	File gameFolder = root.openNextFile();
