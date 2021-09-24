@@ -11,16 +11,12 @@
 #include <ByteBoi.h>
 #include <SPIFFS.h>
 #include "src/Launcher.h"
-#include "src/Services/BatteryService.h"
-#include "src/Services/SleepService.h"
 #include <Settings.h>
 #include <Util/Settings.h>
 #include <SPIFFS.h>
 #include "src/GameManagement/GameManager.h"
 
 Launcher* launcher;
-BatteryService* batteryService;
-SleepService* sleepService;
 
 Display* display;
 
@@ -35,22 +31,12 @@ void setup(){
 
 	display = ByteBoi.getDisplay();
 
-	batteryService = new BatteryService(*display);
-	sleepService = new SleepService(*display);
 
-	LoopManager::addListener(batteryService);
 	LoopManager::addListener(Input::getInstance());
-	launcher = new Launcher(display, batteryService);
-
-	runningContext = launcher;
-
+	launcher = new Launcher(display);
 
 	launcher->unpack();
-
 	launcher->start();
-
-	sleepService->start();
-	LoopManager::addListener(sleepService);
 }
 
 void loop(){

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.15)
 project(ByteBoi-Firmware)
 set(PORT COM3)
-set(DEVICE cm:esp32:byteboi)
+set(DEVICE cm:esp32:byteboi:PartitionScheme=launcher)
 set(CMAKE_CXX_STANDARD 11)
 
 set(ROOT ${CMAKE_SOURCE_DIR})

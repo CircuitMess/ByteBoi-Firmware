@@ -13,13 +13,9 @@ class Splash;
 class Menu;
 
 
-class BatteryService;
-extern Context* runningContext;
-extern bool exitingGame;
-
 class Launcher : public LoopListener, public Context {
 public:
-	Launcher(Display* display, BatteryService* batteryService);
+	Launcher(Display* display);
 
 	virtual ~Launcher();
 
@@ -43,7 +39,6 @@ private:
 	void next();
 
 	void bindInput();
-	BatteryService* batteryService;
 
 	Color* backgroundBuffer = nullptr;
 	Color* iconBuffer = nullptr;
