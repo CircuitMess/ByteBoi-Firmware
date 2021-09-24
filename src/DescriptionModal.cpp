@@ -24,16 +24,13 @@ void DescriptionModal::draw(){
 }
 
 void DescriptionModal::start(){
-	Input::getInstance()->setBtnPressCallback(BTN_B, [](){
-		if(instance == nullptr) return;
-		instance->pop();
-	});
+	Input::getInstance()->addListener(this);
 	draw();
 	screen.commit();
 }
 
 void DescriptionModal::stop(){
-	Input::getInstance()->removeBtnPressCallback(BTN_B);
+	Input::getInstance()->removeListener(this);
 }
 
 void DescriptionModal::init(){
@@ -51,4 +48,45 @@ void DescriptionModal::buildUI(){
 	layout->reflow();
 	screen.addChild(layout);
 	screen.repos();
+}
+
+void DescriptionModal::splitPrintSentence(std::string sentence){
+	uint8_t y_lenght = 30;
+	std::string word;
+	bool firstWord = true;
+	for(auto x : sentence){
+		if(x == ' ' || x == ('!') || x == ('.')){
+			Serial.println(screen.getSprite()->getCursorX());
+			//Serial.printf("width : %d\n", screen.getSprite()->textWidth(word.c_str()));
+			if(((screen.getSprite()->getCursorX()) + screen.getSprite()->textWidth(word.c_str())) > 80){
+				y_lenght += 10;
+				screen.getSprite()->setCursor(1, y_lenght);
+			}else{
+				if(firstWord){
+					screen.getSprite()->setCursor(1, y_lenght);
+					firstWord = false;
+				}else{
+					screen.getSprite()->setCursor(screen.getSprite()->getCursorX() + 3, y_lenght);
+				}
+
+			}
+			screen.getSprite()->print(word.c_str());
+			Serial.println(word.c_str());
+			word.erase();
+		}else{
+			word = word + x;
+		}
+
+	}
+}
+
+void DescriptionModal::buttonPressed(uint id){
+	switch(id){
+		case BTN_A:
+		case BTN_B:
+		case BTN_C:
+			this->pop();
+			break;
+
+	}
 }

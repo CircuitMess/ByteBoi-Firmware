@@ -5,9 +5,11 @@
 #include <Loop/LoopListener.h>
 #include <UI/LinearLayout.h>
 #include <Elements/ModalBackground.hpp>
-#include "DescriptionModalItem.h"
+#include "GameInfo.hpp"
+#include <Input/InputListener.h>
 
-class DescriptionModal : public Modal{
+
+class DescriptionModal : public Modal, private InputListener{
 public:
 	DescriptionModal(Context& context, const char* title,const char* author, const char* description);
 
@@ -28,6 +30,10 @@ private:
 	static DescriptionModal* instance;
 
 	void buildUI();
+
+	void splitPrintSentence(std::string sentence);
+
+	void buttonPressed(uint id) override;
 
 	LinearLayout* layout;
 	DescriptionModalItem* descriptionText;
