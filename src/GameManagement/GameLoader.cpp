@@ -37,8 +37,9 @@ void GameLoader::loadGame(GameInfo* game){
 			fileName = fileName.substring(fileName.lastIndexOf('/') + 1);
 			File destFile = SPIFFS.open(ByteBoiImpl::SPIFFSgameRoot + fileName, FILE_WRITE);
 			uint8_t buf[512];
-			while(file.read(buf, 512)){
-				destFile.write(buf, 512);
+			while(file.available()){
+				size_t readBytes = file.read(buf, 512);
+				destFile.write(buf, readBytes);
 			}
 			destFile.close();
 			file = root.openNextFile();
