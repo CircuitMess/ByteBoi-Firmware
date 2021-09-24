@@ -14,40 +14,19 @@
 #include <SPIFFS.h>
 #include <FS/CompressedFile.h>
 
-
 Launcher* Launcher::instance = nullptr;
 
 Launcher::Launcher(Display* display) : Context(*display), display(display){
 	canvas = screen.getSprite();
-	backgroundBuffer = static_cast<Color*>(ps_malloc(160 * 120 * 2));
-	if(backgroundBuffer == nullptr){
-		Serial.printf("MainMenu background picture unpack error\n");
-		return;
-	}
-
-	fs::File backgroundFile = CompressedFile::open(SPIFFS.open("/Launcher/mainMenuBg.raw.hs"), 13, 12);
-
-	backgroundFile.read(reinterpret_cast<uint8_t*>(backgroundBuffer), 160 * 120 * 2);
-	backgroundFile.close();
-	iconBuffer = static_cast<Color*>(ps_malloc(93 * 26 * 2));
-	if(iconBuffer == nullptr){
-		Serial.printf("MainMenu background picture unpack error\n");
-		return;
-	}
-
-	fs::File iconFile = SPIFFS.open("/Launcher/ByteBoiLogo.raw");
-
-	iconFile.read(reinterpret_cast<uint8_t*>(iconBuffer), 93 * 26 * 2);
-	iconFile.close();
 	scroller = new GameScroller(canvas);
 	logo = new Logo(canvas);
 	title = new GameTitle(canvas);
-
 
 	instance = this;
 	canvas->setChroma(TFT_TRANSPARENT);
 	splash = new Splash(display->getBaseSprite(), logo, title, scroller);
 
+	Launcher::pack();
 }
 
 Launcher::~Launcher(){
@@ -155,5 +134,35 @@ void Launcher::draw(){
 	}
 */
 
+}
+
+void Launcher::init(){
+	Context::init();
+	backgroundBuffer = static_cast<Color*>(ps_malloc(160 * 120 * 2));
+	if(backgroundBuffer == nullptr){
+		Serial.printf("MainMenu background picture unpack error\n");
+		return;
+	}
+
+	fs::File backgroundFile = CompressedFile::open(SPIFFS.open("/Launcher/mainMenuBg.raw.hs"), 13, 12);
+
+	backgroundFile.read(reinterpret_cast<uint8_t*>(backgroundBuffer), 160 * 120 * 2);
+	backgroundFile.close();
+	iconBuffer = static_cast<Color*>(ps_malloc(93 * 26 * 2));
+	if(iconBuffer == nullptr){
+		Serial.printf("Logo picture unpack error\n");
+		return;
+	}
+
+	fs::File iconFile = SPIFFS.open("/Launcher/ByteBoiLogo.raw");
+
+	iconFile.read(reinterpret_cast<uint8_t*>(iconBuffer), 93 * 26 * 2);
+	iconFile.close();
+}
+
+void Launcher::deinit(){
+	Context::deinit();
+	free(backgroundBuffer);
+	free(iconBuffer);
 }
 
