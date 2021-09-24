@@ -9,7 +9,6 @@
 #include <ByteBoi.h>
 #include "GameManagement/GameManager.h"
 #include "GameManagement/GameLoader.h"
-#include "GameInfo.hpp"
 #include <SD.h>
 #include "DescriptionModal.h"
 
@@ -80,15 +79,10 @@ void Launcher::bindInput(){
 	});
 
 	Input::getInstance()->setBtnPressCallback(BTN_C, [](){
-//		if(exitingGame || runningContext == nullptr || runningContext == instance || BatteryService::getInstance()->modalShown()
-//		|| Context::getCurrentContext() == instance->menu)
-//		return;
 		if(instance == nullptr) return;
 		DescriptionModal* descriptionModal;
 		uint8_t index = instance->selectedGame;
-		descriptionModal = new DescriptionModal(*instance, Games.getGame(instance->selectedGame)->name.c_str(),
-												Games.getGame(instance->selectedGame)->author.c_str(),
-												Games.getGame(instance->selectedGame)->description.c_str());
+		descriptionModal = new DescriptionModal(*instance,instance->scroller->getSelectedGame());
 		descriptionModal->push(instance);
 
 	});

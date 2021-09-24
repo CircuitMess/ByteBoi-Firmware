@@ -11,7 +11,7 @@
 
 class DescriptionModal : public Modal, private InputListener{
 public:
-	DescriptionModal(Context& context, const char* title,const char* author, const char* description);
+	DescriptionModal(Context& context, GameInfo* gameInfo);
 
 	~DescriptionModal();
 
@@ -20,11 +20,6 @@ public:
 	void start() override;
 
 	void stop() override;
-
-protected:
-	void init() override;
-
-	void deinit() override;
 
 private:
 	static DescriptionModal* instance;
@@ -36,7 +31,7 @@ private:
 	void buttonPressed(uint id) override;
 
 	LinearLayout* layout;
-	DescriptionModalItem* descriptionText;
+	GameInfo* gameInfo;
 };
 
 #endif //BYTEBOI_FIRMWARE_DESCRIPTIONMODAL_H

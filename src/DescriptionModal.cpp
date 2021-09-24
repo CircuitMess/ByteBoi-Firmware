@@ -1,14 +1,17 @@
-#include <Input/Input.h>
 #include <Pins.hpp>
 #include "DescriptionModal.h"
+#include "profont.h"
+#include "adobex11font.h"
 #include <ByteBoi.h>
+#include <lgfx/v1/lgfx_fonts.hpp>
 
+using namespace std;
+
+static const lgfx::U8g2font adobex11font(u8g2_font_helvB08_tr);
 DescriptionModal* DescriptionModal::instance = nullptr;
 
-DescriptionModal::DescriptionModal(Context& context, const char* title,const char* author, const char* description) : Modal(context, 80, 80),
-																		 layout(new LinearLayout(&screen, VERTICAL)),
-																		 descriptionText(new DescriptionModalItem(layout,title,author,description))
-																		 {
+DescriptionModal::DescriptionModal(Context& context, GameInfo* gameInfo) : Modal(context, 80, 80),gameInfo(gameInfo),
+																		   layout(new LinearLayout(&screen, VERTICAL)){
 	instance = this;
 	buildUI();
 }
@@ -33,18 +36,8 @@ void DescriptionModal::stop(){
 	Input::getInstance()->removeListener(this);
 }
 
-void DescriptionModal::init(){
-	Context::init();
-
-}
-
-void DescriptionModal::deinit(){
-	Context::deinit();
-}
-
 void DescriptionModal::buildUI(){
 	layout->setWHType(CHILDREN, CHILDREN);
-	layout->addChild(descriptionText);
 	layout->reflow();
 	screen.addChild(layout);
 	screen.repos();
