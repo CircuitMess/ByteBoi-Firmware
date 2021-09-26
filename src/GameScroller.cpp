@@ -14,12 +14,7 @@ GameScroller::GameScroller(Sprite* canvas) : canvas(canvas),
 
 
 	for(auto info : Games.getGames()){
-		char path[100] = {0};
-		strncat(path, "/", 100);
-		strncat(path, info->name.c_str(), 100);
-		strncat(path, "/", 100);
-		strncat(path, info->icon.c_str(), 100);
-		File file = SD.open(path);
+		File file = SD.open(info->icon.c_str());
 		uint8_t* buf = genericIcon;
 		if(file){
 			buf = (uint8_t*)ps_malloc(64*64*2);

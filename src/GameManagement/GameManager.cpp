@@ -52,18 +52,36 @@ void GameManager::scanGames(){
 
 				Properties props = PropertiesParser::Read(path);
 				std::string binaryPath = props.GetProperty("Binary");
-				if(binaryPath == "") binaryPath = "firmware.bin";
+				if(binaryPath.empty()) binaryPath = gameDefaults.binary;
 				memset(path, 0, 100);
 				strncat(path, gameFolder.name(), 100);
 				strncat(path, "/", 100);
 				strncat(path, binaryPath.c_str(), 100);
+
+				char resourcesPath[100] = {0};
+				std::string resources = props.GetProperty("Resources");
+				if(resources.empty()) resources = gameDefaults.resources;
+				memset(resourcesPath, 0, 100);
+				strncat(resourcesPath, gameFolder.name(), 100);
+				strncat(resourcesPath, "/", 100);
+				strncat(resourcesPath, resources.c_str(), 100);
+
+				char iconPath[100] = {0};
+				std::string icon = props.GetProperty("Resources");
+				if(icon.empty()) icon = gameDefaults.icon;
+				memset(iconPath, 0, 100);
+				strncat(iconPath, gameFolder.name(), 100);
+				strncat(iconPath, "/", 100);
+				strncat(iconPath, icon.c_str(), 100);
+
 				if(SD.exists(path)){
 					auto game = new GameInfo(GameInfo{
 							getValueOrDefault(props, "Name", gameDefaults.name),
+							props.GetProperty("Author"),
 							props.GetProperty("Description"),
-							getValueOrDefault(props, "Icon", gameDefaults.icon),
-							getValueOrDefault(props, "Binary", gameDefaults.binary),
-							getValueOrDefault(props, "Resources", gameDefaults.resources)
+							(SD.exists(iconPath) ? iconPath : ""),
+							path,
+							(SD.exists(resourcesPath) ? resourcesPath : "")
 					});
 					games.push_back(game);
 				}
