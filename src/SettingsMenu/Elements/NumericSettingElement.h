@@ -16,7 +16,7 @@ private:
 	int numSteps;
 	Vector<int> values;
 	int currentStep;
-	std::string parseSeconds(uint seconds);
+	String parseSeconds(uint seconds);
 
 };
 } // namespace Settings

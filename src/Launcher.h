@@ -17,6 +17,8 @@ class Launcher : public LoopListener, public Context {
 public:
 	Launcher(Display* display);
 
+	virtual ~Launcher();
+
 	void loop(uint micros) override;
 	void start() override;
 	void stop() override;
@@ -38,6 +40,12 @@ private:
 
 	void bindInput();
 
+	Color* backgroundBuffer = nullptr;
+
+protected:
+	void init() override;
+
+	void deinit() override;
 };
 
 #endif //BYTEBOI_LAUNCHER_H

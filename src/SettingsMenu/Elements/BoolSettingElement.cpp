@@ -1,8 +1,5 @@
 #include "BoolSettingElement.h"
-#include <Arduino.h>
-#include <string>
-#include <iostream>
-#include <sstream>
+
 SettingsMenu::BoolSettingElement::BoolSettingElement(ElementContainer* parent, Setting* setting) :
 		SettingElement(parent, setting)
 {

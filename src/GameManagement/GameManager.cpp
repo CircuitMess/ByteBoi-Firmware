@@ -5,8 +5,6 @@
 #include <esp_partition.h>
 #include <esp_ota_ops.h>
 #include <PropertiesParser.h>
-#include <iostream>
-#include <utility>
 #include <ByteBoi.h>
 #include <Properties.h>
 #include "../GameInfo.hpp"
@@ -67,7 +65,7 @@ void GameManager::scanGames(){
 				strncat(resourcesPath, resources.c_str(), 100);
 
 				char iconPath[100] = {0};
-				std::string icon = props.GetProperty("Resources");
+				std::string icon = props.GetProperty("Icon");
 				if(icon.empty()) icon = gameDefaults.icon;
 				memset(iconPath, 0, 100);
 				strncat(iconPath, gameFolder.name(), 100);
