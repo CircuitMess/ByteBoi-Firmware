@@ -24,7 +24,7 @@ Launcher::Launcher(Display* display) : Context(*display), display(display){
 
 	instance = this;
 	canvas->setChroma(TFT_TRANSPARENT);
-	splash = new Splash(display->getBaseSprite(), logo, title, scroller);
+	splash = new Splash(scroller);
 
 	Launcher::pack();
 }
@@ -89,7 +89,6 @@ void Launcher::loop(uint _micros){
 	int t = micros();
 	if(splash){
 		splash->loop(_micros);
-
 		if(splash->done()){
 			delete splash;
 			splash = nullptr;
