@@ -10,6 +10,7 @@
 #include "GameManagement/GameManager.h"
 #include "GameManagement/GameLoader.h"
 #include "GameInfo.hpp"
+#include "DescriptionModal.h"
 #include <SD.h>
 #include <SPIFFS.h>
 #include <FS/CompressedFile.h>
@@ -79,6 +80,13 @@ void Launcher::bindInput(){
 	Input::getInstance()->setBtnPressCallback(BTN_A, [](){
 		if(instance->scroller->scrolling()) return;
 		GameLoader::loadGame(Games.getGame(instance->selectedGame));
+	});
+	Input::getInstance()->setBtnPressCallback(BTN_C, [](){
+		if(instance == nullptr) return;
+		DescriptionModal* descriptionModal;
+		descriptionModal = new DescriptionModal(*instance,instance->scroller->getSelectedGame());
+		descriptionModal->push(instance);
+
 	});
 }
 
