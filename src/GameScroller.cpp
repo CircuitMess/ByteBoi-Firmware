@@ -185,3 +185,8 @@ GameImage* GameScroller::getLLGame(){
 GameImage* GameScroller::getRRGame(){
 	return games[(selectedGame + 2) % games.size()];
 }
+
+GameInfo* const GameScroller::getSelectedGame() const{
+	return Games.getGames()[selectedGame];
+
+}

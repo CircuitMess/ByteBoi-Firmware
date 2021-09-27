@@ -36,7 +36,6 @@ void GameManager::scanGames(){
 	games.clear();
 	File root = SD.open("/");
 	File gameFolder = root.openNextFile();
-	size_t counter = 0;
 	while(gameFolder){
 		if(gameFolder.isDirectory()){
 			char path[100] = {0};
@@ -86,7 +85,6 @@ void GameManager::scanGames(){
 			}
 		}
 		gameFolder = root.openNextFile();
-		counter++;
 	}
 	root.close();
 	gameFolder.close();

@@ -5,6 +5,8 @@
 #include <CircuitOS.h>
 #include <Loop/LoopListener.h>
 #include <Support/Context.h>
+#include "GameInfo.hpp"
+
 
 class Logo;
 class GameTitle;
