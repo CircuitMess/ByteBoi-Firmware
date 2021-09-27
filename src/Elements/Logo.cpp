@@ -29,10 +29,6 @@ void Logo::loop(uint micros){
 	currentY = y + pow(cos(f * 1000.0f / speed), 2) * -amplitude;
 }
 
-void Logo::splash(float f){
-	currentY = f * (float) (y - startY) + startY;
-}
-
 void Logo::draw(){
 	canvas->drawIcon(logoBuffer,x, currentY, width, height,1,TFT_BLACK);
 }
