@@ -25,7 +25,7 @@ Vector<Tone> tones = {
 int tonePlaying = -1;
 uint toneTotal;
 
-Splash::Splash(Sprite* canvas, GameTitle* title, GameScroller* scroller) : canvas(canvas), title(title), scroller(scroller){
+Splash::Splash(GameScroller* scroller) : scroller(scroller){
 
 }
 

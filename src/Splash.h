@@ -9,7 +9,7 @@ class GameScroller;
 
 class Splash {
 public:
-	Splash(Sprite* canvas,GameTitle* title, GameScroller* scroller);
+	Splash(GameScroller* scroller);
 
 	void loop(uint micros);
 	bool done();
