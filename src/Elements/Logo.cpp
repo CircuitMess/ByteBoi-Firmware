@@ -18,6 +18,10 @@ Logo::Logo(Sprite* canvas) : canvas(canvas), x((canvas->width() - width) / 2), c
 	iconFile.close();
 }
 
+Logo::~Logo(){
+	free(logoBuffer);
+}
+
 void Logo::loop(uint micros){
 	f += (float) micros / 1000000.0f;
 	if(f > 2 * M_PI) f -= 2 * M_PI;
@@ -32,3 +36,5 @@ void Logo::splash(float f){
 void Logo::draw(){
 	canvas->drawIcon(logoBuffer,x, currentY, width, height,1,TFT_BLACK);
 }
+
+

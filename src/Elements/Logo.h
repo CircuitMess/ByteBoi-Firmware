@@ -12,6 +12,8 @@ class Logo {
 public:
 	Logo(Sprite* canvas);
 
+	virtual ~Logo();
+
 	void loop(uint micros);
 	void splash(float f);
 	void draw();
