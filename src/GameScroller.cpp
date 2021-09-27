@@ -10,7 +10,7 @@
 GameScroller::GameScroller(Sprite* canvas) : canvas(canvas),
 		origin((canvas->width() - width) / 2){
 	genericIcon = (uint8_t*)ps_malloc(64*64*2);
-	SPIFFS.open("/launcher/genericGame.raw").read(genericIcon, 64*64*2);
+	SPIFFS.open("/Launcher/genericGame.raw").read(genericIcon, 64*64*2);
 
 
 	for(auto info : Games.getGames()){
