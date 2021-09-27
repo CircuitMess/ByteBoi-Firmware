@@ -2,10 +2,20 @@
 
 #include <Display/Sprite.h>
 #include <Display/LovyanGFX_setup.h>
+#include <SPIFFS.h>
 #include "../Bitmaps/logo.hpp"
 
 Logo::Logo(Sprite* canvas) : canvas(canvas), x((canvas->width() - width) / 2), currentY(startY){
+	logoBuffer = static_cast<Color*>(ps_malloc(93 * 26 * 2));
+	if(logoBuffer == nullptr){
+		Serial.printf("Logo picture unpack error\n");
+		return;
+	}
 
+	fs::File iconFile = SPIFFS.open("/launcher/ByteBoiLogo.raw");
+
+	iconFile.read(reinterpret_cast<uint8_t*>(logoBuffer), 93 * 26 * 2);
+	iconFile.close();
 }
 
 void Logo::loop(uint micros){
@@ -20,5 +30,5 @@ void Logo::splash(float f){
 }
 
 void Logo::draw(){
-	canvas->pushImage(x, currentY, width, height, (lgfx::rgb565_t*)logo, 0x2001);
+	canvas->drawIcon(logoBuffer,x, currentY, width, height,1,TFT_BLACK);
 }

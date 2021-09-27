@@ -41,7 +41,6 @@ private:
 	void bindInput();
 
 	Color* backgroundBuffer = nullptr;
-	Color* logoBuffer = nullptr;
 
 protected:
 	void init() override;
