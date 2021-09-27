@@ -22,15 +22,10 @@ public:
 	void stop() override;
 
 private:
-	static DescriptionModal* instance;
-
-	void buildUI();
-
 	void splitPrintSentence(std::string sentence);
 
 	void buttonPressed(uint id) override;
 
-	LinearLayout* layout;
 	GameInfo* gameInfo;
 };
 
