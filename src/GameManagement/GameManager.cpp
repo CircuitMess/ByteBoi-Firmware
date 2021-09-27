@@ -5,8 +5,6 @@
 #include <esp_partition.h>
 #include <esp_ota_ops.h>
 #include <PropertiesParser.h>
-#include <iostream>
-#include <utility>
 #include <ByteBoi.h>
 #include <Properties.h>
 #include "../GameInfo.hpp"
