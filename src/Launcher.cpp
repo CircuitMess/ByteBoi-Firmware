@@ -9,23 +9,28 @@
 #include <ByteBoi.h>
 #include "GameManagement/GameManager.h"
 #include "GameManagement/GameLoader.h"
+#include "GameInfo.hpp"
 #include <SD.h>
-#include "DescriptionModal.h"
+#include <SPIFFS.h>
+#include <FS/CompressedFile.h>
 
 Launcher* Launcher::instance = nullptr;
 
 Launcher::Launcher(Display* display) : Context(*display), display(display){
 	canvas = screen.getSprite();
-
 	scroller = new GameScroller(canvas);
 	logo = new Logo(canvas);
 	title = new GameTitle(canvas);
-
 
 	instance = this;
 	canvas->setChroma(TFT_TRANSPARENT);
 	splash = new Splash(display->getBaseSprite(), logo, title, scroller);
 
+	Launcher::pack();
+}
+
+Launcher::~Launcher(){
+	free(backgroundBuffer);
 }
 
 void Launcher::start(){
@@ -37,13 +42,11 @@ void Launcher::start(){
 	LoopManager::addListener(this);
 }
 
-void Launcher::stop()
-{
+void Launcher::stop(){
 	LoopManager::removeListener(this);
 	Input::getInstance()->removeBtnPressCallback(BTN_RIGHT);
 	Input::getInstance()->removeBtnPressCallback(BTN_LEFT);
 	Input::getInstance()->removeBtnPressCallback(BTN_A);
-	Input::getInstance()->removeBtnPressCallback(BTN_C);
 }
 
 void Launcher::prev(){
@@ -76,15 +79,6 @@ void Launcher::bindInput(){
 	Input::getInstance()->setBtnPressCallback(BTN_A, [](){
 		if(instance->scroller->scrolling()) return;
 		GameLoader::loadGame(Games.getGame(instance->selectedGame));
-	});
-
-	Input::getInstance()->setBtnPressCallback(BTN_C, [](){
-		if(instance == nullptr) return;
-		DescriptionModal* descriptionModal;
-		uint8_t index = instance->selectedGame;
-		descriptionModal = new DescriptionModal(*instance,instance->scroller->getSelectedGame());
-		descriptionModal->push(instance);
-
 	});
 }
 
@@ -123,7 +117,7 @@ void Launcher::loop(uint _micros){
 }
 
 void Launcher::draw(){
-	canvas->clear(TFT_BLACK);
+	screen.getSprite()->drawIcon(backgroundBuffer, 0, 0, 160, 120, 1);
 	scroller->draw();
 	title->draw();
 	logo->draw();
@@ -131,13 +125,30 @@ void Launcher::draw(){
 /*
 	if(batteryService->getVoltage() > 780){
 		canvas->drawBitmap(screen.getWidth() - 8, 0, battery1, 8, 12, TFT_WHITE);
-	}
-	else if(batteryService->getVoltage() <= 780 && batteryService->getVoltage() >= 700){
+	}else if(batteryService->getVoltage() <= 780 && batteryService->getVoltage() >= 700){
 		canvas->drawBitmap(screen.getWidth() - 8, 0, battery2, 8, 12, TFT_WHITE);
-	}
-	else if(batteryService->getVoltage() < 700){
+	}else if(batteryService->getVoltage() < 700){
 		canvas->drawBitmap(screen.getWidth() - 8, 0, battery3, 8, 12, TFT_WHITE);
 	}
 */
 
 }
+
+void Launcher::init(){
+	backgroundBuffer = static_cast<Color*>(ps_malloc(160 * 120 * 2));
+	if(backgroundBuffer == nullptr){
+		Serial.printf("MainMenu background picture unpack error\n");
+		return;
+	}
+
+	fs::File backgroundFile = CompressedFile::open(SPIFFS.open("/launcher/mainMenuBg.raw.hs"), 13, 12);
+
+	backgroundFile.read(reinterpret_cast<uint8_t*>(backgroundBuffer), 160 * 120 * 2);
+	backgroundFile.close();
+
+}
+
+void Launcher::deinit(){
+	free(backgroundBuffer);
+}
+

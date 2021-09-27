@@ -23,38 +23,28 @@ void GameLoader::loadGame(GameInfo* game){
 	file.close();
 	root.close();
 
-	//copy resources
-	char path[100];
-	strncpy(path, "/", 100);
-	strncat(path, game->name.c_str(), 100);
-	strncat(path, "/", 100);
-	strncat(path, game->resources.c_str(), 100);
-	if(SD.exists(path)){
-		root = SD.open(path);
-		file = root.openNextFile();
-		while(file){
-			String fileName = file.name();
-			fileName = fileName.substring(fileName.lastIndexOf('/') + 1);
-			File destFile = SPIFFS.open(ByteBoiImpl::SPIFFSgameRoot + fileName, FILE_WRITE);
-			uint8_t buf[512];
-			while(file.available()){
-				size_t readBytes = file.read(buf, 512);
-				destFile.write(buf, readBytes);
-			}
-			destFile.close();
+	if(!game->resources.empty()){
+		//copy resources
+		if(SD.exists(game->resources.c_str())){
+			root = SD.open(game->resources.c_str());
 			file = root.openNextFile();
+			while(file){
+				String fileName = file.name();
+				fileName = fileName.substring(fileName.lastIndexOf('/') + 1);
+				File destFile = SPIFFS.open(ByteBoiImpl::SPIFFSgameRoot + fileName, FILE_WRITE);
+				uint8_t buf[512];
+				while(file.read(buf, 512)){
+					destFile.write(buf, 512);
+				}
+				destFile.close();
+				file = root.openNextFile();
+			}
+			file.close();
+			root.close();
 		}
-		file.close();
-		root.close();
 	}
 
-
-	strncpy(path, "/", 100);
-	strncat(path, game->name.c_str(), 100);
-	strncat(path, "/", 100);
-	strncat(path, game->binary.c_str(), 100);
-
-	file = SD.open(path);
+	file = SD.open(game->binary.c_str());
 	if(!file) return;
 	if(file.isDirectory()){
 		file.close();
