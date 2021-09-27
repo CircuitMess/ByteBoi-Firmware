@@ -1,5 +1,4 @@
 #include "Splash.h"
-#include "Elements/Logo.h"
 #include "Elements/GameTitle.h"
 #include "GameScroller.h"
 #include <Audio/Piezo.h>
@@ -26,7 +25,7 @@ Vector<Tone> tones = {
 int tonePlaying = -1;
 uint toneTotal;
 
-Splash::Splash(Sprite* canvas, Logo* logo, GameTitle* title, GameScroller* scroller) : canvas(canvas), logo(logo), title(title), scroller(scroller){
+Splash::Splash(Sprite* canvas, GameTitle* title, GameScroller* scroller) : canvas(canvas), title(title), scroller(scroller){
 
 }
 
@@ -51,7 +50,6 @@ void Splash::loop(uint micros){
 
 	if(f >= hold){
 		float fSecondHalf = f * 2.0 - 1.0;
-		logo->splash(fSecondHalf);
 		scroller->splash(fSecondHalf);
 	}
 }
