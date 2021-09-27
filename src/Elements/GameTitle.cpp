@@ -11,7 +11,7 @@ GameTitle::GameTitle(Sprite* canvas) : canvas(canvas), x((canvas->width() - widt
 	y = currentY = canvas->height() - height + 7;
 }
 
-void GameTitle::change(const char* newText){
+void GameTitle::change(const String& newText){
 	bool wasChanging = changeTo != nullptr;
 
 	state = DOWN;
