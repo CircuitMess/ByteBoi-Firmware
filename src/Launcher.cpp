@@ -143,7 +143,7 @@ void Launcher::init(){
 		return;
 	}
 
-	fs::File backgroundFile = CompressedFile::open(SPIFFS.open("/Launcher/mainMenuBg.raw.hs"), 13, 12);
+	fs::File backgroundFile = CompressedFile::open(SPIFFS.open("/launcher/mainMenuBg.raw.hs"), 13, 12);
 
 	backgroundFile.read(reinterpret_cast<uint8_t*>(backgroundBuffer), 160 * 120 * 2);
 	backgroundFile.close();
@@ -153,7 +153,7 @@ void Launcher::init(){
 		return;
 	}
 
-	fs::File iconFile = SPIFFS.open("/Launcher/ByteBoiLogo.raw");
+	fs::File iconFile = SPIFFS.open("/launcher/ByteBoiLogo.raw");
 
 	iconFile.read(reinterpret_cast<uint8_t*>(logoBuffer), 93 * 26 * 2);
 	iconFile.close();
