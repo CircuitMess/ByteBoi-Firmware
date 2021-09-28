@@ -30,9 +30,6 @@ void setup(){
 	Games.scanGames();
 	LoopManager::addListener(&Games);
 
-	pinMode(36, INPUT);
-	pinMode(34, INPUT);
-
 	Context* launcher = new Launcher(ByteBoi.getDisplay());
 	launcher->unpack();
 	launcher->start();
