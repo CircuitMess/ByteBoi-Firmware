@@ -41,6 +41,7 @@ Launcher::Launcher(Display* display) : Context(*display), display(display), gene
 
 	Games.setGameListener(this);
 	load();
+	title->change("");
 	scroller->splash(0);
 
 	Launcher::pack();
@@ -99,6 +100,8 @@ void Launcher::load(){
 	}
 
 	scroller->reset();
+	selectedGame = 0;
+	title->change(items[selectedGame].text);
 }
 
 void Launcher::start(){
@@ -218,5 +221,5 @@ void Launcher::deinit(){
 }
 
 void Launcher::gamesChanged(bool inserted){
-	//TODO: implementirati loadanje/clearanje UI-a
+	load();
 }
