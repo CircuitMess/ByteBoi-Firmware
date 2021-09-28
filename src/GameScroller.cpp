@@ -43,7 +43,8 @@ void GameScroller::reset(){
 
 void GameScroller::repos(){
 	for(auto& item : items){
-		item.image.setX(-128);
+		item.image.setX(-width);
+		item.image.setY(35);
 	}
 
 	if(items.size() < 4) return;
