@@ -1,8 +1,6 @@
 #include "NumericSettingElement.h"
 #include <Arduino.h>
 #include <string>
-#include <iostream>
-#include <sstream>
 #include <Settings.h>
 
 SettingsMenu::NumericSettingElement::NumericSettingElement(ElementContainer* parent, Setting* setting) :
@@ -45,22 +43,22 @@ void SettingsMenu::NumericSettingElement::draw()
 	getSprite()->fillRect(getTotalX() + 30, getTotalY() + 21, map(currentStep, 0, numSteps - 1, 0, getWidth() - 60), 3, TFT_WHITE);
 	Element::draw();
 }
-std::string SettingsMenu::NumericSettingElement::parseSeconds(uint seconds)
+String SettingsMenu::NumericSettingElement::parseSeconds(uint seconds)
 {
-	std::ostringstream str1;
+	String str1 = "";
 	if(seconds >= 3600)
 	{
-		str1 << uint(seconds/3600) << "h";
+		str1 += String(uint(seconds/3600)) + "h";
 	}
 	else if(seconds >= 60)
 	{
-		str1 << uint(seconds/60) << "min";
+		str1 + String(uint(seconds/60)) + "min";
 	}
 	else
 	{
-		str1 << seconds << "s";
+		str1 + String(seconds) + "s";
 	}
-	return str1.str();
+	return str1;
 }
 void SettingsMenu::NumericSettingElement::pressLeft()
 {

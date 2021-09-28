@@ -25,20 +25,16 @@ void setup(){
 	Serial.begin(115200);
 	ByteBoi.begin();
 	ByteBoi.unbindMenu();
-	Games.scanGames();
-	display = ByteBoi.getDisplay();
-
 	BatteryPopup.enablePopups(true);
 
+	Games.scanGames();
+	LoopManager::addListener(&Games);
 
-	LoopManager::addListener(Input::getInstance());
-	launcher = new Launcher(display);
+	pinMode(36, INPUT);
+	pinMode(34, INPUT);
 
-	runningContext = launcher;
-
-
+	Context* launcher = new Launcher(ByteBoi.getDisplay());
 	launcher->unpack();
-
 	launcher->start();
 }
 

@@ -3,6 +3,7 @@
 
 struct GameInfo{
 	std::string name;
+	std::string author;
 	std::string description;
 	std::string icon;
 	std::string binary;

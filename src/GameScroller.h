@@ -6,6 +6,7 @@
 #include <Loop/LoopListener.h>
 #include <Util/Vector.h>
 #include <Properties.h>
+#include "GameInfo.hpp"
 
 class Sprite;
 class Launcher;
@@ -25,6 +26,8 @@ public:
 	bool scrolling();
 
 	void splash(float f);
+
+	GameInfo* const getSelectedGame() const;
 
 private:
 	const uint8_t gutter = 20;

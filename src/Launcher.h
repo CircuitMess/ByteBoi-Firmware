@@ -5,6 +5,8 @@
 #include <CircuitOS.h>
 #include <Loop/LoopListener.h>
 #include <Support/Context.h>
+#include "GameInfo.hpp"
+#include "GameManagement/GameListener.hpp"
 
 class Logo;
 class GameTitle;
@@ -13,17 +15,17 @@ class Splash;
 class Menu;
 
 
-extern Context* runningContext;
-extern bool exitingGame;
-
-class Launcher : public LoopListener, public Context {
+class Launcher : public LoopListener, public Context, public GameListener {
 public:
 	Launcher(Display* display);
+
+	virtual ~Launcher();
 
 	void loop(uint micros) override;
 	void start() override;
 	void stop() override;
 	void draw() override;
+	void gamesChanged(bool inserted) override;
 
 private:
 	static Launcher* instance;
@@ -41,6 +43,12 @@ private:
 
 	void bindInput();
 
+	Color* backgroundBuffer = nullptr;
+
+protected:
+	void init() override;
+
+	void deinit() override;
 };
 
 #endif //BYTEBOI_LAUNCHER_H
