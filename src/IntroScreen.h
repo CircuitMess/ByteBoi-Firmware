@@ -9,7 +9,7 @@
 class IntroScreen: public Context, public LoopListener {
 public:
 
-	IntroScreen(Display &display);
+	IntroScreen(Display &display, Context* menu);
 
 	virtual ~IntroScreen();
 
@@ -24,6 +24,7 @@ public:
 private:
 	static IntroScreen *instance;
 	AnimatedSprite* gif = nullptr;
+	Context* menu = nullptr;
 
 };
 

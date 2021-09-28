@@ -31,7 +31,9 @@ void setup(){
 	Games.scanGames();
 	LoopManager::addListener(&Games);
 
-	Context* intro = new IntroScreen(*ByteBoi.getDisplay());
+	Launcher* launcher = new Launcher(ByteBoi.getDisplay());
+
+	Context* intro = new IntroScreen(*ByteBoi.getDisplay(), launcher);
 	intro->unpack();
 	intro->start();
 }

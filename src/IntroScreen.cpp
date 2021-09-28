@@ -7,7 +7,7 @@
 
 IntroScreen* IntroScreen::instance = nullptr;
 
-IntroScreen::IntroScreen(Display& display) : Context(display){
+IntroScreen::IntroScreen(Display& display, Context* menu) : Context(display), menu(menu){
 	instance = this;
 
 	fs::File f = SPIFFS.open("/launcher/intro.g565.hs");
@@ -43,13 +43,15 @@ void IntroScreen::start(){
 	gif->setLoopDoneCallback([]{
 		if(instance == nullptr) return;
 
-		Display& display = *instance->getScreen().getDisplay();
+		Context* menu = instance->menu;
 
 		instance->stop();
 		delete instance;
-		Launcher* launcher = new Launcher(&display);
-		launcher->unpack();
-		launcher->start();
+
+		if(menu){
+			menu->unpack();
+			menu->start();
+		}
 	});
 
 	LoopManager::addListener(this);
