@@ -41,6 +41,7 @@ Launcher::Launcher(Display* display) : Context(*display), display(display), gene
 
 	Games.setGameListener(this);
 	load();
+	scroller->splash(0);
 
 	Launcher::pack();
 }
