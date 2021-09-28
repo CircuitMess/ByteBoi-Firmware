@@ -43,12 +43,10 @@ private:
 
 	void bindInput();
 
-	Color* backgroundBuffer = nullptr;
-
 protected:
 	void init() override;
-
 	void deinit() override;
+
 };
 
 #endif //BYTEBOI_LAUNCHER_H

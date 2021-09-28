@@ -67,7 +67,7 @@ void SettingsMenu::SettingsMenu::start()
 {
 	Input::getInstance()->setBtnPressCallback(BTN_B, [](){
 		Settings.store();
-		Piezo.setMute(!Settings.get().mute);
+		Piezo.setMute(!Settings.get().volume);
 		instance->pop();
 	});
 	Input::getInstance()->setBtnPressCallback(BTN_UP, [](){

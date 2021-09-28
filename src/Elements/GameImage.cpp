@@ -16,7 +16,7 @@ GameImage::~GameImage(){
 
 
 void GameImage::draw() const {
-	canvas->drawIcon(appIconBuffer, x, y, 64, 64, 1, TFT_BLACK);
+	canvas->drawIcon(appIconBuffer, x, y, 64, 64, 1, TFT_TRANSPARENT);
 }
 
 int16_t GameImage::getX() const{

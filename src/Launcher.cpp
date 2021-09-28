@@ -5,6 +5,7 @@
 #include "Elements/Logo.h"
 #include "Elements/GameTitle.h"
 #include <Audio/Piezo.h>
+#include "Bitmaps/battery.hpp"
 #include <Loop/LoopManager.h>
 #include <ByteBoi.h>
 #include "GameManagement/GameManager.h"
@@ -32,7 +33,6 @@ Launcher::Launcher(Display* display) : Context(*display), display(display){
 }
 
 Launcher::~Launcher(){
-	free(backgroundBuffer);
 	Games.setGameListener(nullptr);
 }
 
@@ -50,6 +50,7 @@ void Launcher::stop(){
 	Input::getInstance()->removeBtnPressCallback(BTN_RIGHT);
 	Input::getInstance()->removeBtnPressCallback(BTN_LEFT);
 	Input::getInstance()->removeBtnPressCallback(BTN_A);
+	Input::getInstance()->removeBtnPressCallback(BTN_C);
 }
 
 void Launcher::prev(){
@@ -83,6 +84,7 @@ void Launcher::bindInput(){
 		if(instance->scroller->scrolling()) return;
 		GameLoader::loadGame(Games.getGame(instance->selectedGame));
 	});
+
 	Input::getInstance()->setBtnPressCallback(BTN_C, [](){
 		if(instance == nullptr) return;
 		DescriptionModal* descriptionModal;
@@ -115,19 +117,15 @@ void Launcher::loop(uint _micros){
 	draw();
 //	canvas->setTextColor(TFT_WHITE);
 //	canvas->setTextSize(1);
-//	canvas->setCursor(120, 10);
-//	canvas->println(GameManager::getExpander()->pinRead(8));
-//	canvas->setCursor(100, 10);
-//	canvas->println(GameManager::getExpander()->pinRead(10));
 //	canvas->setCursor(130, 10);
-//	canvas->println(analogRead(36));
+//	canvas->println(Battery.getPercentage());
 //	canvas->println((1000000.0 / (float)drawTime1));
 	screen.commit();
 	drawTime1 = micros() - t;
 }
 
 void Launcher::draw(){
-	screen.getSprite()->drawIcon(backgroundBuffer, 0, 0, 160, 120, 1);
+	screen.getSprite()->clear(C_HEX(0x0082ff));
 	scroller->draw();
 	title->draw();
 	logo->draw();
@@ -145,21 +143,11 @@ void Launcher::draw(){
 }
 
 void Launcher::init(){
-	backgroundBuffer = static_cast<Color*>(ps_malloc(160 * 120 * 2));
-	if(backgroundBuffer == nullptr){
-		Serial.printf("MainMenu background picture unpack error\n");
-		return;
-	}
-
-	fs::File backgroundFile = CompressedFile::open(SPIFFS.open("/launcher/mainMenuBg.raw.hs"), 13, 12);
-
-	backgroundFile.read(reinterpret_cast<uint8_t*>(backgroundBuffer), 160 * 120 * 2);
-	backgroundFile.close();
 
 }
 
 void Launcher::deinit(){
-	free(backgroundBuffer);
+
 }
 
 void Launcher::gamesChanged(bool inserted){
