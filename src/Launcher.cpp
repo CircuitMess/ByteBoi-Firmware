@@ -50,6 +50,7 @@ void Launcher::stop(){
 	Input::getInstance()->removeBtnPressCallback(BTN_RIGHT);
 	Input::getInstance()->removeBtnPressCallback(BTN_LEFT);
 	Input::getInstance()->removeBtnPressCallback(BTN_A);
+	Input::getInstance()->removeBtnPressCallback(BTN_C);
 }
 
 void Launcher::prev(){
@@ -83,6 +84,7 @@ void Launcher::bindInput(){
 		if(instance->scroller->scrolling()) return;
 		GameLoader::loadGame(Games.getGame(instance->selectedGame));
 	});
+
 	Input::getInstance()->setBtnPressCallback(BTN_C, [](){
 		if(instance == nullptr) return;
 		DescriptionModal* descriptionModal;
