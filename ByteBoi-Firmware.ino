@@ -16,6 +16,7 @@
 #include <SPIFFS.h>
 #include "src/GameManagement/GameManager.h"
 #include <Battery/BatteryPopupService.h>
+#include "src/IntroScreen.h"
 
 Launcher* launcher;
 
@@ -30,9 +31,9 @@ void setup(){
 	Games.scanGames();
 	LoopManager::addListener(&Games);
 
-	Context* launcher = new Launcher(ByteBoi.getDisplay());
-	launcher->unpack();
-	launcher->start();
+	Context* intro = new IntroScreen(*ByteBoi.getDisplay());
+	intro->unpack();
+	intro->start();
 }
 
 void loop(){
