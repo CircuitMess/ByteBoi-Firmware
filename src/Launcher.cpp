@@ -223,4 +223,7 @@ void Launcher::deinit(){
 
 void Launcher::gamesChanged(bool inserted){
 	load();
+	if(splash != nullptr){
+		title->change("");
+	}
 }
