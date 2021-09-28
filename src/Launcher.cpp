@@ -5,6 +5,7 @@
 #include "Elements/Logo.h"
 #include "Elements/GameTitle.h"
 #include <Audio/Piezo.h>
+#include "Bitmaps/battery.hpp"
 #include <Loop/LoopManager.h>
 #include <ByteBoi.h>
 #include "GameManagement/GameManager.h"
@@ -115,12 +116,8 @@ void Launcher::loop(uint _micros){
 	draw();
 //	canvas->setTextColor(TFT_WHITE);
 //	canvas->setTextSize(1);
-//	canvas->setCursor(120, 10);
-//	canvas->println(GameManager::getExpander()->pinRead(8));
-//	canvas->setCursor(100, 10);
-//	canvas->println(GameManager::getExpander()->pinRead(10));
 //	canvas->setCursor(130, 10);
-//	canvas->println(analogRead(36));
+//	canvas->println(Battery.getPercentage());
 //	canvas->println((1000000.0 / (float)drawTime1));
 	screen.commit();
 	drawTime1 = micros() - t;

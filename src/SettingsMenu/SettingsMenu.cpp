@@ -6,7 +6,6 @@
 #include <Settings.h>
 
 Vector<SettingsMenu::Setting> settingsVector = {
-	SettingsMenu::Setting(SettingsMenu::Setting::Type::NUMERIC, new SettingsMenu::NumericSettingParams(Vector<int>{0, 10, 30, 60, 300}), std::string("Sleep"), nullptr),
 	SettingsMenu::Setting(SettingsMenu::Setting::Type::NUMERIC, new SettingsMenu::NumericSettingParams(Vector<int>{0, 300, 600, 1800, 3600}), std::string("Shutdown"), nullptr),
 	SettingsMenu::Setting(SettingsMenu::Setting::Type::BOOLEAN, nullptr, std::string("Audio"), nullptr)
 };
@@ -18,7 +17,6 @@ SettingsMenu::SettingsMenu::SettingsMenu(Display& display) :
 {
 	instance = this;
 
-	settingsVector[0].storeLocation = &(Settings.get().sleepTime);
 	settingsVector[1].storeLocation = &(Settings.get().shutdownTime);
 	settingsVector[2].storeLocation = &(Settings.get().mute);
 
@@ -69,7 +67,7 @@ void SettingsMenu::SettingsMenu::start()
 {
 	Input::getInstance()->setBtnPressCallback(BTN_B, [](){
 		Settings.store();
-		Piezo.setMute(!Settings.get().mute);
+		Piezo.setMute(!Settings.get().volume);
 		instance->pop();
 	});
 	Input::getInstance()->setBtnPressCallback(BTN_UP, [](){
