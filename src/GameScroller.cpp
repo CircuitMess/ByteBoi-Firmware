@@ -26,6 +26,8 @@ GameScroller::~GameScroller(){
 }
 
 void GameScroller::splash(float f){
+	if(items.size() < 4) return;
+
 	getCGame()->setX(f * (float) (origin + width) - width);
 	getLGame()->setX(f * (float) (origin + width) - 2 * width - gutter);
 	getRGame()->setX(f * (float) (origin + width + gutter - (origin + 2*width + 2*gutter)) + origin + 2*width + 2*gutter);
