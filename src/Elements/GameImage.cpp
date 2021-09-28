@@ -5,7 +5,7 @@
 GameImage::GameImage(){}
 
 GameImage::GameImage(Sprite* canvas) : canvas(canvas){
-	buffer = static_cast<Color*>(ps_malloc(64 * 64 * 2));
+	buffer = static_cast<Color*>(malloc(64 * 64 * 2));
 }
 
 GameImage::GameImage(Sprite* canvas, const Color* buffer) : GameImage(canvas){
@@ -22,7 +22,7 @@ GameImage& GameImage::operator=(const GameImage& other){
 
 	this->canvas = other.canvas;
 	free(buffer);
-	buffer = static_cast<Color*>(ps_malloc(64 * 64 * 2));
+	buffer = static_cast<Color*>(malloc(64 * 64 * 2));
 	if(other.buffer != nullptr){
 		memcpy(buffer, other.buffer, 64 * 64 * 2);
 	}
