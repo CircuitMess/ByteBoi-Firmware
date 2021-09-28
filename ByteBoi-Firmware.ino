@@ -16,22 +16,18 @@
 #include <SPIFFS.h>
 #include "src/GameManagement/GameManager.h"
 
-Launcher* launcher;
-
-Display* display;
-
 void setup(){
 	Serial.begin(115200);
 	ByteBoi.begin();
 	ByteBoi.unbindMenu();
+
 	Games.scanGames();
+	LoopManager::addListener(&Games);
 
 	pinMode(36, INPUT);
 	pinMode(34, INPUT);
 
-	display = ByteBoi.getDisplay();
-	launcher = new Launcher(display);
-
+	Context* launcher = new Launcher(ByteBoi.getDisplay());
 	launcher->unpack();
 	launcher->start();
 }
