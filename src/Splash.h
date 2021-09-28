@@ -15,8 +15,6 @@ public:
 	bool done();
 
 private:
-	const float hold = 0.5;
-
 	float f = 0;
 
 	Sprite* canvas;

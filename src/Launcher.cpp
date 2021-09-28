@@ -107,15 +107,20 @@ void Launcher::load(){
 void Launcher::start(){
 	if(splash == nullptr){
 		bindInput();
+	}else{
+		title->change(items[selectedGame].text);
 	}
 
 	draw();
 	screen.commit();
 	LoopManager::addListener(this);
+
+	LoopManager::addListener(logo);
 }
 
 void Launcher::stop(){
 	LoopManager::removeListener(this);
+	LoopManager::removeListener(logo);
 	Input::getInstance()->removeBtnPressCallback(BTN_RIGHT);
 	Input::getInstance()->removeBtnPressCallback(BTN_LEFT);
 	Input::getInstance()->removeBtnPressCallback(BTN_A);
@@ -177,10 +182,7 @@ void Launcher::loop(uint _micros){
 
 			bindInput();
 			scroller->splash(1);
-			title->change(items[selectedGame].text);
 		}
-	}else{
-		logo->loop(_micros);
 	}
 
 	draw();

@@ -8,13 +8,13 @@
 
 class Sprite;
 
-class Logo {
+class Logo : public LoopListener {
 public:
 	Logo(Sprite* canvas);
 
 	virtual ~Logo();
 
-	void loop(uint micros);
+	void loop(uint micros) override;
 	void draw();
 
 private:

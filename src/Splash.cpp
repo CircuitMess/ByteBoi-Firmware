@@ -35,7 +35,7 @@ void Splash::loop(uint micros){
 		return;
 	}
 
-	f = min(1.0, f + micros / 1000000.0);
+	f = min(1.0, f + micros / 500000.0);
 
 	int i = 0;
 	for(const Tone& tone : tones){
@@ -48,10 +48,7 @@ void Splash::loop(uint micros){
 		i++;
 	}
 
-	if(f >= hold){
-		float fSecondHalf = f * 2.0 - 1.0;
-		scroller->splash(fSecondHalf);
-	}
+	scroller->splash(f);
 }
 
 bool Splash::done(){
