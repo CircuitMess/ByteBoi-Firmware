@@ -30,9 +30,6 @@ void setup(){
 	pinMode(34, INPUT);
 
 	display = ByteBoi.getDisplay();
-
-
-	LoopManager::addListener(Input::getInstance());
 	launcher = new Launcher(display);
 
 	launcher->unpack();
