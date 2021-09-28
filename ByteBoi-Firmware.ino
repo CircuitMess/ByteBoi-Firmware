@@ -15,6 +15,7 @@
 #include <Util/Settings.h>
 #include <SPIFFS.h>
 #include "src/GameManagement/GameManager.h"
+#include <Battery/BatteryPopupService.h>
 
 Launcher* launcher;
 
@@ -24,17 +25,12 @@ void setup(){
 	Serial.begin(115200);
 	ByteBoi.begin();
 	ByteBoi.unbindMenu();
+	BatteryPopup.enablePopups(true);
+
 	Games.scanGames();
+	LoopManager::addListener(&Games);
 
-	pinMode(36, INPUT);
-	pinMode(34, INPUT);
-
-	display = ByteBoi.getDisplay();
-
-
-	LoopManager::addListener(Input::getInstance());
-	launcher = new Launcher(display);
-
+	Context* launcher = new Launcher(ByteBoi.getDisplay());
 	launcher->unpack();
 	launcher->start();
 }

@@ -28,7 +28,7 @@ GameImage::operator bool() const{
 
 void GameImage::draw() const {
 	if(buffer == nullptr) return;
-	canvas->drawIcon(buffer, x, y, 64, 64, 1, TFT_BLACK);
+	canvas->drawIcon(buffer, x, y, 64, 64, 1, TFT_TRANSPARENT);
 }
 
 int16_t GameImage::getX() const{

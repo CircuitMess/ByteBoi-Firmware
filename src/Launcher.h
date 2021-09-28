@@ -8,7 +8,7 @@
 #include <functional>
 #include "GameInfo.hpp"
 #include "Elements/GameImage.h"
-
+#include "GameManagement/GameListener.hpp"
 
 class Logo;
 class GameTitle;
@@ -24,7 +24,7 @@ struct LauncherItem {
 	LauncherItem(const GameImage& image, String text, std::function<void()> exec);
 };
 
-class Launcher : public LoopListener, public Context {
+class Launcher : public LoopListener, public Context, public GameListener {
 public:
 	Launcher(Display* display);
 
@@ -34,6 +34,7 @@ public:
 	void start() override;
 	void stop() override;
 	void draw() override;
+	void gamesChanged(bool inserted) override;
 
 private:
 	static Launcher* instance;
@@ -55,12 +56,10 @@ private:
 
 	void bindInput();
 
-	Color* backgroundBuffer = nullptr;
-
 protected:
 	void init() override;
-
 	void deinit() override;
+
 };
 
 #endif //BYTEBOI_LAUNCHER_H
