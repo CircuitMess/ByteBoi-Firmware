@@ -8,14 +8,13 @@
 
 class Sprite;
 
-class Logo {
+class Logo : public LoopListener {
 public:
 	Logo(Sprite* canvas);
 
 	virtual ~Logo();
 
-	void loop(uint micros);
-	void splash(float f);
+	void loop(uint micros) override;
 	void draw();
 
 private:
@@ -23,7 +22,7 @@ private:
 	const uint8_t height = 26;
 	const int8_t x;
 	const int8_t y = 8;
-	const int8_t startY = 50;
+	const int8_t startY = 8;
 	const float speed = 300;
 	const float amplitude = 3;
 

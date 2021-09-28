@@ -29,7 +29,7 @@ Launcher::Launcher(Display* display) : Context(*display), display(display), gene
 
 	instance = this;
 	canvas->setChroma(TFT_TRANSPARENT);
-	splash = new Splash(display->getBaseSprite(), logo, title, scroller);
+	splash = new Splash(scroller);
 
 	fs::File icon = SPIFFS.open("/Launcher/genericGame.raw");
 	if(icon){
@@ -107,15 +107,20 @@ void Launcher::load(){
 void Launcher::start(){
 	if(splash == nullptr){
 		bindInput();
+	}else{
+		title->change(items[selectedGame].text);
 	}
 
 	draw();
 	screen.commit();
 	LoopManager::addListener(this);
+
+	LoopManager::addListener(logo);
 }
 
 void Launcher::stop(){
 	LoopManager::removeListener(this);
+	LoopManager::removeListener(logo);
 	Input::getInstance()->removeBtnPressCallback(BTN_RIGHT);
 	Input::getInstance()->removeBtnPressCallback(BTN_LEFT);
 	Input::getInstance()->removeBtnPressCallback(BTN_A);
@@ -171,17 +176,13 @@ void Launcher::loop(uint _micros){
 	int t = micros();
 	if(splash){
 		splash->loop(_micros);
-
 		if(splash->done()){
 			delete splash;
 			splash = nullptr;
 
 			bindInput();
 			scroller->splash(1);
-			title->change(items[selectedGame].text);
 		}
-	}else{
-		logo->loop(_micros);
 	}
 
 	draw();
