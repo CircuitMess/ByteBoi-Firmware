@@ -31,7 +31,7 @@ void GameTitle::loop(uint micros){
 		state = UP;
 	}else if(state == UP && currentY <= y){
 		LoopManager::removeListener(this);
-		changeTo = nullptr;
+		changeTo = "";
 		currentY = y;
 	}
 }
@@ -43,8 +43,8 @@ void GameTitle::draw(){
 	canvas->setTextWrap(false, false);
 	canvas->setTextColor(TFT_WHITE);
 	canvas->setTextDatum(textdatum_t::middle_center);
-	uint32_t textWidth = canvas->textWidth(text);
+	uint32_t textWidth = canvas->textWidth(text.c_str());
 	canvas->setCursor((canvas->width() - textWidth) / 2, currentY);
-	canvas->print(text);
+	canvas->print(text.c_str());
 //	canvas->drawString(text, canvas->width()/2, currentY);
 }
