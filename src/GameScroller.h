@@ -7,14 +7,15 @@
 #include <Util/Vector.h>
 #include <Properties.h>
 #include "GameInfo.hpp"
+#include "Elements/GameImage.h"
+#include "Launcher.h"
 
 class Sprite;
 class Launcher;
-class GameImage;
 
 class GameScroller : public LoopListener {
 public:
-	GameScroller(Sprite* canvas);
+	GameScroller(Sprite* canvas, std::vector<LauncherItem>& items);
 	~GameScroller();
 
 	void draw();
@@ -26,17 +27,18 @@ public:
 	bool scrolling();
 
 	void splash(float f);
+	void reset();
 
 	GameInfo* const getSelectedGame() const;
 
 private:
 	const uint8_t gutter = 20;
-	const uint8_t width = 60;
+	const uint8_t width = 64;
 	const uint8_t origin;
 	const float speed = 250;
 
 	Sprite* canvas;
-	Vector<GameImage*> games;
+	std::vector<LauncherItem>& items;
 
 	uint selectedGame = 0;
 	enum Direction { PREV, NEXT } direction;
@@ -54,7 +56,6 @@ private:
 	GameImage* getRGame();
 	GameImage* getLLGame();
 	GameImage* getRRGame();
-	uint8_t *genericIcon = nullptr;
 };
 
 
