@@ -11,9 +11,10 @@ class Sprite;
 class GameImage {
 public:
 	GameImage();
-	GameImage(Sprite* canvas);
+	explicit GameImage(Sprite* canvas);
 	GameImage(Sprite* canvas, const Color* buffer);
 	GameImage(const GameImage& other);
+	GameImage& operator=(const GameImage& other);
 	virtual ~GameImage();
 
 	operator bool() const;

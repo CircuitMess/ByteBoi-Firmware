@@ -17,6 +17,18 @@ GameImage::GameImage(const GameImage& other) : GameImage(other.canvas, other.buf
 
 }
 
+GameImage& GameImage::operator=(const GameImage& other){
+	if(&other == this) return *this;
+
+	this->canvas = other.canvas;
+	free(buffer);
+	buffer = static_cast<Color*>(ps_malloc(64 * 64 * 2));
+	if(other.buffer != nullptr){
+		memcpy(buffer, other.buffer, 64 * 64 * 2);
+	}
+	return *this;
+}
+
 GameImage::~GameImage(){
 	free(buffer);
 	buffer = nullptr;
