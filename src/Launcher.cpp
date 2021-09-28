@@ -34,6 +34,8 @@ Launcher::Launcher(Display* display) : Context(*display), display(display), gene
 	fs::File icon = SPIFFS.open("/Launcher/genericGame.raw");
 	if(icon){
 		icon.read(reinterpret_cast<uint8_t*>(genericIcon.getBuffer()), 64 * 64 * 2);
+	}else{
+		genericIcon = GameImage();
 	}
 	icon.close();
 
@@ -102,6 +104,7 @@ void Launcher::start(){
 	if(splash == nullptr){
 		bindInput();
 	}
+
 	draw();
 	screen.commit();
 	LoopManager::addListener(this);

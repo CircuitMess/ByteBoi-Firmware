@@ -8,7 +8,7 @@ GameImage::GameImage(Sprite* canvas) : canvas(canvas){
 	buffer = static_cast<Color*>(ps_malloc(64 * 64 * 2));
 }
 
-GameImage::GameImage(Sprite* canvas, Color* buffer) : GameImage(canvas){
+GameImage::GameImage(Sprite* canvas, const Color* buffer) : GameImage(canvas){
 	if(buffer == nullptr) return;
 	memcpy(this->buffer, buffer, 64 * 64 * 2);
 }
@@ -27,7 +27,7 @@ GameImage::operator bool() const{
 }
 
 void GameImage::draw() const {
-	if(buffer == nullptr) return;
+	if(!*this) return;
 	canvas->drawIcon(buffer, x, y, 64, 64, 1, TFT_TRANSPARENT);
 }
 

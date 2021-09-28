@@ -12,7 +12,7 @@ class GameImage {
 public:
 	GameImage();
 	GameImage(Sprite* canvas);
-	GameImage(Sprite* canvas, Color* buffer);
+	GameImage(Sprite* canvas, const Color* buffer);
 	GameImage(const GameImage& other);
 	virtual ~GameImage();
 
