@@ -8,6 +8,7 @@
 #include <ByteBoi.h>
 #include <Properties.h>
 #include "../GameInfo.hpp"
+#include "GameListener.hpp"
 
 GameManager Games;
 using namespace cppproperties;
@@ -30,10 +31,7 @@ std::string getValueOrDefault(Properties& props, const char* key, const char* de
 }
 
 void GameManager::scanGames(){
-	for(auto game : games){
-		delete game;
-	}
-	games.clear();
+	clearGames();
 	File root = SD.open("/");
 	File gameFolder = root.openNextFile();
 	while(gameFolder){
@@ -96,4 +94,35 @@ const std::vector<GameInfo*> & GameManager::getGames(){
 
 GameInfo* GameManager::getGame(int index){
 	return games[index];
+}
+
+void GameManager::loop(uint){
+	bool SDdetected = !(ByteBoi.getExpander()->getPortState() & (1 << SD_DETECT_PIN));
+	if(SDdetected && !SDinsertedFlag){
+		SDinsertedFlag = true;
+		scanGames();
+		if(listener == nullptr) return;
+		listener->gamesChanged(SDinsertedFlag);
+	}else if(!SDdetected && SDinsertedFlag){
+		SDinsertedFlag = false;
+		clearGames();
+		if(listener == nullptr) return;
+		listener->gamesChanged(SDinsertedFlag);
+	}
+
+}
+
+bool GameManager::SDinserted(){
+	return SDinsertedFlag;
+}
+
+void GameManager::setGameListener(GameListener* listener_){
+	listener = listener_;
+}
+
+void GameManager::clearGames(){
+	for(auto game : games){
+		delete game;
+	}
+	games.clear();
 }

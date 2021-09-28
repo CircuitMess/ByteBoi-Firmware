@@ -28,10 +28,12 @@ Launcher::Launcher(Display* display) : Context(*display), display(display){
 	splash = new Splash(scroller);
 
 	Launcher::pack();
+	Games.setGameListener(this);
 }
 
 Launcher::~Launcher(){
 	free(backgroundBuffer);
+	Games.setGameListener(nullptr);
 }
 
 void Launcher::start(){
@@ -157,5 +159,9 @@ void Launcher::init(){
 
 void Launcher::deinit(){
 	free(backgroundBuffer);
+}
+
+void Launcher::gamesChanged(bool inserted){
+	//TODO: implementirati loadanje/clearanje UI-a
 }
 
