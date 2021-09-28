@@ -160,3 +160,7 @@ void Launcher::deinit(){
 	free(backgroundBuffer);
 }
 
+void Launcher::gamesChanged(bool inserted){
+	//TODO: implementirati loadanje/clearanje UI-a
+}
+

@@ -33,10 +33,12 @@ void setup(){
 
 
 	LoopManager::addListener(Input::getInstance());
+	LoopManager::addListener(&Games);
 	launcher = new Launcher(display);
 
 	launcher->unpack();
 	launcher->start();
+	Games.setGameListener(launcher);
 }
 
 void loop(){

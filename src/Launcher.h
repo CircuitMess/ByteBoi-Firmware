@@ -6,7 +6,7 @@
 #include <Loop/LoopListener.h>
 #include <Support/Context.h>
 #include "GameInfo.hpp"
-
+#include "GameManagement/GameListener.hpp"
 
 class Logo;
 class GameTitle;
@@ -15,7 +15,7 @@ class Splash;
 class Menu;
 
 
-class Launcher : public LoopListener, public Context {
+class Launcher : public LoopListener, public Context, public GameListener {
 public:
 	Launcher(Display* display);
 
@@ -25,6 +25,7 @@ public:
 	void start() override;
 	void stop() override;
 	void draw() override;
+	void gamesChanged(bool inserted) override;
 
 private:
 	static Launcher* instance;
