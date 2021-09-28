@@ -32,6 +32,10 @@ std::string getValueOrDefault(Properties& props, const char* key, const char* de
 
 void GameManager::scanGames(){
 	clearGames();
+
+	detectSD();
+	if(!SDinserted()) return;
+
 	File root = SD.open("/");
 	File gameFolder = root.openNextFile();
 	while(gameFolder){
@@ -97,6 +101,10 @@ GameInfo* GameManager::getGame(int index){
 }
 
 void GameManager::loop(uint){
+	detectSD();
+}
+
+void GameManager::detectSD(){
 	bool SDdetected = !(ByteBoi.getExpander()->getPortState() & (1 << SD_DETECT_PIN));
 	if(SDdetected && !SDinsertedFlag){
 		SD.begin(SD_CS, SPI);
@@ -111,7 +119,6 @@ void GameManager::loop(uint){
 		if(listener == nullptr) return;
 		listener->gamesChanged(SDinsertedFlag);
 	}
-
 }
 
 bool GameManager::SDinserted(){
