@@ -56,7 +56,7 @@ void Launcher::load(){
 	// TODO: also, add "no ownership of buffer" mode or something similar to GameImage to avoid multiple buffers for genericIcon
 	items.clear();
 
-	if(false/* !Games.SDinserted() */){
+	if(!Games.SDinserted()){
 		items.emplace_back(GameImage(), "No SD card", [](){}); // TODO: icon
 	}else if(Games.getGames().empty()){
 		items.emplace_back(GameImage(), "SD card empty", [](){}); // TODO: icon
