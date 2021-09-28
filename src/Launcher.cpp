@@ -28,10 +28,12 @@ Launcher::Launcher(Display* display) : Context(*display), display(display){
 	splash = new Splash(display->getBaseSprite(), logo, title, scroller);
 
 	Launcher::pack();
+	Games.setGameListener(this);
 }
 
 Launcher::~Launcher(){
 	free(backgroundBuffer);
+	Games.setGameListener(nullptr);
 }
 
 void Launcher::start(){

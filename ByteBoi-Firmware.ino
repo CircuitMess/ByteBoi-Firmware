@@ -38,7 +38,6 @@ void setup(){
 
 	launcher->unpack();
 	launcher->start();
-	Games.setGameListener(launcher);
 }
 
 void loop(){
