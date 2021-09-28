@@ -33,7 +33,6 @@ Launcher::Launcher(Display* display) : Context(*display), display(display){
 }
 
 Launcher::~Launcher(){
-	free(backgroundBuffer);
 	Games.setGameListener(nullptr);
 }
 
@@ -124,7 +123,7 @@ void Launcher::loop(uint _micros){
 }
 
 void Launcher::draw(){
-	screen.getSprite()->drawIcon(backgroundBuffer, 0, 0, 160, 120, 1);
+	screen.getSprite()->clear(C_HEX(0x0082ff));
 	scroller->draw();
 	title->draw();
 	logo->draw();
@@ -142,21 +141,11 @@ void Launcher::draw(){
 }
 
 void Launcher::init(){
-	backgroundBuffer = static_cast<Color*>(ps_malloc(160 * 120 * 2));
-	if(backgroundBuffer == nullptr){
-		Serial.printf("MainMenu background picture unpack error\n");
-		return;
-	}
-
-	fs::File backgroundFile = CompressedFile::open(SPIFFS.open("/launcher/mainMenuBg.raw.hs"), 13, 12);
-
-	backgroundFile.read(reinterpret_cast<uint8_t*>(backgroundBuffer), 160 * 120 * 2);
-	backgroundFile.close();
 
 }
 
 void Launcher::deinit(){
-	free(backgroundBuffer);
+
 }
 
 void Launcher::gamesChanged(bool inserted){
