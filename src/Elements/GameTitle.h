@@ -11,7 +11,7 @@ class GameTitle : public LoopListener {
 public:
 	GameTitle(Sprite* canvas);
 
-	void change(const char* newText);
+	void change(const String& newText);
 
 	void loop(uint micros) override;
 	void draw();
@@ -25,11 +25,11 @@ private:
 	const uint8_t overHide = 5;
 
 	Sprite* canvas;
-	const char* text = nullptr;
+	String text;
 
 	float currentY;
 	enum State { DOWN, UP } state;
-	const char* changeTo = nullptr;
+	String changeTo;
 
 };
 

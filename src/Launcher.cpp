@@ -15,11 +15,15 @@
 #include <SPIFFS.h>
 #include <FS/CompressedFile.h>
 
+#include <utility>
+
 Launcher* Launcher::instance = nullptr;
 
-Launcher::Launcher(Display* display) : Context(*display), display(display){
+LauncherItem::LauncherItem(const GameImage& image, String text, std::function<void()> exec) : image(image), text(std::move(text)), exec(std::move(exec)){}
+
+Launcher::Launcher(Display* display) : Context(*display), display(display), genericIcon(screen.getSprite()){
 	canvas = screen.getSprite();
-	scroller = new GameScroller(canvas);
+	scroller = new GameScroller(canvas, items);
 	logo = new Logo(canvas);
 	title = new GameTitle(canvas);
 
@@ -27,19 +31,84 @@ Launcher::Launcher(Display* display) : Context(*display), display(display){
 	canvas->setChroma(TFT_TRANSPARENT);
 	splash = new Splash(scroller);
 
-	Launcher::pack();
+	fs::File icon = SPIFFS.open("/Launcher/genericGame.raw");
+	if(icon){
+		icon.read(reinterpret_cast<uint8_t*>(genericIcon.getBuffer()), 64 * 64 * 2);
+	}else{
+		genericIcon = GameImage();
+	}
+	icon.close();
+
 	Games.setGameListener(this);
+	load();
+	title->change("");
+	scroller->splash(0);
+
+	Launcher::pack();
 }
 
 Launcher::~Launcher(){
-	free(backgroundBuffer);
 	Games.setGameListener(nullptr);
+}
+
+void Launcher::load(){
+	// TODO: check if the copying calls the GameImage copy constructor. otherwise multiple GameInfo will attempt to destruct the same buffer
+	// TODO: also, add "no ownership of buffer" mode or something similar to GameImage to avoid multiple buffers for genericIcon
+	items.clear();
+
+	if(false/* !Games.SDinserted() */){
+		items.emplace_back(GameImage(), "No SD card", [](){}); // TODO: icon
+	}else if(Games.getGames().empty()){
+		items.emplace_back(GameImage(), "SD card empty", [](){}); // TODO: icon
+	}else{
+		for(const auto& game : Games.getGames()){
+			items.emplace_back(GameImage(), game->name.c_str(), [game](){
+				GameLoader::loadGame(game);
+			});
+
+			LauncherItem& item = items.back();
+			item.text = game->name.c_str();
+
+			fs::File icon = SD.open(game->icon.c_str());
+			if(icon){
+				item.image = GameImage(canvas);
+				if(icon.read(reinterpret_cast<uint8_t*>(item.image.getBuffer()), 64 * 64 * 2) != 64 * 64 * 2){
+					item.image = GameImage();
+				}
+				icon.close();
+			}
+
+			if(!item.image){
+				item.image = genericIcon;
+			}
+		}
+	}
+
+	items.emplace_back(GameImage(), "Settings", [](){}); // TODO: icon and starting
+
+	if(!items.empty() && items.size() < 4){ // scroller expects at least 4 items
+		if(items.size() == 1){ // if only one element, duplicate it 3 times
+			for(int i = 0; i < 3; i++){
+				items.emplace_back(items.front());
+			}
+		}else{ // for 2 and 3 elements, duplicate them so we get to at least 4
+			int count = items.size();
+			for(int i = 0; i < count; i++){
+				items.emplace_back(items[i]);
+			}
+		}
+	}
+
+	scroller->reset();
+	selectedGame = 0;
+	title->change(items[selectedGame].text);
 }
 
 void Launcher::start(){
 	if(splash == nullptr){
 		bindInput();
 	}
+
 	draw();
 	screen.commit();
 	LoopManager::addListener(this);
@@ -50,12 +119,13 @@ void Launcher::stop(){
 	Input::getInstance()->removeBtnPressCallback(BTN_RIGHT);
 	Input::getInstance()->removeBtnPressCallback(BTN_LEFT);
 	Input::getInstance()->removeBtnPressCallback(BTN_A);
+	Input::getInstance()->removeBtnPressCallback(BTN_C);
 }
 
 void Launcher::prev(){
 	uint8_t selecting = instance->scroller->prev();
 	if(selecting != selectedGame){
-		instance->title->change(Games.getGame(selecting)->name.c_str());
+		instance->title->change(items[selecting].text);
 	}
 	selectedGame = selecting;
 }
@@ -63,7 +133,7 @@ void Launcher::prev(){
 void Launcher::next(){
 	uint8_t selecting = instance->scroller->next();
 	if(selecting != selectedGame){
-		instance->title->change(Games.getGame(selecting)->name.c_str());
+		instance->title->change(items[selecting].text);
 	}
 	selectedGame = selecting;
 }
@@ -81,10 +151,12 @@ void Launcher::bindInput(){
 
 	Input::getInstance()->setBtnPressCallback(BTN_A, [](){
 		if(instance->scroller->scrolling()) return;
-		GameLoader::loadGame(Games.getGame(instance->selectedGame));
+		instance->items[instance->selectedGame].exec();
 	});
+
 	Input::getInstance()->setBtnPressCallback(BTN_C, [](){
 		if(instance == nullptr) return;
+		// TODO: check for non-games
 		DescriptionModal* descriptionModal;
 		descriptionModal = new DescriptionModal(*instance,instance->scroller->getSelectedGame());
 		descriptionModal->push(instance);
@@ -105,7 +177,7 @@ void Launcher::loop(uint _micros){
 
 			bindInput();
 			scroller->splash(1);
-			title->change(Games.getGame(selectedGame)->name.c_str());
+			title->change(items[selectedGame].text);
 		}
 	}else{
 		logo->loop(_micros);
@@ -114,19 +186,15 @@ void Launcher::loop(uint _micros){
 	draw();
 //	canvas->setTextColor(TFT_WHITE);
 //	canvas->setTextSize(1);
-//	canvas->setCursor(120, 10);
-//	canvas->println(GameManager::getExpander()->pinRead(8));
-//	canvas->setCursor(100, 10);
-//	canvas->println(GameManager::getExpander()->pinRead(10));
 //	canvas->setCursor(130, 10);
-//	canvas->println(analogRead(36));
+//	canvas->println(Battery.getPercentage());
 //	canvas->println((1000000.0 / (float)drawTime1));
 	screen.commit();
 	drawTime1 = micros() - t;
 }
 
 void Launcher::draw(){
-	screen.getSprite()->drawIcon(backgroundBuffer, 0, 0, 160, 120, 1);
+	screen.getSprite()->clear(C_HEX(0x0082ff));
 	scroller->draw();
 	title->draw();
 	logo->draw();
@@ -144,24 +212,13 @@ void Launcher::draw(){
 }
 
 void Launcher::init(){
-	backgroundBuffer = static_cast<Color*>(ps_malloc(160 * 120 * 2));
-	if(backgroundBuffer == nullptr){
-		Serial.printf("MainMenu background picture unpack error\n");
-		return;
-	}
-
-	fs::File backgroundFile = CompressedFile::open(SPIFFS.open("/launcher/mainMenuBg.raw.hs"), 13, 12);
-
-	backgroundFile.read(reinterpret_cast<uint8_t*>(backgroundBuffer), 160 * 120 * 2);
-	backgroundFile.close();
 
 }
 
 void Launcher::deinit(){
-	free(backgroundBuffer);
+
 }
 
 void Launcher::gamesChanged(bool inserted){
-	//TODO: implementirati loadanje/clearanje UI-a
+	load();
 }
-

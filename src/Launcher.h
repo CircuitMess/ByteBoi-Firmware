@@ -5,7 +5,9 @@
 #include <CircuitOS.h>
 #include <Loop/LoopListener.h>
 #include <Support/Context.h>
+#include <functional>
 #include "GameInfo.hpp"
+#include "Elements/GameImage.h"
 #include "GameManagement/GameListener.hpp"
 
 class Logo;
@@ -14,6 +16,13 @@ class GameScroller;
 class Splash;
 class Menu;
 
+struct LauncherItem {
+	GameImage image;
+	String text;
+	std::function<void()> exec;
+
+	LauncherItem(const GameImage& image, String text, std::function<void()> exec);
+};
 
 class Launcher : public LoopListener, public Context, public GameListener {
 public:
@@ -37,18 +46,20 @@ private:
 	GameScroller* scroller;
 	Splash* splash;
 
+	GameImage genericIcon;
+	std::vector<LauncherItem> items;
+	void load();
+
 	uint8_t selectedGame = 0;
 	void prev();
 	void next();
 
 	void bindInput();
 
-	Color* backgroundBuffer = nullptr;
-
 protected:
 	void init() override;
-
 	void deinit() override;
+
 };
 
 #endif //BYTEBOI_LAUNCHER_H

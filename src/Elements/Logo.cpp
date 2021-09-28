@@ -6,7 +6,7 @@
 #include "../Bitmaps/logo.hpp"
 
 Logo::Logo(Sprite* canvas) : canvas(canvas), x((canvas->width() - width) / 2), currentY(startY){
-	logoBuffer = static_cast<Color*>(ps_malloc(93 * 26 * 2));
+	logoBuffer = static_cast<Color*>(malloc(93 * 26 * 2));
 	if(logoBuffer == nullptr){
 		Serial.printf("Logo picture unpack error\n");
 		return;
