@@ -47,6 +47,7 @@ private:
 	Splash* splash;
 
 	GameImage genericIcon;
+	GameImage settingsIcon;
 	std::vector<LauncherItem> items;
 	void load();
 
