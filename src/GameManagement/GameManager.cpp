@@ -32,6 +32,11 @@ std::string getValueOrDefault(Properties& props, const char* key, const char* de
 
 void GameManager::scanGames(){
 	clearGames();
+
+	// TODO: there is a potential infinite loop between scanGames and detectSD
+	detectSD();
+	if(!SDinserted()) return;
+
 	File root = SD.open("/");
 	File gameFolder = root.openNextFile();
 	while(gameFolder){
@@ -97,19 +102,24 @@ GameInfo* GameManager::getGame(int index){
 }
 
 void GameManager::loop(uint){
+	detectSD();
+}
+
+void GameManager::detectSD(){
 	bool SDdetected = !(ByteBoi.getExpander()->getPortState() & (1 << SD_DETECT_PIN));
 	if(SDdetected && !SDinsertedFlag){
+		SD.begin(SD_CS, SPI);
 		SDinsertedFlag = true;
 		scanGames();
 		if(listener == nullptr) return;
 		listener->gamesChanged(SDinsertedFlag);
 	}else if(!SDdetected && SDinsertedFlag){
+		SD.end();
 		SDinsertedFlag = false;
 		clearGames();
 		if(listener == nullptr) return;
 		listener->gamesChanged(SDinsertedFlag);
 	}
-
 }
 
 bool GameManager::SDinserted(){

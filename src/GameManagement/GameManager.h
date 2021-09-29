@@ -16,11 +16,12 @@ public:
 
 	void loop(uint) override;
 	bool SDinserted();
+	void detectSD();
 	void setGameListener(GameListener* listener);
 
 private:
 	std::vector<GameInfo*> games;
-	bool SDinsertedFlag = true;
+	bool SDinsertedFlag = false;
 	GameListener* listener = nullptr;
 	void clearGames();
 };

@@ -1,22 +1,46 @@
 #include "GameImage.h"
 #include <Display/Sprite.h>
 #include <Display/Color.h>
-#include <FS.h>
-#include <SPIFFS.h>
-#include "../GameManagement/GameManager.h"
 
-GameImage::GameImage(Sprite* canvas, uint8_t* icon) : canvas(canvas), appIconBuffer((Color*)icon){
+GameImage::GameImage(){}
 
+GameImage::GameImage(Sprite* canvas) : canvas(canvas){
+	buffer = static_cast<Color*>(malloc(64 * 64 * 2));
+}
+
+GameImage::GameImage(Sprite* canvas, const Color* buffer) : GameImage(canvas){
+	if(buffer == nullptr) return;
+	memcpy(this->buffer, buffer, 64 * 64 * 2);
+}
+
+GameImage::GameImage(const GameImage& other) : GameImage(other.canvas, other.buffer){
+
+}
+
+GameImage& GameImage::operator=(const GameImage& other){
+	if(&other == this) return *this;
+
+	this->canvas = other.canvas;
+	free(buffer);
+	buffer = static_cast<Color*>(malloc(64 * 64 * 2));
+	if(other.buffer != nullptr){
+		memcpy(buffer, other.buffer, 64 * 64 * 2);
+	}
+	return *this;
 }
 
 GameImage::~GameImage(){
-	free(appIconBuffer);
-	appIconBuffer = nullptr;
+	free(buffer);
+	buffer = nullptr;
 }
 
+GameImage::operator bool() const{
+	return canvas != nullptr && buffer != nullptr;
+}
 
 void GameImage::draw() const {
-	canvas->drawIcon(appIconBuffer, x, y, 64, 64, 1, TFT_TRANSPARENT);
+	if(!*this) return;
+	canvas->drawIcon(buffer, x, y, 64, 64, 1, TFT_TRANSPARENT);
 }
 
 int16_t GameImage::getX() const{
@@ -33,4 +57,8 @@ int16_t GameImage::getY() const{
 
 void GameImage::setY(int16_t y){
 	GameImage::y = y;
+}
+
+Color* GameImage::getBuffer() const{
+	return buffer;
 }

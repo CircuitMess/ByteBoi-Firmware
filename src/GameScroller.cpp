@@ -7,48 +7,62 @@
 #include "GameInfo.hpp"
 #include <SD.h>
 
-GameScroller::GameScroller(Sprite* canvas) : canvas(canvas),
+
+
+GameScroller::GameScroller(Sprite* canvas, std::vector<LauncherItem>& items) : canvas(canvas), items(items),
 		origin((canvas->width() - width) / 2){
-	genericIcon = (uint8_t*)ps_malloc(64*64*2);
-	SPIFFS.open("/Launcher/genericGame.raw").read(genericIcon, 64*64*2);
 
 
-	for(auto info : Games.getGames()){
-		File file = SD.open(info->icon.c_str());
-		uint8_t* buf = genericIcon;
-		if(file){
-			buf = (uint8_t*)ps_malloc(64*64*2);
-			if(file.read(buf, 64*64*2) <= 0){
-				free(buf);
-				buf = genericIcon;
-			}
-		}
-		GameImage* gameImage = new GameImage(canvas, buf);
-		games.push_back(gameImage);
-		games.back()->setX(-width);
-		games.back()->setY(35);
+	for(auto& item : items){
+		item.image.setX(-width);
+		item.image.setY(35);
 	}
 
 	// repos();
 }
 
 GameScroller::~GameScroller(){
-	for(auto game: games){
-		delete game;
-	}
+
 }
 
 void GameScroller::splash(float f){
+	if(items.size() < 4) return;
+
 	getCGame()->setX(f * (float) (origin + width) - width);
 	getLGame()->setX(f * (float) (origin + width) - 2 * width - gutter);
 	getRGame()->setX(f * (float) (origin + width + gutter - (origin + 2*width + 2*gutter)) + origin + 2*width + 2*gutter);
 }
 
+void GameScroller::reset(){
+	selectedGame = 0;
+	delta = 0;
+	queued = false;
+
+	LoopManager::removeListener(this);
+
+	repos();
+}
+
+void GameScroller::repos(){
+	for(auto& item : items){
+		item.image.setX(-width);
+		item.image.setY(35);
+	}
+
+	if(items.size() < 4) return;
+
+	getLGame()->setX(origin - width - gutter);
+	getCGame()->setX(origin);
+	getRGame()->setX(origin + width + gutter);
+}
+
 uint8_t GameScroller::prev(){
+	if(items.size() < 4) return 0;
+
 	if(scrolling() && direction == PREV){
 		multiplier = min(2, multiplier+1);
 		queued = true;
-		return (selectedGame < 2) ? games.size() - 2 + selectedGame : selectedGame - 2;
+		return (selectedGame < 2) ? items.size() - 2 + selectedGame : selectedGame - 2;
 	}
 
 	direction = PREV;
@@ -64,14 +78,16 @@ uint8_t GameScroller::prev(){
 		LoopManager::addListener(this);
 	}
 
-	return (selectedGame < 1) ? games.size() - 1 : selectedGame - 1;
+	return (selectedGame < 1) ? items.size() - 1 : selectedGame - 1;
 }
 
 uint8_t GameScroller::next(){
+	if(items.size() < 4) return 0;
+
 	if(scrolling() && direction == NEXT){
 		multiplier = min(2, multiplier+1);
 		queued = true;
-		return (selectedGame + 2) % games.size();
+		return (selectedGame + 2) % items.size();
 	}
 
 	direction = NEXT;
@@ -87,10 +103,12 @@ uint8_t GameScroller::next(){
 		LoopManager::addListener(this);
 	}
 
-	return (selectedGame + 1) % games.size();
+	return (selectedGame + 1) % items.size();
 }
 
 void GameScroller::draw(){
+	if(items.size() < 4) return;
+
 	getCGame()->draw();
 	getRGame()->draw();
 	getLGame()->draw();
@@ -105,6 +123,12 @@ void GameScroller::draw(){
 }
 
 void GameScroller::loop(uint micros){
+	if(items.size() < 4){
+		reset();
+		LoopManager::removeListener(this);
+		return;
+	}
+
 	delta += speed * (micros / 1000000.0f) * (float) multiplier;
 
 	if(direction == PREV){
@@ -138,52 +162,42 @@ void GameScroller::loop(uint micros){
 	}
 }
 
-void GameScroller::repos(){
-	for(GameImage* game : games){
-		game->setX(-128);
-	}
-
-	getLGame()->setX(origin - width - gutter);
-	getCGame()->setX(origin);
-	getRGame()->setX(origin + width + gutter);
-}
-
 bool GameScroller::scrolling(){
 	return delta != 0;
 }
 
 void GameScroller::selectNext(){
-	selectedGame = (selectedGame + 1) % games.size();
+	selectedGame = (selectedGame + 1) % items.size();
 }
 
 void GameScroller::selectPrev(){
 	if(selectedGame == 0){
-		selectedGame = games.size() - 1;
+		selectedGame = items.size() - 1;
 	}else{
 		selectedGame--;
 	}
 }
 
 GameImage* GameScroller::getCGame(){
-	return games[selectedGame];
+	return &items[selectedGame].image;
 }
 
 GameImage* GameScroller::getLGame(){
-	if(selectedGame == 0) return games.back();
-	return games[selectedGame - 1];
+	if(selectedGame == 0) return &items.back().image;
+	return &items[selectedGame - 1].image;
 }
 
 GameImage* GameScroller::getRGame(){
-	return games[(selectedGame + 1) % games.size()];
+	return &items[(selectedGame + 1) % items.size()].image;
 }
 
 GameImage* GameScroller::getLLGame(){
-	if(selectedGame <= 1) return games[games.size() - 2 + selectedGame];
-	return games[selectedGame - 2];
+	if(selectedGame <= 1) return &items[items.size() - 2 + selectedGame].image;
+	return &items[selectedGame - 2].image;
 }
 
 GameImage* GameScroller::getRRGame(){
-	return games[(selectedGame + 2) % games.size()];
+	return &items[(selectedGame + 2) % items.size()].image;
 }
 
 GameInfo* const GameScroller::getSelectedGame() const{
