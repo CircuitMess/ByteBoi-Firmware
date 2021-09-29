@@ -12,6 +12,7 @@ public:
 	GameTitle(Sprite* canvas);
 
 	void change(const String& newText);
+	String getCurrent();
 
 	void loop(uint micros) override;
 	void draw();

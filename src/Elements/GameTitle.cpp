@@ -21,6 +21,10 @@ void GameTitle::change(const String& newText){
 	LoopManager::addListener(this);
 }
 
+String GameTitle::getCurrent(){
+	return text;
+}
+
 void GameTitle::loop(uint micros){
 	currentY += speed * (micros / 1000000.0f) * (state == DOWN ? 0.75f : -0.75f);
 
