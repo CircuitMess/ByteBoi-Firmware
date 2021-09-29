@@ -32,7 +32,7 @@ public:
 	GameInfo* const getSelectedGame() const;
 
 private:
-	const uint8_t gutter = 20;
+	const uint8_t gutter = 25;
 	const uint8_t width = 64;
 	const uint8_t origin;
 	const float speed = 250;
