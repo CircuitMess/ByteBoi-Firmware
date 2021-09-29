@@ -93,7 +93,11 @@ void Launcher::load(){
 		}
 	}
 
-	items.emplace_back(GameImage(), "Settings", [](){}); // TODO: icon and starting
+	items.emplace_back(settingsIcon, "Settings", [this](){
+		Display& display = *this->getScreen().getDisplay();
+		SettingsScreen::SettingsScreen* settingsScreen =new SettingsScreen::SettingsScreen(display);
+		settingsScreen->push(this);
+	});
 
 	if(!items.empty() && items.size() < 4){ // scroller expects at least 4 items
 		if(items.size() == 1){ // if only one element, duplicate it 3 times
