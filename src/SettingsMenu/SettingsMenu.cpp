@@ -18,7 +18,7 @@ SettingsMenu::SettingsMenu::SettingsMenu(Display& display) :
 	instance = this;
 
 	settingsVector[0].storeLocation = &(Settings.get().shutdownTime);
-	settingsVector[1].storeLocation = &(Settings.get().mute);
+	settingsVector[1].storeLocation = &(Settings.get().volume);
 
 	layout->setWHType(PARENT, PARENT);
 	layout->setPadding(3);
