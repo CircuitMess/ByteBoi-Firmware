@@ -46,11 +46,13 @@ private:
 	GameTitle* title;
 	GameScroller* scroller;
 	Splash* splash;
-	LoadingIndicator* loading;
+	LoadingIndicator* loader;
 
 	GameImage genericIcon;
 	std::vector<LauncherItem> items;
 	void load();
+	bool loading = false;
+	bool doneLoading = false;
 
 	uint8_t selectedGame = 0;
 	void prev();

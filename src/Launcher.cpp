@@ -26,7 +26,7 @@ Launcher::Launcher(Display* display) : Context(*display), display(display), gene
 	scroller = new GameScroller(canvas, items);
 	logo = new Logo(canvas);
 	title = new GameTitle(canvas);
-	loading = new LoadingIndicator(canvas, logo, scroller, title);
+	loader = new LoadingIndicator(canvas, logo, scroller, title);
 
 	instance = this;
 	canvas->setChroma(TFT_TRANSPARENT);
@@ -63,8 +63,11 @@ void Launcher::load(){
 		items.emplace_back(GameImage(), "SD card empty", [](){}); // TODO: icon
 	}else{
 		for(const auto& game : Games.getGames()){
-			items.emplace_back(GameImage(), game->name.c_str(), [game](){
-				GameLoader::loadGame(game);
+			items.emplace_back(GameImage(), game->name.c_str(), [this, game](){
+				loading = true;
+				doneLoading = false;
+				loader->start();
+				Loader.loadGame(game);
 			});
 
 			LauncherItem& item = items.back();
@@ -129,6 +132,7 @@ void Launcher::stop(){
 }
 
 void Launcher::prev(){
+	if(loading) return;
 	uint8_t selecting = instance->scroller->prev();
 	if(selecting != selectedGame){
 		instance->title->change(items[selecting].text);
@@ -137,6 +141,7 @@ void Launcher::prev(){
 }
 
 void Launcher::next(){
+	if(loading) return;
 	uint8_t selecting = instance->scroller->next();
 	if(selecting != selectedGame){
 		instance->title->change(items[selecting].text);
@@ -156,12 +161,14 @@ void Launcher::bindInput(){
 	});
 
 	Input::getInstance()->setBtnPressCallback(BTN_A, [](){
-		if(instance->scroller->scrolling()) return;
+		if(instance == nullptr) return;
+		if(instance->scroller->scrolling() || instance->loading) return;
 		instance->items[instance->selectedGame].exec();
 	});
 
 	Input::getInstance()->setBtnPressCallback(BTN_C, [](){
 		if(instance == nullptr) return;
+		if(instance->scroller->scrolling() || instance->loading) return;
 		// TODO: check for non-games
 		DescriptionModal* descriptionModal;
 		descriptionModal = new DescriptionModal(*instance,instance->scroller->getSelectedGame());
@@ -186,6 +193,18 @@ void Launcher::loop(uint _micros){
 		}
 	}
 
+	if(loading && !doneLoading && Loader.doneLoading()){
+		Input::getInstance()->removeBtnPressCallback(BTN_RIGHT);
+		Input::getInstance()->removeBtnPressCallback(BTN_LEFT);
+		Input::getInstance()->removeBtnPressCallback(BTN_A);
+		Input::getInstance()->removeBtnPressCallback(BTN_B);
+		Input::getInstance()->removeBtnPressCallback(BTN_C);
+		Games.setGameListener(nullptr);
+		doneLoading = true;
+		loader->finish();
+		title->change("");
+	}
+
 	draw();
 //	canvas->setTextColor(TFT_WHITE);
 //	canvas->setTextSize(1);
@@ -200,7 +219,7 @@ void Launcher::draw(){
 	screen.getSprite()->clear(C_HEX(0x0082ff));
 	scroller->draw();
 	title->draw();
-	loading->draw();
+	loader->draw();
 	logo->draw();
 
 /*
@@ -224,6 +243,14 @@ void Launcher::deinit(){
 }
 
 void Launcher::gamesChanged(bool inserted){
+	if(doneLoading) return;
+
+	if(loading){
+		Loader.abort();
+		loading = false;
+		loader->stop();
+	}
+
 	load();
 	if(splash != nullptr){
 		title->change("");
