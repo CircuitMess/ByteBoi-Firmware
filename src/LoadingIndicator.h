@@ -14,8 +14,10 @@ public:
 
 	void start();
 	void stop();
+	void finish();
 
 	bool isActive() const;
+
 	void draw();
 
 	void loop(uint micros) override;
@@ -28,8 +30,9 @@ private:
 
 	bool active = false;
 	String currentText;
+	bool boot = false;
 
-	enum { OUT, ENTER, IN, EXIT } state = OUT;
+	enum { OUT, ENTER, IN, EXIT, FINISH } state = OUT;
 	float f = 0;
 	float ballf = 0;
 };
