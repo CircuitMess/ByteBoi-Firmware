@@ -17,17 +17,19 @@ public:
 	void loop(uint micros) override;
 	void draw();
 
+	void setCentered(float f);
+
 private:
 	const uint8_t width = 93;
 	const uint8_t height = 26;
-	const int8_t x;
-	const int8_t y = 8;
-	const int8_t startY = 8;
+	const int8_t startY = 6;
+	const int8_t startX;
 	const float speed = 300;
 	const float amplitude = 3;
 
-	float currentY;
 	float f = 0;
+	float center = 0;
+	uint8_t centerDiff;
 
 	Color* logoBuffer = nullptr;
 
