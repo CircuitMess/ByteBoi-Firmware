@@ -10,6 +10,8 @@ namespace SettingsScreen {
 
 		void toggle() override;
 
+		bool getBooleanSwitch() const;
+
 	private:
 
 		bool booleanSwitch = false;

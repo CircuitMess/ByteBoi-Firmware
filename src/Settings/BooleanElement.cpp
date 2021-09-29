@@ -25,3 +25,7 @@ void SettingsScreen::BooleanElement::drawControl(){
 	getSprite()->drawRoundRect(getTotalX() + 120, getTotalY() + 5, 27, 11, 2, TFT_BLACK);
 
 }
+
+bool SettingsScreen::BooleanElement::getBooleanSwitch() const{
+	return booleanSwitch;
+}
