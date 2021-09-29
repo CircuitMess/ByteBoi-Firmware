@@ -151,23 +151,26 @@ void Launcher::next(){
 
 void Launcher::bindInput(){
 	Input::getInstance()->setBtnPressCallback(BTN_RIGHT, [](){
+		if(instance == nullptr) return;
 		instance->next();
 		Piezo.tone(800, 50);
 	});
 
 	Input::getInstance()->setBtnPressCallback(BTN_LEFT, [](){
+		if(instance == nullptr) return;
 		instance->prev();
 		Piezo.tone(800, 50);
 	});
 
 	Input::getInstance()->setBtnPressCallback(BTN_A, [](){
 		if(instance == nullptr) return;
-		if(instance->scroller->scrolling() || instance->loading) return;
+		if(instance->scroller->scrolling() || instance->loader->isActive() || instance->loading) return;
 		instance->items[instance->selectedGame].exec();
 	});
 
 	Input::getInstance()->setBtnPressCallback(BTN_B, [](){
 		if(instance == nullptr) return;
+		Piezo.tone(800, 50);
 		if(instance->loading){
 			Loader.abort();
 			instance->loading = false;
@@ -178,7 +181,8 @@ void Launcher::bindInput(){
 
 	Input::getInstance()->setBtnPressCallback(BTN_C, [](){
 		if(instance == nullptr) return;
-		if(instance->scroller->scrolling() || instance->loading) return;
+		if(instance->scroller->scrolling() || instance->loader->isActive() || instance->loading) return;
+		Piezo.tone(800, 50);
 		// TODO: check for non-games
 		DescriptionModal* descriptionModal;
 		descriptionModal = new DescriptionModal(*instance,instance->scroller->getSelectedGame());
