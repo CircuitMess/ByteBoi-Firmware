@@ -12,7 +12,7 @@ GameTitle::GameTitle(Sprite* canvas) : canvas(canvas), x((canvas->width() - widt
 }
 
 void GameTitle::change(const String& newText){
-	bool wasChanging = changeTo != nullptr;
+	bool wasChanging = changeTo != "";
 
 	state = DOWN;
 	changeTo = newText;
@@ -41,7 +41,7 @@ void GameTitle::loop(uint micros){
 }
 
 void GameTitle::draw(){
-	if(text == nullptr) return;
+	if(text == "") return;
 	canvas->setTextSize(2);
 	canvas->setTextFont(0);
 	canvas->setTextWrap(false, false);
