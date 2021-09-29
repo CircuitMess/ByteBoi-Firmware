@@ -30,7 +30,7 @@ Launcher::Launcher(Display* display) : Context(*display), display(display), gene
 
 	instance = this;
 	canvas->setChroma(TFT_TRANSPARENT);
-	splash = new Splash(scroller);
+	splash = new Splash(scroller, logo);
 
 	fs::File icon = SPIFFS.open("/Launcher/genericGame.raw");
 	if(icon){
@@ -44,6 +44,7 @@ Launcher::Launcher(Display* display) : Context(*display), display(display), gene
 	load();
 	title->change("");
 	scroller->splash(0);
+	logo->setCentered(1);
 
 	Launcher::pack();
 }
@@ -119,12 +120,12 @@ void Launcher::start(){
 	screen.commit();
 	LoopManager::addListener(this);
 
-	LoopManager::addListener(logo);
+	//LoopManager::addListener(logo);
 }
 
 void Launcher::stop(){
 	LoopManager::removeListener(this);
-	LoopManager::removeListener(logo);
+	//LoopManager::removeListener(logo);
 	Input::getInstance()->removeBtnPressCallback(BTN_RIGHT);
 	Input::getInstance()->removeBtnPressCallback(BTN_LEFT);
 	Input::getInstance()->removeBtnPressCallback(BTN_A);
