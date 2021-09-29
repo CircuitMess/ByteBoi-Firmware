@@ -21,6 +21,8 @@ void GameLoader::loadGame(GameInfo* game){
 
 void GameLoader::loadFunc(Task* task){
 	GameLoader* loader = static_cast<GameLoader*>(task->arg);
+	GameInfo* game = loader->loading;
+	if(game == nullptr) return;
 
 	//create game folder if not present
 	if(!SPIFFS.exists(ByteBoiImpl::SPIFFSgameRoot)){
@@ -37,8 +39,7 @@ void GameLoader::loadFunc(Task* task){
 	file.close();
 	root.close();
 
-	GameInfo* game = loader->loading;
-	if(game == nullptr) return;
+	if(loader->checkAbort()) return;
 
 	//copy resources
 	if(!game->resources.empty() && SD.exists(game->resources.c_str())){

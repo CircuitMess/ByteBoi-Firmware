@@ -7,19 +7,22 @@
 
 LoadingIndicator::LoadingIndicator(Sprite* canvas, Logo* logo, GameScroller* scroller, GameTitle* title) : canvas(canvas), logo(logo), scroller(scroller), title(title){}
 
-void LoadingIndicator::start(){
+void LoadingIndicator::start(GameInfo* game){
 	if(state != OUT) return;
+	this->game = game;
 	currentText = title->getCurrent();
 	title->change("Loading...");
 	active = true;
 	state = ENTER;
 	f = 0;
 	ballf = 0;
+	ballGrown = ballGrown2 = false;
 	LoopManager::addListener(this);
 }
 
 void LoadingIndicator::stop(){
 	if(state == OUT || state == EXIT) return;
+	game = nullptr;
 	exitf = f;
 	if(state == IN){
 		f = 1;
@@ -36,6 +39,8 @@ void LoadingIndicator::finish(){
 }
 
 void LoadingIndicator::loop(uint micros){
+	// abandon hope all ye who enter here
+
 	if(boot){
 		Loader.boot();
 	}
@@ -94,6 +99,22 @@ void LoadingIndicator::loop(uint micros){
 			ballf += (float) micros / 500000.0f;
 			if(ballf >= 1){
 				ballf = 1;
+			}
+		}else if(ballf == 1){
+			if(ballGrown && !ballGrown2 && f >= 0.4){
+				ballGrown2 = true;
+
+				if(game == nullptr){
+					stop();
+					Loader.abort();
+					return;
+				}else{
+					Loader.loadGame(game);
+				}
+			}
+
+			if(!ballGrown){
+				ballGrown = true;
 			}
 		}
 	}

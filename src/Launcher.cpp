@@ -67,8 +67,7 @@ void Launcher::load(){
 			items.emplace_back(GameImage(), game->name.c_str(), [this, game](){
 				loading = true;
 				doneLoading = false;
-				loader->start();
-				Loader.loadGame(game);
+				loader->start(game);
 			});
 
 			LauncherItem& item = items.back();
