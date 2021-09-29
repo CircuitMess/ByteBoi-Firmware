@@ -14,14 +14,17 @@ void LoadingIndicator::start(){
 	active = true;
 	state = ENTER;
 	f = 0;
+	ballf = 0;
 	LoopManager::addListener(this);
 }
 
 void LoadingIndicator::stop(){
 	if(state == OUT || state == EXIT) return;
+	exitf = f;
 	if(state == IN){
 		f = 1;
-		ballf = 0.999f;
+	}else if(state == ENTER){
+		ballf = 0;
 	}
 	title->change(currentText);
 	state = EXIT;
@@ -44,6 +47,13 @@ void LoadingIndicator::loop(uint micros){
 
 	if(state == EXIT){
 		f -= (float) micros / 500000.0f;
+		exitf += (float) micros / 2000000.0f;
+		ballf -= (float) micros / 1000000.0f;
+		ballf = max(0.0f, ballf);
+
+		if(exitf >= 1){
+			exitf -= 1.0f;
+		}
 
 		if(f < 0){
 			active = false;
@@ -96,8 +106,14 @@ void LoadingIndicator::loop(uint micros){
 }
 
 void LoadingIndicator::draw(){
-	if(state != IN && state != FINISH) return;
+	if(state != EXIT && state != IN && state != FINISH) return;
 	if(boot) return;
+	if(ballf == 0) return;
+
+	float f = this->f;
+	if(state == EXIT){
+		f = exitf;
+	}
 
 	int16_t ballX = sin(f * M_PI * 2.0f) * 60.0f * ballf;
 	int16_t ballY = cos(f * M_PI * 2.0f) * 30.0f * ballf;

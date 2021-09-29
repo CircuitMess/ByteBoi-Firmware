@@ -228,9 +228,9 @@ void Launcher::loop(uint _micros){
 
 void Launcher::draw(){
 	screen.getSprite()->clear(C_HEX(0x0041ff));
+	loader->draw();
 	scroller->draw();
 	title->draw();
-	loader->draw();
 	logo->draw();
 
 /*

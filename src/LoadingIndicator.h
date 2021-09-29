@@ -34,6 +34,7 @@ private:
 
 	enum { OUT, ENTER, IN, EXIT, FINISH } state = OUT;
 	float f = 0;
+	float exitf = 0;
 	float ballf = 0;
 };
 
