@@ -26,6 +26,7 @@ Launcher::Launcher(Display* display) : Context(*display), display(display), gene
 	scroller = new GameScroller(canvas, items);
 	logo = new Logo(canvas);
 	title = new GameTitle(canvas);
+	loading = new LoadingIndicator(canvas, logo, scroller, title);
 
 	instance = this;
 	canvas->setChroma(TFT_TRANSPARENT);
@@ -199,6 +200,7 @@ void Launcher::draw(){
 	screen.getSprite()->clear(C_HEX(0x0082ff));
 	scroller->draw();
 	title->draw();
+	loading->draw();
 	logo->draw();
 
 /*
