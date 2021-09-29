@@ -101,8 +101,8 @@ void LoadingIndicator::draw(){
 
 	int16_t ballX = sin(f * M_PI * 2.0f) * 60.0f * ballf;
 	int16_t ballY = cos(f * M_PI * 2.0f) * 30.0f * ballf;
-
-	canvas->fillCircle(canvas->width() / 2 + ballX, canvas->height() / 2 - ballY, 3, C_HEX(0x0041ff));
+	
+	canvas->fillCircle(canvas->width() / 2 + ballX, canvas->height() / 2 - ballY, r, C_HEX(0x0082ff));
 }
 
 bool LoadingIndicator::isActive() const{
