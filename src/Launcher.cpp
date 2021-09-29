@@ -166,6 +166,16 @@ void Launcher::bindInput(){
 		instance->items[instance->selectedGame].exec();
 	});
 
+	Input::getInstance()->setBtnPressCallback(BTN_B, [](){
+		if(instance == nullptr) return;
+		if(instance->loading){
+			Loader.abort();
+			instance->loading = false;
+			instance->doneLoading = false;
+			instance->loader->stop();
+		}
+	});
+
 	Input::getInstance()->setBtnPressCallback(BTN_C, [](){
 		if(instance == nullptr) return;
 		if(instance->scroller->scrolling() || instance->loading) return;
