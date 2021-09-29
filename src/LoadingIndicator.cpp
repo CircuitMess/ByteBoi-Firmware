@@ -96,7 +96,7 @@ void LoadingIndicator::loop(uint micros){
 				return;
 			}
 		}else if(ballf != 0 && ballf < 1){
-			ballf += (float) micros / 500000.0f;
+			ballf += (float) micros / 800000.0f;
 			if(ballf >= 1){
 				ballf = 1;
 			}
