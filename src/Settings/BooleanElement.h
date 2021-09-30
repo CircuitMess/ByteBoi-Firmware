@@ -12,6 +12,8 @@ namespace SettingsScreen {
 
 		bool getBooleanSwitch() const;
 
+		void setBooleanSwitch(bool booleanSwitch);
+
 	private:
 
 		bool booleanSwitch = false;

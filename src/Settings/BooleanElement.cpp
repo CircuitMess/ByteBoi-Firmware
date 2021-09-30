@@ -29,3 +29,7 @@ void SettingsScreen::BooleanElement::drawControl(){
 bool SettingsScreen::BooleanElement::getBooleanSwitch() const{
 	return booleanSwitch;
 }
+
+void SettingsScreen::BooleanElement::setBooleanSwitch(bool booleanSwitch){
+	BooleanElement::booleanSwitch = booleanSwitch;
+}
