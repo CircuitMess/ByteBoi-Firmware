@@ -36,6 +36,7 @@ void LoadingIndicator::stop(){
 
 void LoadingIndicator::finish(){
 	state = FINISH;
+	title->change("");
 }
 
 void LoadingIndicator::loop(uint micros){

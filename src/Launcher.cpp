@@ -113,6 +113,7 @@ void Launcher::start(){
 		bindInput();
 	}else{
 		title->change(items[selectedGame].text);
+		scroller->splash(0);
 	}
 
 	draw();
