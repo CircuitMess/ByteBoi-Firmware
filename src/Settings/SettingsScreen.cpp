@@ -8,13 +8,15 @@
 SettingsScreen::SettingsScreen::SettingsScreen(Display& display) : Context(display), screenLayout(new LinearLayout(&screen, VERTICAL)),
 																   shutDownSlider(new DiscreteSlider(screenLayout, "Auto shutdown", {0, 1, 5, 15, 30})),
 																   volumeSlider(new SliderElement(screenLayout, "Volume")),
-																   enableLED(new BooleanElement(screenLayout,"LED enable")),
+																   enableLED(new BooleanElement(screenLayout, "LED enable")),
 																   inputTest(new TextElement(screenLayout, "Hardware test")),
 																   save(new TextElement(screenLayout, "Save")){
 
 	buildUI();
 	shutDownSlider->setIsSelected(true);
 	shutDownSlider->setIndex(Settings.get().shutdownTime);
+	volumeSlider->setSliderValue(Settings.get().volume);
+	enableLED->setBooleanSwitch(Settings.get().RGBenable);
 	SettingsScreen::pack();
 }
 
@@ -35,7 +37,7 @@ void SettingsScreen::SettingsScreen::draw(){
 	screen.getSprite()->setTextSize(1);
 	screen.getSprite()->setTextFont(1);
 	screen.getSprite()->setCursor(screenLayout->getTotalX() + 42, screenLayout->getTotalY() + 110);
-	screen.getSprite()->print("Version 1.0.1");
+	screen.getSprite()->print("Version 1.0");
 
 	for(int i = 0; i < 5; i++){
 		if(!reinterpret_cast<SettingsElement*>(screenLayout->getChild(i))->isSelected()){
@@ -185,10 +187,21 @@ void SettingsScreen::SettingsScreen::buttonPressed(uint id){
 		case BTN_A:
 			if(selectedSetting == 2){
 				enableLED->toggle();
+			}else if(selectedSetting == 4){
+				Settings.get().shutdownTime = shutDownSlider->getIndex();
+				Settings.get().volume = volumeSlider->getSliderValue();
+				Settings.get().RGBenable = enableLED->getBooleanSwitch();
+				Settings.store();
+				this->pop();
 			}
+			draw();
+			screen.commit();
+			break;
 		case BTN_B:
 		case BTN_C:
 			Settings.get().shutdownTime = shutDownSlider->getIndex();
+			Settings.get().volume = volumeSlider->getSliderValue();
+			Settings.get().RGBenable = enableLED->getBooleanSwitch();
 			Settings.store();
 			this->pop();
 			draw();
