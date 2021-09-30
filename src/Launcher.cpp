@@ -27,10 +27,11 @@ Launcher::Launcher(Display* display) : Context(*display), display(display), gene
 	scroller = new GameScroller(canvas, items);
 	logo = new Logo(canvas);
 	title = new GameTitle(canvas);
+	loader = new LoadingIndicator(canvas, logo, scroller, title);
 
 	instance = this;
 	canvas->setChroma(TFT_TRANSPARENT);
-	splash = new Splash(scroller);
+	splash = new Splash(scroller, logo);
 
 	fs::File icon = SPIFFS.open("/Launcher/genericGame.raw");
 	if(icon){
@@ -52,6 +53,7 @@ Launcher::Launcher(Display* display) : Context(*display), display(display), gene
 	load();
 	title->change("");
 	scroller->splash(0);
+	logo->setCentered(1);
 
 	Launcher::pack();
 }
@@ -71,8 +73,10 @@ void Launcher::load(){
 		items.emplace_back(GameImage(), "SD card empty", [](){}); // TODO: icon
 	}else{
 		for(const auto& game : Games.getGames()){
-			items.emplace_back(GameImage(), game->name.c_str(), [game](){
-				GameLoader::loadGame(game);
+			items.emplace_back(GameImage(), game->name.c_str(), [this, game](){
+				loading = true;
+				doneLoading = false;
+				loader->start(game);
 			});
 
 			LauncherItem& item = items.back();
@@ -128,12 +132,12 @@ void Launcher::start(){
 	screen.commit();
 	LoopManager::addListener(this);
 
-	LoopManager::addListener(logo);
+	//LoopManager::addListener(logo);
 }
 
 void Launcher::stop(){
 	LoopManager::removeListener(this);
-	LoopManager::removeListener(logo);
+	//LoopManager::removeListener(logo);
 	Input::getInstance()->removeBtnPressCallback(BTN_RIGHT);
 	Input::getInstance()->removeBtnPressCallback(BTN_LEFT);
 	Input::getInstance()->removeBtnPressCallback(BTN_A);
@@ -141,6 +145,7 @@ void Launcher::stop(){
 }
 
 void Launcher::prev(){
+	if(loading) return;
 	uint8_t selecting = instance->scroller->prev();
 	if(selecting != selectedGame){
 		instance->title->change(items[selecting].text);
@@ -149,6 +154,7 @@ void Launcher::prev(){
 }
 
 void Launcher::next(){
+	if(loading) return;
 	uint8_t selecting = instance->scroller->next();
 	if(selecting != selectedGame){
 		instance->title->change(items[selecting].text);
@@ -158,22 +164,38 @@ void Launcher::next(){
 
 void Launcher::bindInput(){
 	Input::getInstance()->setBtnPressCallback(BTN_RIGHT, [](){
+		if(instance == nullptr) return;
 		instance->next();
 		Piezo.tone(800, 50);
 	});
 
 	Input::getInstance()->setBtnPressCallback(BTN_LEFT, [](){
+		if(instance == nullptr) return;
 		instance->prev();
 		Piezo.tone(800, 50);
 	});
 
 	Input::getInstance()->setBtnPressCallback(BTN_A, [](){
-		if(instance->scroller->scrolling()) return;
+		if(instance == nullptr) return;
+		if(instance->scroller->scrolling() || instance->loader->isActive() || instance->loading) return;
 		instance->items[instance->selectedGame].exec();
+	});
+
+	Input::getInstance()->setBtnPressCallback(BTN_B, [](){
+		if(instance == nullptr) return;
+		Piezo.tone(800, 50);
+		if(instance->loading){
+			Loader.abort();
+			instance->loading = false;
+			instance->doneLoading = false;
+			instance->loader->stop();
+		}
 	});
 
 	Input::getInstance()->setBtnPressCallback(BTN_C, [](){
 		if(instance == nullptr) return;
+		if(instance->scroller->scrolling() || instance->loader->isActive() || instance->loading) return;
+		Piezo.tone(800, 50);
 		// TODO: check for non-games
 		DescriptionModal* descriptionModal;
 		descriptionModal = new DescriptionModal(*instance,instance->scroller->getSelectedGame());
@@ -198,6 +220,18 @@ void Launcher::loop(uint _micros){
 		}
 	}
 
+	if(loading && !doneLoading && Loader.doneLoading()){
+		Input::getInstance()->removeBtnPressCallback(BTN_RIGHT);
+		Input::getInstance()->removeBtnPressCallback(BTN_LEFT);
+		Input::getInstance()->removeBtnPressCallback(BTN_A);
+		Input::getInstance()->removeBtnPressCallback(BTN_B);
+		Input::getInstance()->removeBtnPressCallback(BTN_C);
+		Games.setGameListener(nullptr);
+		doneLoading = true;
+		loader->finish();
+		title->change("");
+	}
+
 	draw();
 //	canvas->setTextColor(TFT_WHITE);
 //	canvas->setTextSize(1);
@@ -209,7 +243,8 @@ void Launcher::loop(uint _micros){
 }
 
 void Launcher::draw(){
-	screen.getSprite()->clear(C_HEX(0x0082ff));
+	screen.getSprite()->clear(C_HEX(0x0041ff));
+	loader->draw();
 	scroller->draw();
 	title->draw();
 	logo->draw();
@@ -235,6 +270,14 @@ void Launcher::deinit(){
 }
 
 void Launcher::gamesChanged(bool inserted){
+	if(doneLoading) return;
+
+	if(loading){
+		Loader.abort();
+		loading = false;
+		loader->stop();
+	}
+
 	load();
 	if(splash != nullptr){
 		title->change("");

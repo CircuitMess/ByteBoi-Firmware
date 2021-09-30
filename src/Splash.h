@@ -4,12 +4,12 @@
 #include <Arduino.h>
 
 class Sprite;
-class GameTitle;
 class GameScroller;
+class Logo;
 
 class Splash {
 public:
-	Splash(GameScroller* scroller);
+	Splash(GameScroller* scroller, Logo* logo);
 
 	void loop(uint micros);
 	bool done();
@@ -19,8 +19,8 @@ private:
 
 	Sprite* canvas;
 
-	GameTitle* title;
 	GameScroller* scroller;
+	Logo* logo;
 };
 
 
