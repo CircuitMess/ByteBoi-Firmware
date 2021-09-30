@@ -3,7 +3,6 @@
 #include <Display/Sprite.h>
 #include <Display/LovyanGFX_setup.h>
 #include <SPIFFS.h>
-#include "../Bitmaps/logo.hpp"
 
 Logo::Logo(Sprite* canvas) : canvas(canvas), startX((canvas->width() - width) / 2), centerDiff((canvas->height() - height) / 2 - startY){
 	logoBuffer = static_cast<Color*>(malloc(93 * 26 * 2));

@@ -33,9 +33,7 @@ std::string getValueOrDefault(Properties& props, const char* key, const char* de
 void GameManager::scanGames(){
 	clearGames();
 
-	// TODO: there is a potential infinite loop between scanGames and detectSD
-	detectSD();
-	if(!SDinserted()) return;
+	if((ByteBoi.getExpander()->getPortState() & (1 << SD_DETECT_PIN))) return;
 
 	File root = SD.open("/");
 	File gameFolder = root.openNextFile();
