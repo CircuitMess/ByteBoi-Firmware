@@ -235,6 +235,7 @@ void Launcher::draw(){
 	scroller->draw();
 	title->draw();
 	logo->draw();
+	Battery.drawIcon(*screen.getSprite(),140,5);
 
 /*
 	if(batteryService->getVoltage() > 780){
