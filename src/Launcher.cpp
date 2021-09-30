@@ -245,6 +245,7 @@ void Launcher::loop(uint _micros){
 //	canvas->println((1000000.0 / (float)drawTime1));
 	screen.commit();
 	drawTime1 = micros() - t;
+
 }
 
 void Launcher::draw(){
@@ -253,6 +254,7 @@ void Launcher::draw(){
 	scroller->draw();
 	title->draw();
 	logo->draw();
+	Battery.drawIcon(*screen.getSprite(),143,3);
 
 /*
 	if(batteryService->getVoltage() > 780){
