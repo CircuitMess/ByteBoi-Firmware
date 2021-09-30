@@ -9,8 +9,8 @@
 #include <ByteBoi.h>
 #include "GameManagement/GameManager.h"
 #include "GameManagement/GameLoader.h"
-#include "GameInfo.hpp"
 #include "DescriptionModal.h"
+#include "ErrorModal.h"
 #include "Settings/SettingsScreen.h"
 #include <SD.h>
 #include <SPIFFS.h>
@@ -76,6 +76,8 @@ void Launcher::load(){
 			items.emplace_back(GameImage(), game->name.c_str(), [this, game](){
 				loading = true;
 				doneLoading = false;
+				hasError = false;
+				Loader.clearError();
 				loader->start(game);
 			});
 
@@ -126,6 +128,7 @@ void Launcher::start(){
 		bindInput();
 	}else{
 		title->change(items[selectedGame].text);
+		scroller->splash(0);
 	}
 
 	draw();
@@ -221,18 +224,33 @@ void Launcher::loop(uint _micros){
 	}
 
 	if(loading && !doneLoading && Loader.doneLoading()){
-		Input::getInstance()->removeBtnPressCallback(BTN_RIGHT);
-		Input::getInstance()->removeBtnPressCallback(BTN_LEFT);
-		Input::getInstance()->removeBtnPressCallback(BTN_A);
-		Input::getInstance()->removeBtnPressCallback(BTN_B);
-		Input::getInstance()->removeBtnPressCallback(BTN_C);
-		Games.setGameListener(nullptr);
-		doneLoading = true;
-		loader->finish();
-		title->change("");
+		if(Loader.getError() == ""){
+			Input::getInstance()->removeBtnPressCallback(BTN_RIGHT);
+			Input::getInstance()->removeBtnPressCallback(BTN_LEFT);
+			Input::getInstance()->removeBtnPressCallback(BTN_A);
+			Input::getInstance()->removeBtnPressCallback(BTN_B);
+			Input::getInstance()->removeBtnPressCallback(BTN_C);
+			Games.setGameListener(nullptr);
+			doneLoading = true;
+			loader->finish();
+		}else{
+			loading = false;
+			doneLoading = false;
+			loader->stop();
+			hasError = true;
+		}
 	}
 
 	draw();
+
+	if(hasError && !loader->isActive()){
+		hasError = false;
+		Modal* errorModal = new ErrorModal(*this, Loader.getError());
+		Loader.clearError();
+		errorModal->push(this);
+		return;
+	}
+
 //	canvas->setTextColor(TFT_WHITE);
 //	canvas->setTextSize(1);
 //	canvas->setCursor(130, 10);
@@ -240,6 +258,7 @@ void Launcher::loop(uint _micros){
 //	canvas->println((1000000.0 / (float)drawTime1));
 	screen.commit();
 	drawTime1 = micros() - t;
+
 }
 
 void Launcher::draw(){
@@ -248,6 +267,7 @@ void Launcher::draw(){
 	scroller->draw();
 	title->draw();
 	logo->draw();
+	Battery.drawIcon(*screen.getSprite(),143,3);
 
 /*
 	if(batteryService->getVoltage() > 780){
