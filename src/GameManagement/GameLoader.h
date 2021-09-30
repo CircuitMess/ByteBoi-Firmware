@@ -14,13 +14,16 @@ public:
 	void boot();
 	void abort();
 	bool doneLoading();
+	const String& getError() const;
+	void clearError();
 
 	static void loadFunc(Task* task);
 
 private:
 	Task loadTask;
-	GameInfo* loading = nullptr;
-	bool done;
+	GameInfo* game = nullptr;
+	bool done = false;
+	String error = "";
 
 	bool checkAbort();
 };

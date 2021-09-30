@@ -9,7 +9,6 @@
 #include <ByteBoi.h>
 #include "GameManagement/GameManager.h"
 #include "GameManagement/GameLoader.h"
-#include "GameInfo.hpp"
 #include "DescriptionModal.h"
 #include <SD.h>
 #include <SPIFFS.h>
@@ -67,6 +66,7 @@ void Launcher::load(){
 			items.emplace_back(GameImage(), game->name.c_str(), [this, game](){
 				loading = true;
 				doneLoading = false;
+				Loader.clearError();
 				loader->start(game);
 			});
 
@@ -208,15 +208,21 @@ void Launcher::loop(uint _micros){
 	}
 
 	if(loading && !doneLoading && Loader.doneLoading()){
-		Input::getInstance()->removeBtnPressCallback(BTN_RIGHT);
-		Input::getInstance()->removeBtnPressCallback(BTN_LEFT);
-		Input::getInstance()->removeBtnPressCallback(BTN_A);
-		Input::getInstance()->removeBtnPressCallback(BTN_B);
-		Input::getInstance()->removeBtnPressCallback(BTN_C);
-		Games.setGameListener(nullptr);
-		doneLoading = true;
-		loader->finish();
-		title->change("");
+		if(Loader.getError() == ""){
+			Input::getInstance()->removeBtnPressCallback(BTN_RIGHT);
+			Input::getInstance()->removeBtnPressCallback(BTN_LEFT);
+			Input::getInstance()->removeBtnPressCallback(BTN_A);
+			Input::getInstance()->removeBtnPressCallback(BTN_B);
+			Input::getInstance()->removeBtnPressCallback(BTN_C);
+			Games.setGameListener(nullptr);
+			doneLoading = true;
+			loader->finish();
+		}else{
+			loading = false;
+			doneLoading = false;
+			loader->stop();
+			Serial.print(Loader.getError());
+		}
 	}
 
 	draw();
