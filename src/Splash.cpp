@@ -1,5 +1,5 @@
 #include "Splash.h"
-#include "Elements/GameTitle.h"
+#include "Elements/Logo.h"
 #include "GameScroller.h"
 #include <Audio/Piezo.h>
 
@@ -25,7 +25,7 @@ Vector<Tone> tones = {
 int tonePlaying = -1;
 uint toneTotal;
 
-Splash::Splash(GameScroller* scroller) : scroller(scroller){
+Splash::Splash(GameScroller* scroller, Logo* logo) : scroller(scroller), logo(logo){
 
 }
 
@@ -49,6 +49,7 @@ void Splash::loop(uint micros){
 	}
 
 	scroller->splash(f);
+	logo->setCentered(1.0f - f);
 }
 
 bool Splash::done(){

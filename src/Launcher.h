@@ -9,6 +9,7 @@
 #include "GameInfo.hpp"
 #include "Elements/GameImage.h"
 #include "GameManagement/GameListener.hpp"
+#include "LoadingIndicator.h"
 
 class Logo;
 class GameTitle;
@@ -45,10 +46,13 @@ private:
 	GameTitle* title;
 	GameScroller* scroller;
 	Splash* splash;
+	LoadingIndicator* loader;
 
 	GameImage genericIcon;
 	std::vector<LauncherItem> items;
 	void load();
+	bool loading = false;
+	bool doneLoading = false;
 
 	uint8_t selectedGame = 0;
 	void prev();
