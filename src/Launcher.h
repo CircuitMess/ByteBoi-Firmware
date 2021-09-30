@@ -49,6 +49,7 @@ private:
 	LoadingIndicator* loader;
 
 	GameImage genericIcon;
+	GameImage settingsIcon;
 	std::vector<LauncherItem> items;
 	void load();
 	bool loading = false;

@@ -11,6 +11,7 @@
 #include "GameManagement/GameLoader.h"
 #include "DescriptionModal.h"
 #include "ErrorModal.h"
+#include "Settings/SettingsScreen.h"
 #include <SD.h>
 #include <SPIFFS.h>
 #include <FS/CompressedFile.h>
@@ -21,7 +22,7 @@ Launcher* Launcher::instance = nullptr;
 
 LauncherItem::LauncherItem(const GameImage& image, String text, std::function<void()> exec) : image(image), text(std::move(text)), exec(std::move(exec)){}
 
-Launcher::Launcher(Display* display) : Context(*display), display(display), genericIcon(screen.getSprite()){
+Launcher::Launcher(Display* display) : Context(*display), display(display), genericIcon(screen.getSprite()), settingsIcon(screen.getSprite()){
 	canvas = screen.getSprite();
 	scroller = new GameScroller(canvas, items);
 	logo = new Logo(canvas);
@@ -39,6 +40,14 @@ Launcher::Launcher(Display* display) : Context(*display), display(display), gene
 		genericIcon = GameImage();
 	}
 	icon.close();
+
+	fs::File settIcon = SPIFFS.open("/launcher/SettingsIcon.raw");
+	if(settIcon){
+		settIcon.read(reinterpret_cast<uint8_t*>(settingsIcon.getBuffer()), 64 * 64 * 2);
+	}else{
+		settingsIcon = GameImage();
+	}
+	settIcon.close();
 
 	Games.setGameListener(this);
 	load();
@@ -90,7 +99,11 @@ void Launcher::load(){
 		}
 	}
 
-	items.emplace_back(GameImage(), "Settings", [](){}); // TODO: icon and starting
+	items.emplace_back(settingsIcon, "Settings", [this](){
+		Display& display = *this->getScreen().getDisplay();
+		SettingsScreen::SettingsScreen* settingsScreen =new SettingsScreen::SettingsScreen(display);
+		settingsScreen->push(this);
+	});
 
 	if(!items.empty() && items.size() < 4){ // scroller expects at least 4 items
 		if(items.size() == 1){ // if only one element, duplicate it 3 times
