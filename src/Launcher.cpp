@@ -10,6 +10,7 @@
 #include "GameManagement/GameManager.h"
 #include "GameManagement/GameLoader.h"
 #include "DescriptionModal.h"
+#include "ErrorModal.h"
 #include <SD.h>
 #include <SPIFFS.h>
 #include <FS/CompressedFile.h>
@@ -66,6 +67,7 @@ void Launcher::load(){
 			items.emplace_back(GameImage(), game->name.c_str(), [this, game](){
 				loading = true;
 				doneLoading = false;
+				hasError = false;
 				Loader.clearError();
 				loader->start(game);
 			});
@@ -222,11 +224,20 @@ void Launcher::loop(uint _micros){
 			loading = false;
 			doneLoading = false;
 			loader->stop();
-			Serial.print(Loader.getError());
+			hasError = true;
 		}
 	}
 
 	draw();
+
+	if(hasError && !loader->isActive()){
+		hasError = false;
+		Modal* errorModal = new ErrorModal(*this, Loader.getError());
+		Loader.clearError();
+		errorModal->push(this);
+		return;
+	}
+
 //	canvas->setTextColor(TFT_WHITE);
 //	canvas->setTextSize(1);
 //	canvas->setCursor(130, 10);
