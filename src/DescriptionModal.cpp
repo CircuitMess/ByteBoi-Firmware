@@ -8,7 +8,7 @@ using namespace std;
 
 static const lgfx::U8g2font adobex11font(u8g2_font_helvB08_tr);
 
-DescriptionModal::DescriptionModal(Context& context, GameInfo* gameInfo) : Modal(context, 80, 80),gameInfo(gameInfo){
+DescriptionModal::DescriptionModal(Context& context, GameInfo* gameInfo) : Modal(context, 100, 80),gameInfo(gameInfo){
 }
 
 DescriptionModal::~DescriptionModal(){
@@ -48,7 +48,7 @@ void DescriptionModal::splitPrintSentence(std::string sentence){
 	for(auto x : sentence){
 		if(x == ' ' || x == ('!') || x == ('.')){
 			Serial.println(screen.getSprite()->getCursorX());
-			if(((screen.getSprite()->getCursorX()) + screen.getSprite()->textWidth(word.c_str())) > 78){
+			if(((screen.getSprite()->getCursorX()) + screen.getSprite()->textWidth(word.c_str())) > screen.getSprite()->width()-2){
 				y_lenght += 10;
 				screen.getSprite()->setCursor(2, y_lenght);
 			}else{

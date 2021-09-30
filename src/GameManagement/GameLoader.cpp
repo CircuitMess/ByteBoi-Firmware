@@ -47,7 +47,7 @@ void GameLoader::loadFunc(Task* task){
 		file = root.openNextFile();
 		while(file){
 			String fileName = file.name();
-			fileName = fileName.substring(fileName.lastIndexOf('/') + 1);
+			fileName = fileName.substring(fileName.lastIndexOf('/'));
 			File destFile = SPIFFS.open(ByteBoiImpl::SPIFFSgameRoot + fileName, FILE_WRITE);
 			uint8_t buf[512];
 			size_t count;
