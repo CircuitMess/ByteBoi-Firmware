@@ -256,7 +256,6 @@ void Launcher::loop(uint _micros){
 		Modal* errorModal = new ErrorModal(*this, Loader.getError());
 		Loader.clearError();
 		errorModal->push(this);
-		instance->logo->start();
 		return;
 	}
 

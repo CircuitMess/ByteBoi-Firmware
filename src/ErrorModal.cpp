@@ -55,8 +55,13 @@ uint8_t ErrorModal::splitPrintSentence(Sprite* canvas, std::string sentence){
 	std::string word;
 	bool firstWord = true;
 	int lines = 1;
+	int i = 0;
 	for(auto x : sentence){
-		if(x == ' ' || x == ('!') || x == ('.')){
+		i++;
+		if(i == sentence.size() || x == ' ' || x == ('!') || x == ('.')){
+			if(i == sentence.size()){
+				word = word + x;
+			}
 			if(((canvas->getCursorX()) + canvas->textWidth(word.c_str())) > canvas->width()-4){
 				y_lenght += 10;
 				canvas->setCursor(4, y_lenght);
