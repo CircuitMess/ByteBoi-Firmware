@@ -79,6 +79,7 @@ void Launcher::load(){
 				hasError = false;
 				Loader.clearError();
 				loader->start(game);
+				logo->stop();
 			}, [this, game](){
 				DescriptionModal* descriptionModal;
 				descriptionModal = new DescriptionModal(*this, game);
@@ -130,6 +131,7 @@ void Launcher::load(){
 void Launcher::start(){
 	if(splash == nullptr){
 		bindInput();
+		logo->start();
 	}else{
 		title->change(items[selectedGame].text);
 		scroller->splash(0);
@@ -138,13 +140,11 @@ void Launcher::start(){
 	draw();
 	screen.commit();
 	LoopManager::addListener(this);
-
-	//LoopManager::addListener(logo);
 }
 
 void Launcher::stop(){
 	LoopManager::removeListener(this);
-	//LoopManager::removeListener(logo);
+	logo->pause();
 	Input::getInstance()->removeBtnPressCallback(BTN_RIGHT);
 	Input::getInstance()->removeBtnPressCallback(BTN_LEFT);
 	Input::getInstance()->removeBtnPressCallback(BTN_A);
@@ -199,6 +199,7 @@ void Launcher::bindInput(){
 			instance->loading = false;
 			instance->doneLoading = false;
 			instance->loader->stop();
+			instance->logo->start();
 		}
 	});
 
@@ -225,6 +226,7 @@ void Launcher::loop(uint _micros){
 
 			bindInput();
 			scroller->splash(1);
+			logo->start();
 		}
 	}
 
@@ -253,6 +255,7 @@ void Launcher::loop(uint _micros){
 		Modal* errorModal = new ErrorModal(*this, Loader.getError());
 		Loader.clearError();
 		errorModal->push(this);
+		instance->logo->start();
 		return;
 	}
 
