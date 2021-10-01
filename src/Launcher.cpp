@@ -20,7 +20,7 @@
 
 Launcher* Launcher::instance = nullptr;
 
-LauncherItem::LauncherItem(const GameImage& image, String text, std::function<void()> exec) : image(image), text(std::move(text)), exec(std::move(exec)){}
+LauncherItem::LauncherItem(String text, const GameImage& image, std::function<void()> primary, std::function<void()> secondary) : text(std::move(text)), image(image), primary(primary), secondary(secondary){}
 
 Launcher::Launcher(Display* display) : Context(*display), display(display), genericIcon(screen.getSprite()), settingsIcon(screen.getSprite()){
 	canvas = screen.getSprite();
@@ -68,17 +68,21 @@ void Launcher::load(){
 	items.clear();
 
 	if(!Games.SDinserted()){
-		items.emplace_back(GameImage(), "No SD card", [](){}); // TODO: icon
+		items.emplace_back("No SD card", GameImage()); // TODO: icon
 	}else if(Games.getGames().empty()){
-		items.emplace_back(GameImage(), "SD card empty", [](){}); // TODO: icon
+		items.emplace_back("SD card empty", GameImage()); // TODO: icon
 	}else{
 		for(const auto& game : Games.getGames()){
-			items.emplace_back(GameImage(), game->name.c_str(), [this, game](){
+			items.emplace_back(game->name.c_str(), GameImage(), [this, game](){
 				loading = true;
 				doneLoading = false;
 				hasError = false;
 				Loader.clearError();
 				loader->start(game);
+			}, [this, game](){
+				DescriptionModal* descriptionModal;
+				descriptionModal = new DescriptionModal(*this, game);
+				descriptionModal->push(instance);
 			});
 
 			LauncherItem& item = items.back();
@@ -99,7 +103,7 @@ void Launcher::load(){
 		}
 	}
 
-	items.emplace_back(settingsIcon, "Settings", [this](){
+	items.emplace_back("Settings", settingsIcon, [this](){
 		Display& display = *this->getScreen().getDisplay();
 		SettingsScreen::SettingsScreen* settingsScreen =new SettingsScreen::SettingsScreen(display);
 		settingsScreen->push(this);
@@ -181,7 +185,10 @@ void Launcher::bindInput(){
 	Input::getInstance()->setBtnPressCallback(BTN_A, [](){
 		if(instance == nullptr) return;
 		if(instance->scroller->scrolling() || instance->loader->isActive() || instance->loading) return;
-		instance->items[instance->selectedGame].exec();
+		Piezo.tone(800, 50);
+		if(instance->items[instance->selectedGame].primary){
+			instance->items[instance->selectedGame].primary();
+		}
 	});
 
 	Input::getInstance()->setBtnPressCallback(BTN_B, [](){
@@ -199,11 +206,9 @@ void Launcher::bindInput(){
 		if(instance == nullptr) return;
 		if(instance->scroller->scrolling() || instance->loader->isActive() || instance->loading) return;
 		Piezo.tone(800, 50);
-		// TODO: check for non-games
-		DescriptionModal* descriptionModal;
-		descriptionModal = new DescriptionModal(*instance,instance->scroller->getSelectedGame());
-		descriptionModal->push(instance);
-
+		if(instance->items[instance->selectedGame].secondary){
+			instance->items[instance->selectedGame].secondary();
+		}
 	});
 }
 

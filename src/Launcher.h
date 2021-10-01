@@ -18,11 +18,12 @@ class Splash;
 class Menu;
 
 struct LauncherItem {
-	GameImage image;
 	String text;
-	std::function<void()> exec;
+	GameImage image;
+	std::function<void()> primary;
+	std::function<void()> secondary;
 
-	LauncherItem(const GameImage& image, String text, std::function<void()> exec);
+	LauncherItem(String text, const GameImage& image = GameImage(), std::function<void()> primary = {}, std::function<void()> secondary = {});
 };
 
 class Launcher : public LoopListener, public Context, public GameListener {
