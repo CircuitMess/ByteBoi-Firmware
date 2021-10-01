@@ -108,6 +108,7 @@ void Launcher::load(){
 		Display& display = *this->getScreen().getDisplay();
 		SettingsScreen::SettingsScreen* settingsScreen =new SettingsScreen::SettingsScreen(display);
 		settingsScreen->push(this);
+		logo->reset();
 	});
 
 	if(!items.empty() && items.size() < 4){ // scroller expects at least 4 items

@@ -19,6 +19,7 @@ public:
 	void start();
 	void stop();
 	void pause();
+	void reset();
 
 	void setCentered(float f);
 

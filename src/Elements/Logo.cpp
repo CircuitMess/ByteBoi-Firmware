@@ -32,9 +32,7 @@ void Logo::loop(uint micros){
 		ampf -= ((float) micros / 1000000.0f);
 
 		if(ampf <= 0 || f == 0){
-			diffX = 0;
-			ampf = 0;
-			f = 0;
+			reset();
 			state = OFF;
 			LoopManager::removeListener(this);
 			return;
@@ -71,6 +69,12 @@ void Logo::stop(){
 
 void Logo::pause(){
 	LoopManager::removeListener(this);
+}
+
+void Logo::reset(){
+	diffX = 0;
+	ampf = 0;
+	f = 0;
 }
 
 void Logo::draw(){
