@@ -48,7 +48,6 @@ void DescriptionModal::splitPrintSentence(std::string sentence){
 	bool firstWord = true;
 	for(auto x : sentence){
 		if(x == ' ' || x == ('!') || x == ('.')){
-			Serial.println(screen.getSprite()->getCursorX());
 			if(((screen.getSprite()->getCursorX()) + screen.getSprite()->textWidth(word.c_str())) > screen.getSprite()->width()-4){
 				y_lenght += 10;
 				screen.getSprite()->setCursor(4, y_lenght);
@@ -62,7 +61,6 @@ void DescriptionModal::splitPrintSentence(std::string sentence){
 
 			}
 			screen.getSprite()->print(word.c_str());
-			Serial.println(word.c_str());
 			word.erase();
 		}else{
 			word = word + x;
