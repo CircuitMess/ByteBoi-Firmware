@@ -4,6 +4,7 @@
 #include "Elements/GameTitle.h"
 #include "GameScroller.h"
 #include "GameManagement/GameLoader.h"
+#include <ByteBoi.h>
 
 LoadingIndicator::LoadingIndicator(Sprite* canvas, Logo* logo, GameScroller* scroller, GameTitle* title) : canvas(canvas), logo(logo), scroller(scroller), title(title){}
 
@@ -43,6 +44,8 @@ void LoadingIndicator::loop(uint micros){
 	// abandon hope all ye who enter here
 
 	if(boot){
+		ByteBoi.fadeout();
+		ByteBoi.getExpander()->pinWrite(BL_PIN, HIGH);
 		Loader.boot();
 	}
 
