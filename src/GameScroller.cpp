@@ -15,7 +15,7 @@ GameScroller::GameScroller(Sprite* canvas, std::vector<LauncherItem>& items) : c
 
 	for(auto& item : items){
 		item.image.setX(-width);
-		item.image.setY(35);
+		item.image.setY(originY);
 	}
 
 	// repos();
@@ -33,6 +33,22 @@ void GameScroller::splash(float f){
 	getRGame()->setX(f * (float) (origin + width + gutter - (origin + 2*width + 2*gutter)) + origin + 2*width + 2*gutter);
 }
 
+void GameScroller::load(float f){
+	if(items.size() < 4) return;
+
+	getCGame()->setY((f * -7.0f + originY));
+
+	f = 1.0f - f;
+	getLGame()->setX(f * (float) (origin + width) - 2 * width - gutter);
+	getRGame()->setX(f * (float) (origin + width + gutter - (origin + 2*width + 2*gutter)) + origin + 2*width + 2*gutter);
+}
+
+void GameScroller::finish(float f){
+	if(items.size() < 4) return;
+
+	getCGame()->setY((f * (120.0f - originY + 7.0f) + originY - 7.0f));
+}
+
 void GameScroller::reset(){
 	selectedGame = 0;
 	delta = 0;
@@ -46,7 +62,7 @@ void GameScroller::reset(){
 void GameScroller::repos(){
 	for(auto& item : items){
 		item.image.setX(-width);
-		item.image.setY(35);
+		item.image.setY(originY);
 	}
 
 	if(items.size() < 4) return;
@@ -200,11 +216,6 @@ GameImage* GameScroller::getRRGame(){
 	return &items[(selectedGame + 2) % items.size()].image;
 }
 
-GameInfo* const GameScroller::getSelectedGame() const{
-	return Games.getGames()[selectedGame];
-
-}
-
 void GameScroller::setCanvas(Sprite* canvas){
 	GameScroller::canvas = canvas;
 
@@ -212,4 +223,8 @@ void GameScroller::setCanvas(Sprite* canvas){
 		if(!item.image) continue;
 		item.image.setCanvas(canvas);
 	}
+}
+
+uint GameScroller::getSelectedIndex() const{
+	return selectedGame;
 }

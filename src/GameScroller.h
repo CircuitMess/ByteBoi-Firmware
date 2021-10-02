@@ -28,14 +28,16 @@ public:
 	bool scrolling();
 
 	void splash(float f);
+	void load(float f);
+	void finish(float f);
 	void reset();
-
-	GameInfo* const getSelectedGame() const;
+	uint getSelectedIndex() const;
 
 private:
 	const uint8_t gutter = 25;
 	const uint8_t width = 64;
 	const uint8_t origin;
+	const uint8_t originY = 35;
 	const float speed = 250;
 
 	Sprite* canvas;

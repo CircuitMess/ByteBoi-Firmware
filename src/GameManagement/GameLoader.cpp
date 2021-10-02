@@ -16,6 +16,7 @@ void GameLoader::loadGame(GameInfo* game){
 	this->game = game;
 	done = false;
 	error = "";
+	progress = 0;
 
 	loadTask.start(1, 0);
 }
@@ -129,6 +130,7 @@ void GameLoader::loadFunc(Task* task){
 		}
 
 		totalWritten += written;
+		loader->progress = (float) totalWritten / (float) updateSize;
 		yield();
 	}
 	file.close();
@@ -159,6 +161,7 @@ void GameLoader::abort(){
 	game = nullptr;
 	done = false;
 	error = "";
+	progress = 0;
 }
 
 bool GameLoader::doneLoading(){
@@ -175,4 +178,8 @@ const String& GameLoader::getError() const{
 
 void GameLoader::clearError(){
 	error = "";
+}
+
+float GameLoader::getProgress() const{
+	return progress;
 }

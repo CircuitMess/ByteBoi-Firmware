@@ -8,28 +8,25 @@
 
 LoadingIndicator::LoadingIndicator(Sprite* canvas, Logo* logo, GameScroller* scroller, GameTitle* title) : canvas(canvas), logo(logo), scroller(scroller), title(title){}
 
-void LoadingIndicator::start(GameInfo* game){
+void LoadingIndicator::start(GameInfo* game, GameImage* image){
 	if(state != OUT) return;
 	this->game = game;
+	this->image = image;
+	imageCopy = *image;
 	currentText = title->getCurrent();
 	title->change("Loading...");
 	active = true;
 	state = ENTER;
 	f = 0;
-	ballf = 0;
-	ballGrown = ballGrown2 = false;
 	LoopManager::addListener(this);
 }
 
 void LoadingIndicator::stop(){
 	if(state == OUT || state == EXIT) return;
+	*image = imageCopy;
+	imageCopy = GameImage();
+	image = nullptr;
 	game = nullptr;
-	exitf = f;
-	if(state == IN){
-		f = 1;
-	}else if(state == ENTER){
-		ballf = 0;
-	}
 	title->change(currentText);
 	state = EXIT;
 	LoopManager::addListener(this);
@@ -37,6 +34,8 @@ void LoadingIndicator::stop(){
 
 void LoadingIndicator::finish(){
 	state = FINISH;
+	finishTime = millis();
+	*image = imageCopy;
 	title->change("");
 }
 
@@ -54,98 +53,85 @@ void LoadingIndicator::loop(uint micros){
 		return;
 	}
 
-	if(state == EXIT){
-		f -= (float) micros / 500000.0f;
-		exitf += (float) micros / 2000000.0f;
-		ballf -= (float) micros / 1000000.0f;
-		ballf = max(0.0f, ballf);
+	if(state == EXIT || state == FINISH){
+		if(state == FINISH && millis() - finishTime < 1000) return;
 
-		if(exitf >= 1){
-			exitf -= 1.0f;
-		}
+		f -= (float) micros / 500000.0f;
 
 		if(f < 0){
-			active = false;
-			state = OUT;
-			logo->setCentered(0);
-			scroller->splash(1);
-			LoopManager::removeListener(this);
-			return;
+			if(state == EXIT){
+				f = 0;
+				active = false;
+				state = OUT;
+				logo->setCentered(0);
+				scroller->load(0);
+				LoopManager::removeListener(this);
+				return;
+			}else{
+				f = 0;
+				boot = true;
+			}
 		}
-	}else{
-		float multiplier = 1;
-		if(state == IN || state == FINISH){
-			multiplier = 0.25;
-		}
-
-		f += multiplier * (float) micros / 500000.0f;
+	}else if(state == ENTER){
+		f += (float) micros / 500000.0f;
 
 		if(f >= 1){
-			f -= 1.0f;
-
-			if(state == ENTER){
-				logo->setCentered(1);
-				scroller->splash(0);
-				state = IN;
-				ballf = 0.001f;
-			}
+			f = 1;
+			state = IN;
+			logo->setCentered(-1);
+			scroller->load(1);
+			lastDraw = 0;
+			Loader.loadGame(game);
+			return;
 		}
+	}else if(state == IN){
+		uint32_t m = millis();
 
-		if(state == FINISH){
-			ballf -= (float) micros / 1000000.0f;
-			if(ballf <= 0){
-				// we need another loop iteration to draw splash screen without ball
-				ballf = 0;
-				boot = true;
-				return;
-			}
-		}else if(ballf != 0 && ballf < 1){
-			ballf += (float) micros / 800000.0f;
-			if(ballf >= 1){
-				ballf = 1;
-			}
-		}else if(ballf == 1){
-			if(ballGrown && !ballGrown2 && f >= 0.4){
-				ballGrown2 = true;
-
-				if(game == nullptr){
-					stop();
-					Loader.abort();
-					return;
-				}else{
-					Loader.loadGame(game);
+		if(m - lastDraw < 200){
+			for(int y = 2 + 60.0f * (1.0f - Loader.getProgress()); y < 62; y++){
+				for(int x = 2; x < 62; x++){
+					image->getBuffer()[y * 64 + x] = ((bool) image->getBuffer()[y * 64 + x]) * 0x0041ff;
 				}
 			}
 
-			if(!ballGrown){
-				ballGrown = true;
+			return;
+		}
+
+		lastDraw = m;
+
+		bool field[10][10];
+		for(int i = 0; i < 10; i++){
+			for(int j = 0; j < 10; j++){
+				field[i][j] = rand() % 2;
+			}
+		}
+
+		for(int x = 2; x < 62; x++){
+			for(int y = 2; y < 62; y++){
+				bool c = field[(int) floor((x-2) / 6)][(int) floor((y-2) / 6)];
+				bool under = (1.0f - (float) y / 60.0f) < Loader.getProgress();
+				if(c){
+					image->getBuffer()[y * 64 + x] = TFT_BLACK;
+				}else{
+					image->getBuffer()[y * 64 + x] = under ? 0x0041ff : TFT_WHITE;
+				}
 			}
 		}
 	}
 
 	if(state == ENTER || state == EXIT){
-		logo->setCentered(f);
-		scroller->splash(1.0f - f);
-		return;
+		logo->setCentered(-f);
+		scroller->load(f);
+	}else if(state == FINISH){
+		logo->setCentered(-f * 2.0f + 1.0f);
+		scroller->finish(1.0f - f);
 	}
 }
 
 void LoadingIndicator::draw(){
 	if(state != EXIT && state != IN && state != FINISH) return;
 	if(boot) return;
-	if(ballf == 0) return;
 
-	float f = this->f;
-	if(state == EXIT){
-		f = exitf;
-	}
-
-	int16_t ballX = sin(f * M_PI * 2.0f) * 60.0f * ballf;
-	int16_t ballY = cos(f * M_PI * 2.0f) * 30.0f * ballf;
-
-	int8_t r = round(3.0f * ballf);
-
-	canvas->fillCircle(canvas->width() / 2 + ballX, canvas->height() / 2 - ballY, r, C_HEX(0x0082ff));
 }
 
 bool LoadingIndicator::isActive() const{

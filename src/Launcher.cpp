@@ -78,7 +78,7 @@ void Launcher::load(){
 				doneLoading = false;
 				hasError = false;
 				Loader.clearError();
-				loader->start(game);
+				loader->start(game, &items[scroller->getSelectedIndex()].image);
 				logo->stop();
 			}, [this, game](){
 				DescriptionModal* descriptionModal;

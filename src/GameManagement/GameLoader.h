@@ -16,6 +16,7 @@ public:
 	bool doneLoading();
 	const String& getError() const;
 	void clearError();
+	float getProgress() const;
 
 	static void loadFunc(Task* task);
 
@@ -24,6 +25,7 @@ private:
 	GameInfo* game = nullptr;
 	bool done = false;
 	String error = "";
+	float progress = 0;
 
 	bool checkAbort();
 };

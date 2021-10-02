@@ -4,6 +4,7 @@
 
 #include <Display/Sprite.h>
 #include <Loop/LoopListener.h>
+#include "Elements/GameImage.h">
 class Logo;
 class GameScroller;
 class GameTitle;
@@ -14,7 +15,7 @@ public:
 	LoadingIndicator(Sprite* canvas, Logo* logo, GameScroller* scroller, GameTitle* title);
 	void setCanvas(Sprite* canvas);
 
-	void start(GameInfo* game);
+	void start(GameInfo* game, GameImage* image);
 	void stop();
 	void finish();
 
@@ -29,18 +30,19 @@ private:
 	Logo* logo = nullptr;
 	GameScroller* scroller = nullptr;
 	GameTitle* title = nullptr;
+	GameImage* image = nullptr;
+	GameImage imageCopy;
+	GameInfo* game;
 
 	bool active = false;
 	String currentText;
 	bool boot = false;
-	GameInfo* game = nullptr;
 
 	enum { OUT, ENTER, IN, EXIT, FINISH } state = OUT;
 	float f = 0;
-	float exitf = 0;
-	float ballf = 0;
-	bool ballGrown = false;
-	bool ballGrown2 = false;
+	uint32_t finishTime = 0;
+
+	uint32_t lastDraw = 0;
 };
 
 
