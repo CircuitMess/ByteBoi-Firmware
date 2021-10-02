@@ -42,7 +42,7 @@ void GameTitle::loop(uint micros){
 
 void GameTitle::draw(){
 	if(text == "") return;
-	canvas->setTextSize(2);
+	canvas->setTextSize(text == "Loading..." ? 1 : 2);
 	canvas->setTextFont(0);
 	canvas->setTextWrap(false, false);
 	canvas->setTextColor(TFT_WHITE);
