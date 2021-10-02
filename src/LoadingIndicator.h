@@ -12,6 +12,7 @@ struct GameInfo;
 class LoadingIndicator : public LoopListener {
 public:
 	LoadingIndicator(Sprite* canvas, Logo* logo, GameScroller* scroller, GameTitle* title);
+	void setCanvas(Sprite* canvas);
 
 	void start(GameInfo* game);
 	void stop();

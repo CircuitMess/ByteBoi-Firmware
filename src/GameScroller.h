@@ -17,6 +17,7 @@ class GameScroller : public LoopListener {
 public:
 	GameScroller(Sprite* canvas, std::vector<LauncherItem>& items);
 	~GameScroller();
+	void setCanvas(Sprite* canvas);
 
 	void draw();
 	void loop(uint micros);

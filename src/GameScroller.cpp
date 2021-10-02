@@ -204,3 +204,12 @@ GameInfo* const GameScroller::getSelectedGame() const{
 	return Games.getGames()[selectedGame];
 
 }
+
+void GameScroller::setCanvas(Sprite* canvas){
+	GameScroller::canvas = canvas;
+
+	for(auto& item : items){
+		if(!item.image) continue;
+		item.image.setCanvas(canvas);
+	}
+}

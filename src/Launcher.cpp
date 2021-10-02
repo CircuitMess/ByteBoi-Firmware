@@ -130,6 +130,8 @@ void Launcher::load(){
 }
 
 void Launcher::start(){
+	setCanvas(display->getBaseSprite());
+
 	if(splash == nullptr){
 		bindInput();
 		logo->start();
@@ -139,17 +141,28 @@ void Launcher::start(){
 	}
 
 	draw();
-	screen.commit();
+	display->commit();
 	LoopManager::addListener(this);
 }
 
 void Launcher::stop(){
+	setCanvas(screen.getSprite());
+	draw();
+
 	LoopManager::removeListener(this);
 	logo->pause();
 	Input::getInstance()->removeBtnPressCallback(BTN_RIGHT);
 	Input::getInstance()->removeBtnPressCallback(BTN_LEFT);
 	Input::getInstance()->removeBtnPressCallback(BTN_A);
 	Input::getInstance()->removeBtnPressCallback(BTN_C);
+}
+
+void Launcher::setCanvas(Sprite* canvas){
+	this->canvas = canvas;
+	loader->setCanvas(canvas);
+	logo->setCanvas(canvas);
+	title->setCanvas(canvas);
+	scroller->setCanvas(canvas);
 }
 
 void Launcher::prev(){
@@ -214,11 +227,7 @@ void Launcher::bindInput(){
 	});
 }
 
-uint32_t drawTime1 = 0;
-
 void Launcher::loop(uint _micros){
-
-	int t = micros();
 	if(splash){
 		splash->loop(_micros);
 		if(splash->done()){
@@ -259,25 +268,22 @@ void Launcher::loop(uint _micros){
 		return;
 	}
 
-//	canvas->setTextColor(TFT_WHITE);
-//	canvas->setTextSize(1);
-//	canvas->setCursor(130, 10);
-//	canvas->println(Battery.getPercentage());
-//	canvas->println((1000000.0 / (float)drawTime1));
-	screen.commit();
-	drawTime1 = micros() - t;
-
+	// canvas->setTextColor(TFT_WHITE);
+	// canvas->setTextSize(1);
+	// canvas->setCursor(2, 5);
+	// canvas->printf("%.1f fps", (1000000.0 / (float) _micros));
+	display->commit();
 }
 
 void Launcher::draw(){
-	screen.getSprite()->clear(C_HEX(0x0041ff));
+	canvas->clear(C_HEX(0x0041ff));
 	loader->draw();
 	scroller->draw();
 	title->draw();
 	logo->draw();
 
 	if(!doneLoading){
-		Battery.drawIcon(*screen.getSprite(),143,3);
+		Battery.drawIcon(*canvas,143,3);
 	}
 
 /*

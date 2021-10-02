@@ -10,6 +10,7 @@ class Sprite;
 class GameTitle : public LoopListener {
 public:
 	GameTitle(Sprite* canvas);
+	void setCanvas(Sprite* canvas);
 
 	void change(const String& newText);
 	String getCurrent();

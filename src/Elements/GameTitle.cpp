@@ -52,3 +52,7 @@ void GameTitle::draw(){
 	canvas->print(text.c_str());
 //	canvas->drawString(text, canvas->width()/2, currentY);
 }
+
+void GameTitle::setCanvas(Sprite* canvas){
+	GameTitle::canvas = canvas;
+}

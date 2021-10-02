@@ -20,6 +20,8 @@ public:
 	operator bool() const;
 	Color* getBuffer() const;
 
+	void setCanvas(Sprite* canvas);
+
 	int16_t getX() const;
 	int16_t getY() const;
 	void setX(int16_t x);

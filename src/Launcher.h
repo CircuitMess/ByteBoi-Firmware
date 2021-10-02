@@ -42,6 +42,7 @@ private:
 	static Launcher* instance;
 	Display* display;
 	Sprite* canvas;
+	void setCanvas(Sprite* canvas);
 
 	Logo* logo;
 	GameTitle* title;

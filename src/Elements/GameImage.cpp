@@ -62,3 +62,7 @@ void GameImage::setY(int16_t y){
 Color* GameImage::getBuffer() const{
 	return buffer;
 }
+
+void GameImage::setCanvas(Sprite* canvas){
+	GameImage::canvas = canvas;
+}

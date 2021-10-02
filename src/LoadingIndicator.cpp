@@ -151,3 +151,7 @@ void LoadingIndicator::draw(){
 bool LoadingIndicator::isActive() const{
 	return active;
 }
+
+void LoadingIndicator::setCanvas(Sprite* canvas){
+	LoadingIndicator::canvas = canvas;
+}

@@ -11,8 +11,8 @@ class Sprite;
 class Logo : public LoopListener {
 public:
 	Logo(Sprite* canvas);
-
 	virtual ~Logo();
+	void setCanvas(Sprite* canvas);
 
 	void loop(uint micros) override;
 	void draw();

@@ -84,3 +84,7 @@ void Logo::draw(){
 void Logo::setCentered(float f){
 	center = f;
 }
+
+void Logo::setCanvas(Sprite* canvas){
+	Logo::canvas = canvas;
+}
