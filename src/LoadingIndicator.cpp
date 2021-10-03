@@ -56,13 +56,14 @@ void LoadingIndicator::abort(bool immediate){
 	if(loadJob != nullptr){
 		loadJob->abort();
 	}
-	stop();
 
-	if(immediate){
+	if(immediate && state != IN){
 		*image = imageCopy;
 		imageCopy = GameImage();
 		image = nullptr;
 	}
+
+	stop();
 }
 
 void LoadingIndicator::loop(uint micros){
