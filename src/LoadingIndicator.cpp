@@ -94,7 +94,8 @@ void LoadingIndicator::loop(uint micros){
 		if(m - lastDraw < 200){
 			for(int y = 2 + 60.0f * (1.0f - Loader.getProgress()); y < 62; y++){
 				for(int x = 2; x < 62; x++){
-					image->getBuffer()[y * 64 + x] = ((bool) image->getBuffer()[y * 64 + x]) * 0x0041ff;
+					size_t i = y * 64 + x;
+					image->getBuffer()[i] = ((bool) image->getBuffer()[i]) * imageCopy.getBuffer()[i];
 				}
 			}
 
@@ -112,12 +113,19 @@ void LoadingIndicator::loop(uint micros){
 
 		for(int x = 2; x < 62; x++){
 			for(int y = 2; y < 62; y++){
+				size_t i = y * 64 + x;
 				bool c = field[(int) floor((x-2) / 6)][(int) floor((y-2) / 6)];
-				bool under = (1.0f - (float) y / 60.0f) < Loader.getProgress();
+				bool under = (1.0f - (float) y / 60.0f) < loadJob->getProgress();
 				if(c){
-					image->getBuffer()[y * 64 + x] = TFT_BLACK;
+					image->getBuffer()[i] = TFT_BLACK;
+				}else if(under){
+					image->getBuffer()[i] = imageCopy.getBuffer()[i];
 				}else{
-					image->getBuffer()[y * 64 + x] = under ? 0x0041ff : TFT_WHITE;
+					lgfx::rgb565_t c(imageCopy.getBuffer()[i]);
+					c.R8(min(255.0f, c.R8() + (float) (255 - c.R8()) * 0.6f));
+					c.G8(min(255.0f, c.G8() + (float) (255 - c.G8()) * 0.6f));
+					c.B8(min(255.0f, c.B8() + (float) (255 - c.B8()) * 0.6f));
+					image->getBuffer()[i] = c.operator unsigned short();
 				}
 			}
 		}
@@ -126,6 +134,21 @@ void LoadingIndicator::loop(uint micros){
 	if(state == ENTER || state == EXIT){
 		logo->setCentered(-f);
 		scroller->load(f);
+
+		if(image && imageCopy){
+			for(int x = 2; x < 62; x++){
+				for(int y = 2; y < 62; y++){
+					size_t i = y * 64 + x;
+
+					lgfx::rgb565_t c(imageCopy.getBuffer()[i]);
+					c.R8(min(255.0f, c.R8() + (float) (255 - c.R8()) * f * 0.7f));
+					c.G8(min(255.0f, c.G8() + (float) (255 - c.G8()) * f * 0.7f));
+					c.B8(min(255.0f, c.B8() + (float) (255 - c.B8()) * f * 0.7f));
+
+					image->getBuffer()[i] = c.operator unsigned short();
+				}
+			}
+		}
 	}else if(state == FINISH){
 		logo->setCentered(-f * 2.0f + 1.0f);
 		scroller->finish(1.0f - f);
