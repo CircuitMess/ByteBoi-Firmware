@@ -10,21 +10,60 @@ GameLoader Loader;
 
 GameLoader::GameLoader() : loadTask("GameLoad", GameLoader::loadFunc, 4096, this){}
 
-void GameLoader::loadGame(GameInfo* game){
-	if(!ByteBoiImpl::inFirmware()) return;
-	if(this->game != nullptr) return;
-	this->game = game;
-	done = false;
-	error = "";
-	progress = 0;
+void GameLoader::Job::abort(){
+	aborted = true;
+}
+
+bool GameLoader::Job::isDone(){
+	return done;
+}
+
+bool GameLoader::Job::hasError(){
+	return error != "";
+}
+
+String GameLoader::Job::getError(){
+	return error;
+}
+
+float GameLoader::Job::getProgress(){
+	return progress;
+}
+
+GameLoader::Job* GameLoader::loadGame(GameInfo* game){
+	if(!ByteBoiImpl::inFirmware()) return nullptr;
+	if(current){
+		if(current->done || current->aborted){
+			// Wait for task to finish if it's still running
+			while(loadTask.running){
+				delay(1);
+			}
+
+			delete current;
+		}else{
+			printf("Another load operation pending\n");
+			return nullptr;
+		}
+	}
+
+	current = new Job;
+	current->game = game;
 
 	loadTask.start(1, 0);
+	return current;
 }
 
 void GameLoader::loadFunc(Task* task){
 	GameLoader* loader = static_cast<GameLoader*>(task->arg);
-	GameInfo* game = loader->game;
-	if(game == nullptr) return;
+	Job* job = loader->current;
+
+	if(job == nullptr){
+		printf("Update task started, current job is nullptr.\n"); // Memory leak. Game starts loading, stopped before task gets access to update
+		return;
+	}
+
+	GameInfo* game = job->game;
+	if(game == nullptr || checkAbort(job)) return;
 
 	//create game folder if not present
 	if(!SPIFFS.exists(ByteBoiImpl::SPIFFSgameRoot)){
@@ -41,9 +80,9 @@ void GameLoader::loadFunc(Task* task){
 	file.close();
 	root.close();
 
-	if(loader->checkAbort()) return;
+	if(checkAbort(job)) return;
 
-#define error(message) loader->error = message; loader->game = nullptr; return
+#define error(message) printf("E: %s\n", String(message).c_str()); job->error = message; job->done = true; return
 
 	//copy resources
 	if(!game->resources.empty() && SD.exists(game->resources.c_str())){
@@ -67,7 +106,7 @@ void GameLoader::loadFunc(Task* task){
 			destFile.close();
 			file.close();
 
-			if(loader->checkAbort()){
+			if(checkAbort(job)){
 				root.close();
 				return;
 			}
@@ -80,7 +119,7 @@ void GameLoader::loadFunc(Task* task){
 
 	yield();
 
-	if(loader->checkAbort()) return;
+	if(checkAbort(job)) return;
 
 	file = SD.open(game->binary.c_str());
 	if(!file || file.isDirectory()){
@@ -110,7 +149,7 @@ void GameLoader::loadFunc(Task* task){
 			error("Error reading binary from SD card.");
 		}
 
-		if(loader->checkAbort()){
+		if(checkAbort(job)){
 			Update.abort();
 			file.close();
 			return;
@@ -123,14 +162,14 @@ void GameLoader::loadFunc(Task* task){
 			error("Error writing binary to flash.");
 		}
 
-		if(loader->checkAbort()){
+		if(checkAbort(job)){
 			Update.abort();
 			file.close();
 			return;
 		}
 
 		totalWritten += written;
-		loader->progress = (float) totalWritten / (float) updateSize;
+		job->progress = (float) totalWritten / (float) updateSize;
 		yield();
 	}
 	file.close();
@@ -145,9 +184,12 @@ void GameLoader::loadFunc(Task* task){
 
 	esp_ota_set_boot_partition(esp_ota_get_running_partition());
 
-	if(loader->checkAbort()) return;
+	if(checkAbort(job)) return;
 
-	loader->done = true;
+	job->done = true;
+	if(job->aborted){
+		printf("Update aborted after being done.\n"); // Possible memory leak
+	}
 
 	printf("Update finished\n");
 }
@@ -157,29 +199,12 @@ void GameLoader::boot(){
 	ESP.restart();
 }
 
-void GameLoader::abort(){
-	game = nullptr;
-	done = false;
-	error = "";
-	progress = 0;
+bool GameLoader::checkAbort(Job* job){
+	if(job->aborted){
+		job->done = true;
+		return true;
+	}
+
+	return false;
 }
 
-bool GameLoader::doneLoading(){
-	return done || error != "";
-}
-
-bool GameLoader::checkAbort(){
-	return game == nullptr;
-}
-
-const String& GameLoader::getError() const{
-	return error;
-}
-
-void GameLoader::clearError(){
-	error = "";
-}
-
-float GameLoader::getProgress() const{
-	return progress;
-}

@@ -3,8 +3,9 @@
 #include "Elements/Logo.h"
 #include "Elements/GameTitle.h"
 #include "GameScroller.h"
-#include "GameManagement/GameLoader.h"
 #include <ByteBoi.h>
+#include "ErrorModal.h"
+#include "GameManagement/GameManager.h"
 
 LoadingIndicator::LoadingIndicator(Sprite* canvas, Logo* logo, GameScroller* scroller, GameTitle* title) : canvas(canvas), logo(logo), scroller(scroller), title(title){}
 
@@ -15,7 +16,7 @@ void LoadingIndicator::start(GameInfo* game, GameImage* image){
 	imageCopy = *image;
 	currentText = title->getCurrent();
 	title->change("Loading...");
-	active = true;
+	logo->stop();
 	state = ENTER;
 	f = 0;
 	LoopManager::addListener(this);
@@ -23,12 +24,16 @@ void LoadingIndicator::start(GameInfo* game, GameImage* image){
 
 void LoadingIndicator::stop(){
 	if(state == OUT || state == EXIT) return;
-	*image = imageCopy;
-	imageCopy = GameImage();
-	image = nullptr;
+	if(state == IN){
+		*image = imageCopy;
+		imageCopy = GameImage();
+		image = nullptr;
+	}
 	game = nullptr;
 	title->change(currentText);
+	logo->start();
 	state = EXIT;
+	loadJob = nullptr;
 	LoopManager::addListener(this);
 }
 
@@ -37,10 +42,31 @@ void LoadingIndicator::finish(){
 	finishTime = millis();
 	*image = imageCopy;
 	title->change(currentText);
+
+	Input::getInstance()->removeBtnPressCallback(BTN_RIGHT);
+	Input::getInstance()->removeBtnPressCallback(BTN_LEFT);
+	Input::getInstance()->removeBtnPressCallback(BTN_A);
+	Input::getInstance()->removeBtnPressCallback(BTN_B);
+	Input::getInstance()->removeBtnPressCallback(BTN_C);
+	Games.setGameListener(nullptr);
+}
+
+void LoadingIndicator::abort(){
+	if(state != IN && state != ENTER) return;
+	if(loadJob != nullptr){
+		loadJob->abort();
+	}
+	stop();
 }
 
 void LoadingIndicator::loop(uint micros){
 	// abandon hope all ye who enter here
+
+	if(loadJob && loadJob->hasError() && state == IN){
+		auto* job = loadJob;
+		stop();
+		loadJob = job;
+	}
 
 	if(boot){
 		ByteBoi.fadeout();
@@ -65,10 +91,22 @@ void LoadingIndicator::loop(uint micros){
 		if(f < 0){
 			if(state == EXIT){
 				f = 0;
-				active = false;
 				state = OUT;
 				logo->setCentered(0);
 				scroller->load(0);
+
+				if(image && imageCopy){
+					*image = imageCopy;
+					imageCopy = GameImage();
+					image = nullptr;
+				}
+
+				if(loadJob && loadJob->hasError()){
+					Modal* errorModal = new ErrorModal(*Context::getCurrentContext(), loadJob->getError());
+					errorModal->push(Context::getCurrentContext());
+					loadJob = nullptr;
+				}
+
 				LoopManager::removeListener(this);
 				return;
 			}else{
@@ -85,14 +123,18 @@ void LoadingIndicator::loop(uint micros){
 			logo->setCentered(-1);
 			scroller->load(1);
 			lastDraw = 0;
-			Loader.loadGame(game);
+			loadJob = Loader.loadGame(game);
 			return;
 		}
 	}else if(state == IN){
+		if(loadJob->isDone() && !loadJob->hasError()){
+			finish();
+		}
+
 		uint32_t m = millis();
 
 		if(m - lastDraw < 200){
-			for(int y = 2 + 60.0f * (1.0f - Loader.getProgress()); y < 62; y++){
+			for(int y = 2 + 60.0f * (1.0f - loadJob->getProgress()); y < 62; y++){
 				for(int x = 2; x < 62; x++){
 					size_t i = y * 64 + x;
 					image->getBuffer()[i] = ((bool) image->getBuffer()[i]) * imageCopy.getBuffer()[i];
@@ -162,7 +204,11 @@ void LoadingIndicator::draw(){
 }
 
 bool LoadingIndicator::isActive() const{
-	return active;
+	return state != OUT;
+}
+
+bool LoadingIndicator::isBooting() const{
+	return state == FINISH;
 }
 
 void LoadingIndicator::setCanvas(Sprite* canvas){

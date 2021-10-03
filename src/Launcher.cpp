@@ -74,12 +74,7 @@ void Launcher::load(){
 	}else{
 		for(const auto& game : Games.getGames()){
 			items.emplace_back(game->name.c_str(), GameImage(), [this, game](){
-				loading = true;
-				doneLoading = false;
-				hasError = false;
-				Loader.clearError();
 				loader->start(game, &items[scroller->getSelectedIndex()].image);
-				logo->stop();
 			}, [this, game](){
 				DescriptionModal* descriptionModal;
 				descriptionModal = new DescriptionModal(*this, game);
@@ -166,7 +161,7 @@ void Launcher::setCanvas(Sprite* canvas){
 }
 
 void Launcher::prev(){
-	if(loading) return;
+	if(loader->isActive()) return;
 	uint8_t selecting = instance->scroller->prev();
 	if(selecting != selectedGame){
 		instance->title->change(items[selecting].text);
@@ -175,7 +170,7 @@ void Launcher::prev(){
 }
 
 void Launcher::next(){
-	if(loading) return;
+	if(loader->isActive()) return;
 	uint8_t selecting = instance->scroller->next();
 	if(selecting != selectedGame){
 		instance->title->change(items[selecting].text);
@@ -198,7 +193,7 @@ void Launcher::bindInput(){
 
 	Input::getInstance()->setBtnPressCallback(BTN_A, [](){
 		if(instance == nullptr) return;
-		if(instance->scroller->scrolling() || instance->loader->isActive() || instance->loading) return;
+		if(instance->scroller->scrolling() || instance->loader->isActive()) return;
 		Piezo.tone(800, 50);
 		if(instance->items[instance->selectedGame].primary){
 			instance->items[instance->selectedGame].primary();
@@ -208,18 +203,14 @@ void Launcher::bindInput(){
 	Input::getInstance()->setBtnPressCallback(BTN_B, [](){
 		if(instance == nullptr) return;
 		Piezo.tone(800, 50);
-		if(instance->loading){
-			Loader.abort();
-			instance->loading = false;
-			instance->doneLoading = false;
-			instance->loader->stop();
-			instance->logo->start();
+		if(instance->loader->isActive()){
+			instance->loader->abort();
 		}
 	});
 
 	Input::getInstance()->setBtnPressCallback(BTN_C, [](){
 		if(instance == nullptr) return;
-		if(instance->scroller->scrolling() || instance->loader->isActive() || instance->loading) return;
+		if(instance->scroller->scrolling() || instance->loader->isActive()) return;
 		Piezo.tone(800, 50);
 		if(instance->items[instance->selectedGame].secondary){
 			instance->items[instance->selectedGame].secondary();
@@ -240,33 +231,7 @@ void Launcher::loop(uint _micros){
 		}
 	}
 
-	if(loading && !doneLoading && Loader.doneLoading()){
-		if(Loader.getError() == ""){
-			Input::getInstance()->removeBtnPressCallback(BTN_RIGHT);
-			Input::getInstance()->removeBtnPressCallback(BTN_LEFT);
-			Input::getInstance()->removeBtnPressCallback(BTN_A);
-			Input::getInstance()->removeBtnPressCallback(BTN_B);
-			Input::getInstance()->removeBtnPressCallback(BTN_C);
-			Games.setGameListener(nullptr);
-			doneLoading = true;
-			loader->finish();
-		}else{
-			loading = false;
-			doneLoading = false;
-			loader->stop();
-			hasError = true;
-		}
-	}
-
 	draw();
-
-	if(hasError && !loader->isActive()){
-		hasError = false;
-		Modal* errorModal = new ErrorModal(*this, Loader.getError());
-		Loader.clearError();
-		errorModal->push(this);
-		return;
-	}
 
 	// canvas->setTextColor(TFT_WHITE);
 	// canvas->setTextSize(1);
@@ -282,7 +247,7 @@ void Launcher::draw(){
 	title->draw();
 	logo->draw();
 
-	if(!doneLoading){
+	if(!loader->isBooting()){
 		Battery.drawIcon(*canvas,143,3);
 	}
 
@@ -307,15 +272,14 @@ void Launcher::deinit(){
 }
 
 void Launcher::gamesChanged(bool inserted){
-	if(doneLoading) return;
+	if(loader->isBooting()) return;
 
-	if(loading){
-		Loader.abort();
-		loading = false;
-		loader->stop();
+	if(loader->isActive()){
+		loader->abort();
 	}
 
 	load();
+
 	if(splash != nullptr){
 		title->change("");
 	}

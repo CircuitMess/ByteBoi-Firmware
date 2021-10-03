@@ -4,7 +4,9 @@
 
 #include <Display/Sprite.h>
 #include <Loop/LoopListener.h>
-#include "Elements/GameImage.h">
+#include "Elements/GameImage.h"
+#include "GameManagement/GameLoader.h"
+
 class Logo;
 class GameScroller;
 class GameTitle;
@@ -16,10 +18,10 @@ public:
 	void setCanvas(Sprite* canvas);
 
 	void start(GameInfo* game, GameImage* image);
-	void stop();
-	void finish();
+	void abort();
 
 	bool isActive() const;
+	bool isBooting() const;
 
 	void draw();
 
@@ -33,8 +35,8 @@ private:
 	GameImage* image = nullptr;
 	GameImage imageCopy;
 	GameInfo* game;
+	GameLoader::Job* loadJob = nullptr;
 
-	bool active = false;
 	String currentText;
 	bool boot = false;
 
@@ -43,6 +45,9 @@ private:
 	uint32_t finishTime = 0;
 
 	uint32_t lastDraw = 0;
+
+	void stop();
+	void finish();
 };
 
 

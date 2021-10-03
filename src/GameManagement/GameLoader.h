@@ -9,25 +9,36 @@ class GameLoader {
 public:
 	GameLoader();
 
+	class Job {
+	friend GameLoader;
+	public:
+		void abort();
+		bool isDone();
+		bool hasError();
+		String getError();
+		float getProgress();
+
+	private:
+		bool done = false;
+		bool aborted = false;
+		String error = "";
+		float progress = 0;
+		GameInfo* game;
+	};
+
 // check given FS for valid update.bin and perform update if available
-	void loadGame(GameInfo* game);
+	Job* loadGame(GameInfo* game);
 	void boot();
-	void abort();
-	bool doneLoading();
-	const String& getError() const;
-	void clearError();
-	float getProgress() const;
+	Job* getCurrent();
 
 	static void loadFunc(Task* task);
 
 private:
 	Task loadTask;
-	GameInfo* game = nullptr;
-	bool done = false;
-	String error = "";
-	float progress = 0;
 
-	bool checkAbort();
+	Job* current = nullptr;
+
+	static bool checkAbort(Job* job);
 };
 
 extern GameLoader Loader;

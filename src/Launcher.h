@@ -54,9 +54,6 @@ private:
 	GameImage settingsIcon;
 	std::vector<LauncherItem> items;
 	void load();
-	bool loading = false;
-	bool doneLoading = false;
-	bool hasError = false;
 
 	uint8_t selectedGame = 0;
 	void prev();
