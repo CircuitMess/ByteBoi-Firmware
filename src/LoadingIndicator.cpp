@@ -136,6 +136,7 @@ void LoadingIndicator::loop(uint micros){
 	}else if(state == IN){
 		if(loadJob->isDone() && !loadJob->hasError()){
 			finish();
+			return;
 		}
 
 		uint32_t m = millis();
