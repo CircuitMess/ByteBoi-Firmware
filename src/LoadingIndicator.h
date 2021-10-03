@@ -18,7 +18,7 @@ public:
 	void setCanvas(Sprite* canvas);
 
 	void start(GameInfo* game, GameImage* image);
-	void abort();
+	void abort(bool immediate = false);
 
 	bool isActive() const;
 	bool isBooting() const;

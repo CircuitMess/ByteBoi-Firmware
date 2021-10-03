@@ -51,12 +51,18 @@ void LoadingIndicator::finish(){
 	Games.setGameListener(nullptr);
 }
 
-void LoadingIndicator::abort(){
+void LoadingIndicator::abort(bool immediate){
 	if(state != IN && state != ENTER) return;
 	if(loadJob != nullptr){
 		loadJob->abort();
 	}
 	stop();
+
+	if(immediate){
+		*image = imageCopy;
+		imageCopy = GameImage();
+		image = nullptr;
+	}
 }
 
 void LoadingIndicator::loop(uint micros){

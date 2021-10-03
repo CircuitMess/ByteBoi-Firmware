@@ -277,10 +277,13 @@ void Launcher::gamesChanged(bool inserted){
 	if(loader->isBooting()) return;
 
 	if(loader->isActive()){
-		loader->abort();
+		loader->abort(true);
 	}
 
 	load();
+	if(loader->isActive()){
+		loader->loop(0);
+	}
 
 	if(splash != nullptr){
 		title->change("");
