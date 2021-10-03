@@ -158,6 +158,8 @@ void Launcher::setCanvas(Sprite* canvas){
 	logo->setCanvas(canvas);
 	title->setCanvas(canvas);
 	scroller->setCanvas(canvas);
+	genericIcon.setCanvas(canvas);
+	settingsIcon.setCanvas(canvas);
 }
 
 void Launcher::prev(){
