@@ -139,19 +139,21 @@ void GameLoader::loadFunc(Task* task){
 	}
 
 	size_t totalWritten = 0;
-	const size_t at_once = 64;
+	const size_t at_once = 512;
 	uint8_t* buffer = static_cast<uint8_t*>(malloc(at_once));
 	while(totalWritten < updateSize){
 		size_t read = file.read(buffer, min((size_t) at_once, updateSize - totalWritten));
 		if(read == 0){
 			Update.abort();
 			file.close();
+			free(buffer);
 			error("Error reading binary from SD card.");
 		}
 
 		if(checkAbort(job)){
 			Update.abort();
 			file.close();
+			free(buffer);
 			return;
 		}
 
@@ -159,12 +161,14 @@ void GameLoader::loadFunc(Task* task){
 		if(written != read){
 			Update.abort();
 			file.close();
+			free(buffer);
 			error("Error writing binary to flash.");
 		}
 
 		if(checkAbort(job)){
 			Update.abort();
 			file.close();
+			free(buffer);
 			return;
 		}
 
@@ -173,6 +177,7 @@ void GameLoader::loadFunc(Task* task){
 		yield();
 	}
 	file.close();
+	free(buffer);
 
 	if(!Update.end(true)){
 		error("Update finalization failed.");
