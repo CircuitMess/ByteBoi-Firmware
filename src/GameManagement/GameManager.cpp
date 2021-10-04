@@ -48,39 +48,8 @@ void GameManager::scanGames(){
 				strncat(path, gameFolder.name(), 100);
 				strncat(path, "/game.properties", 100);
 
-				Properties props = PropertiesParser::Read(path);
-				std::string binaryPath = props.GetProperty("Binary");
-				if(binaryPath.empty()) binaryPath = gameDefaults.binary;
-				memset(path, 0, 100);
-				strncat(path, gameFolder.name(), 100);
-				strncat(path, "/", 100);
-				strncat(path, binaryPath.c_str(), 100);
-
-				char resourcesPath[100] = {0};
-				std::string resources = props.GetProperty("Resources");
-				if(resources.empty()) resources = gameDefaults.resources;
-				memset(resourcesPath, 0, 100);
-				strncat(resourcesPath, gameFolder.name(), 100);
-				strncat(resourcesPath, "/", 100);
-				strncat(resourcesPath, resources.c_str(), 100);
-
-				char iconPath[100] = {0};
-				std::string icon = props.GetProperty("Icon");
-				if(icon.empty()) icon = gameDefaults.icon;
-				memset(iconPath, 0, 100);
-				strncat(iconPath, gameFolder.name(), 100);
-				strncat(iconPath, "/", 100);
-				strncat(iconPath, icon.c_str(), 100);
-
-				if(SD.exists(path)){
-					auto game = new GameInfo(GameInfo{
-							getValueOrDefault(props, "Name", gameDefaults.name),
-							props.GetProperty("Author"),
-							props.GetProperty("Description"),
-							(SD.exists(iconPath) ? iconPath : ""),
-							path,
-							(SD.exists(resourcesPath) ? resourcesPath : "")
-					});
+				GameInfo* game = parseInfo(path, gameFolder.name());
+				if(game != nullptr){
 					games.push_back(game);
 				}
 			}
@@ -89,6 +58,45 @@ void GameManager::scanGames(){
 	}
 	root.close();
 	gameFolder.close();
+}
+
+GameInfo* GameManager::parseInfo(const char* infoFilePath, const char* dirName, bool checkBinary){
+	Properties props = PropertiesParser::Read(infoFilePath);
+	char path[100] = {0};
+	std::string binaryPath = props.GetProperty("Binary");
+	if(binaryPath.empty()) binaryPath = gameDefaults.binary;
+	memset(path, 0, 100);
+	strncat(path, dirName, 100);
+	strncat(path, "/", 100);
+	strncat(path, binaryPath.c_str(), 100);
+
+	char resourcesPath[100] = {0};
+	std::string resources = props.GetProperty("Resources");
+	if(resources.empty()) resources = gameDefaults.resources;
+	memset(resourcesPath, 0, 100);
+	strncat(resourcesPath, dirName, 100);
+	strncat(resourcesPath, "/", 100);
+	strncat(resourcesPath, resources.c_str(), 100);
+
+	char iconPath[100] = {0};
+	std::string icon = props.GetProperty("Icon");
+	if(icon.empty()) icon = gameDefaults.icon;
+	memset(iconPath, 0, 100);
+	strncat(iconPath, dirName, 100);
+	strncat(iconPath, "/", 100);
+	strncat(iconPath, icon.c_str(), 100);
+
+	if(checkBinary && !SD.exists(path)) return nullptr;
+
+	return new GameInfo(GameInfo{
+		getValueOrDefault(props, "Name", gameDefaults.name),
+		props.GetProperty("Author"),
+		props.GetProperty("Description"),
+		(SD.exists(iconPath) ? iconPath : ""),
+		path,
+		(SD.exists(resourcesPath) ? resourcesPath : ""),
+		dirName
+	});
 }
 
 const std::vector<GameInfo*> & GameManager::getGames(){

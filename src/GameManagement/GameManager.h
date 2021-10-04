@@ -19,6 +19,8 @@ public:
 	void detectSD();
 	void setGameListener(GameListener* listener);
 
+	GameInfo* parseInfo(const char* infoFilePath, const char* dirName, bool checkBinary = true);
+
 private:
 	std::vector<GameInfo*> games;
 	bool SDinsertedFlag = false;

@@ -8,6 +8,7 @@ struct GameInfo{
 	std::string icon;
 	std::string binary;
 	std::string resources;
+	std::string root;
 };
 
 #endif //BYTEBOI_FIRMWARE_GAMEINFO_HPP
