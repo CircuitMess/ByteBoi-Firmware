@@ -126,8 +126,9 @@ void Launcher::load(){
 
 	if(loaded){
 		items.emplace_back(loaded->name.c_str(), GameImage(canvas), [this](){
-			Loader.boot();
-			}, [this](){
+			if(loaded == nullptr) return;
+			loader->start(loaded, &items[scroller->getSelectedIndex()].image, true);
+		}, [this](){
 			DescriptionModal* descriptionModal;
 			descriptionModal = new DescriptionModal(*this, loaded);
 			descriptionModal->push(instance);

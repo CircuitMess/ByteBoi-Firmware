@@ -18,7 +18,7 @@ public:
 	LoadingIndicator(Launcher* launcher, Sprite* canvas, Logo* logo, GameScroller* scroller, GameTitle* title);
 	void setCanvas(Sprite* canvas);
 
-	void start(GameInfo* game, GameImage* image);
+	void start(GameInfo* game, GameImage* image, bool loaded = false);
 	void abort(bool immediate = false);
 
 	bool isActive() const;
@@ -41,6 +41,8 @@ private:
 
 	String currentText;
 	bool boot = false;
+	bool loaded = false;
+	Color* loadedIcon = nullptr;
 
 	enum { OUT, ENTER, IN, EXIT, FINISH } state = OUT;
 	float f = 0;

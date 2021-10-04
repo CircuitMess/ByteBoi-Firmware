@@ -6,16 +6,27 @@
 #include <ByteBoi.h>
 #include "ErrorModal.h"
 #include "GameManagement/GameManager.h"
+#include <SPIFFS.h>
 
 LoadingIndicator::LoadingIndicator(Launcher* launcher, Sprite* canvas, Logo* logo, GameScroller* scroller, GameTitle* title) : launcher(launcher), canvas(canvas), logo(logo), scroller(scroller), title(title){}
 
-void LoadingIndicator::start(GameInfo* game, GameImage* image){
+void LoadingIndicator::start(GameInfo* game, GameImage* image, bool loaded){
 	if(state != OUT) return;
+	this->loaded = loaded;
 	this->game = game;
 	this->image = image;
 	imageCopy = *image;
 	currentText = title->getCurrent();
-	title->change("Loading...");
+	if(loaded){
+		fs::File icon = SPIFFS.open(game->icon.c_str());
+		if(icon){
+			loadedIcon = static_cast<Color*>(malloc(64 * 64 * 2));
+			icon.read(reinterpret_cast<uint8_t*>(loadedIcon), 64 * 64 * 2);
+		}
+		icon.close();
+	}else{
+		title->change("Loading...");
+	}
 	logo->stop();
 	state = ENTER;
 	f = 0;
@@ -36,13 +47,21 @@ void LoadingIndicator::stop(){
 	loadJob = nullptr;
 	LoopManager::addListener(this);
 	launcher->checkLoaded();
+	free(loadedIcon);
+	loadedIcon = nullptr;
 }
 
 void LoadingIndicator::finish(){
 	state = FINISH;
 	finishTime = millis();
-	*image = imageCopy;
-	title->change(currentText);
+	if(loaded){
+		if(loadedIcon != nullptr){
+			memcpy(image->getBuffer(), loadedIcon, 64 * 64 * 2);
+		}
+	}else{
+		*image = imageCopy;
+		title->change(currentText);
+	}
 
 	Input::getInstance()->removeBtnPressCallback(BTN_RIGHT);
 	Input::getInstance()->removeBtnPressCallback(BTN_LEFT);
@@ -131,7 +150,11 @@ void LoadingIndicator::loop(uint micros){
 			logo->setCentered(-1);
 			scroller->load(1);
 			lastDraw = 0;
-			loadJob = Loader.loadGame(game);
+			if(loaded){
+				finish();
+			}else{
+				loadJob = Loader.loadGame(game);
+			}
 			return;
 		}
 	}else if(state == IN){
@@ -191,10 +214,13 @@ void LoadingIndicator::loop(uint micros){
 				for(int y = 2; y < 62; y++){
 					size_t i = y * 64 + x;
 
+					lgfx::rgb565_t target = (loaded && loadedIcon) ? loadedIcon[i] : TFT_WHITE;
+					float multiplier = (loaded && loadedIcon) ? 1 : 0.7f;
+
 					lgfx::rgb565_t c(imageCopy.getBuffer()[i]);
-					c.R8(min(255.0f, c.R8() + (float) (255 - c.R8()) * f * 0.7f));
-					c.G8(min(255.0f, c.G8() + (float) (255 - c.G8()) * f * 0.7f));
-					c.B8(min(255.0f, c.B8() + (float) (255 - c.B8()) * f * 0.7f));
+					c.R8(min(255.0f, c.R8() + (float) (target.R8() - c.R8()) * f * multiplier));
+					c.G8(min(255.0f, c.G8() + (float) (target.G8() - c.G8()) * f * multiplier));
+					c.B8(min(255.0f, c.B8() + (float) (target.B8() - c.B8()) * f * multiplier));
 
 					image->getBuffer()[i] = c.operator unsigned short();
 				}
