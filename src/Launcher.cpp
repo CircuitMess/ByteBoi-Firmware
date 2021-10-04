@@ -147,6 +147,20 @@ void Launcher::load(){
 		if(!item.image){
 			item.image = genericIcon;
 		}
+
+		icon = SPIFFS.open("/launcher/reload.raw");
+		if(icon){
+			for(int y = 0; y < 64; y++){
+				for(int x = 0; x < 64; x++){
+					int i = y * 64 + x;
+					Color pixel;
+					icon.read(reinterpret_cast<uint8_t*>(&pixel), 2);
+					if(pixel == TFT_TRANSPARENT) continue;
+					item.image.getBuffer()[i] = pixel;
+				}
+			}
+			icon.close();
+		}
 	}
 
 	if(items.size() == size){
@@ -271,10 +285,10 @@ void Launcher::loop(uint _micros){
 
 	draw();
 
-	// canvas->setTextColor(TFT_WHITE);
-	// canvas->setTextSize(1);
-	// canvas->setCursor(2, 5);
-	// canvas->printf("%.1f fps", (1000000.0 / (float) _micros));
+	canvas->setTextColor(TFT_WHITE);
+	canvas->setTextSize(1);
+	canvas->setCursor(2, 5);
+	canvas->printf("%.1f fps", (1000000.0 / (float) _micros));
 	display->commit();
 }
 
