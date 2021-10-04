@@ -31,6 +31,7 @@ public:
 	void load(float f);
 	void finish(float f);
 	void reset();
+	void repos();
 	uint getSelectedIndex() const;
 
 private:
@@ -48,8 +49,6 @@ private:
 	float delta = 0;
 	bool queued = false;
 	uint8_t multiplier = 1;
-
-	void repos();
 
 	void selectNext();
 	void selectPrev();

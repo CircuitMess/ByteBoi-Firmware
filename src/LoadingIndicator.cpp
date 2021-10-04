@@ -7,7 +7,7 @@
 #include "ErrorModal.h"
 #include "GameManagement/GameManager.h"
 
-LoadingIndicator::LoadingIndicator(Sprite* canvas, Logo* logo, GameScroller* scroller, GameTitle* title) : canvas(canvas), logo(logo), scroller(scroller), title(title){}
+LoadingIndicator::LoadingIndicator(Launcher* launcher, Sprite* canvas, Logo* logo, GameScroller* scroller, GameTitle* title) : launcher(launcher), canvas(canvas), logo(logo), scroller(scroller), title(title){}
 
 void LoadingIndicator::start(GameInfo* game, GameImage* image){
 	if(state != OUT) return;
@@ -35,6 +35,7 @@ void LoadingIndicator::stop(){
 	state = EXIT;
 	loadJob = nullptr;
 	LoopManager::addListener(this);
+	launcher->checkLoaded();
 }
 
 void LoadingIndicator::finish(){

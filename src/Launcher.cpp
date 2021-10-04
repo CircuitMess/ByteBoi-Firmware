@@ -27,7 +27,7 @@ Launcher::Launcher(Display* display) : Context(*display), display(display), gene
 	scroller = new GameScroller(canvas, items);
 	logo = new Logo(canvas);
 	title = new GameTitle(canvas);
-	loader = new LoadingIndicator(canvas, logo, scroller, title);
+	loader = new LoadingIndicator(this, canvas, logo, scroller, title);
 
 	instance = this;
 	canvas->setChroma(TFT_TRANSPARENT);
@@ -63,6 +63,9 @@ Launcher::~Launcher(){
 }
 
 void Launcher::load(){
+	int size = items.size();
+	int current = selectedGame;
+
 	// TODO: check if the copying calls the GameImage copy constructor. otherwise multiple GameInfo will attempt to destruct the same buffer
 	// TODO: also, add "no ownership of buffer" mode or something similar to GameImage to avoid multiple buffers for genericIcon
 	items.clear();
@@ -82,7 +85,6 @@ void Launcher::load(){
 			});
 
 			LauncherItem& item = items.back();
-			item.text = game->name.c_str();
 
 			fs::File icon = SD.open(game->icon.c_str());
 			if(icon){
@@ -119,8 +121,42 @@ void Launcher::load(){
 		}
 	}
 
-	scroller->reset();
-	selectedGame = 0;
+	delete loaded;
+	loaded = Loader.getLoaded();
+
+	if(loaded){
+		items.emplace_back(loaded->name.c_str(), GameImage(canvas), [this](){
+			Loader.boot();
+			}, [this](){
+			DescriptionModal* descriptionModal;
+			descriptionModal = new DescriptionModal(*this, loaded);
+			descriptionModal->push(instance);
+		});
+
+		LauncherItem& item = items.back();
+
+		fs::File icon = SPIFFS.open(loaded->icon.c_str());
+		if(icon){
+			item.image = GameImage(canvas);
+			if(icon.read(reinterpret_cast<uint8_t*>(item.image.getBuffer()), 64 * 64 * 2) != 64 * 64 * 2){
+				item.image = GameImage();
+			}
+			icon.close();
+		}
+
+		if(!item.image){
+			item.image = genericIcon;
+		}
+	}
+
+	if(items.size() == size){
+		scroller->repos();
+		selectedGame = current;
+	}else{
+		scroller->reset();
+		selectedGame = 0;
+	}
+
 	title->change(items[selectedGame].text);
 }
 
@@ -287,5 +323,20 @@ void Launcher::gamesChanged(bool inserted){
 
 	if(splash != nullptr){
 		title->change("");
+	}
+}
+
+void Launcher::checkLoaded(){
+	if(loaded == nullptr) return;
+	delete loaded;
+	loaded = Loader.getLoaded();
+	if(loaded == nullptr){
+		items.erase(items.end());
+
+		if(selectedGame == items.size()){
+			selectedGame = 0;
+			scroller->reset();
+			title->change(items[selectedGame].text);
+		}
 	}
 }

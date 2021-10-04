@@ -11,10 +11,11 @@ class Logo;
 class GameScroller;
 class GameTitle;
 struct GameInfo;
+class Launcher;
 
 class LoadingIndicator : public LoopListener {
 public:
-	LoadingIndicator(Sprite* canvas, Logo* logo, GameScroller* scroller, GameTitle* title);
+	LoadingIndicator(Launcher* launcher, Sprite* canvas, Logo* logo, GameScroller* scroller, GameTitle* title);
 	void setCanvas(Sprite* canvas);
 
 	void start(GameInfo* game, GameImage* image);
@@ -28,6 +29,7 @@ public:
 	void loop(uint micros) override;
 
 private:
+	Launcher* launcher;
 	Sprite* canvas = nullptr;
 	Logo* logo = nullptr;
 	GameScroller* scroller = nullptr;

@@ -38,6 +38,8 @@ public:
 	void draw() override;
 	void gamesChanged(bool inserted) override;
 
+	void checkLoaded();
+
 private:
 	static Launcher* instance;
 	Display* display;
@@ -54,6 +56,7 @@ private:
 	GameImage settingsIcon;
 	std::vector<LauncherItem> items;
 	void load();
+	GameInfo* loaded = nullptr;
 
 	uint8_t selectedGame = 0;
 	void prev();
