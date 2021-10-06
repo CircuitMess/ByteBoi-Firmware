@@ -32,10 +32,7 @@ void UserHWTest::stop(){
 }
 
 void UserHWTest::currentTestDone(){
-	Serial.println("CurrentTestDone");
-	Serial.printf("TestCounter : %d\n",testCounter);
 	testCounter++;
-	Serial.printf("TestCounter1 : %d\n",testCounter);
 	if(testCounter > 3){
 		if(doneCallback){
 			doneCallback(this);
