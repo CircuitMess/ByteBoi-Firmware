@@ -55,7 +55,8 @@ void LEDHWTest::loop(uint micros){
 	if(millis() - previousTime >= 500){
 		previousTime = millis();
 		if(rgbLED.getRGB() == OFF){
-			rgbLED.setRGB(static_cast<LEDColor>(ledArray[rand()%3]));
+			rgbLED.setRGB(static_cast<LEDColor>(ledArray[index%3]));
+			index++;
 		}else{
 			rgbLED.setRGB(OFF);
 		}

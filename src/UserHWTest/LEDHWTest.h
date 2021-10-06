@@ -27,10 +27,10 @@ public:
 
 private:
 	uint32_t previousTime = 0;
-
 	ByteBoiLED rgbLED;
 
-	uint8_t ledArray[3] = {1, 2, 4};
+	const LEDColor ledArray[3] = {LEDColor::RED, LEDColor::GREEN, LEDColor::BLUE};
+	uint8_t index = 0;
 
 	uint8_t doneCounter = 0;
 	bool soundIsDone = false;
