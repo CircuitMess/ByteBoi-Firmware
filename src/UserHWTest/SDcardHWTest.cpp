@@ -44,6 +44,7 @@ void SDcardHWTest::draw(){
 
 void SDcardHWTest::start(){
 	Input::getInstance()->addListener(this);
+	userHwTest->draw();
 	userHwTest->getScreen().getSprite()->setTextFont(1);
 	userHwTest->getScreen().getSprite()->setTextSize(1);
 	userHwTest->getScreen().getSprite()->setTextColor(TFT_WHITE);
