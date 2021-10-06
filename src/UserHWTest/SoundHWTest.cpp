@@ -4,8 +4,6 @@
 #include "SoundHWTest.h"
 
 SoundHWTest::SoundHWTest(UserHWTest* userHwTest) : HWTestPart(userHwTest){
-	Piezo.begin(SPEAKER_PIN);
-
 }
 
 SoundHWTest::~SoundHWTest(){
@@ -49,14 +47,10 @@ void SoundHWTest::buttonPressed(uint id){
 }
 
 void SoundHWTest::loop(uint micros){
-	Piezo.tone(NOTE_G4, 100);
-	Piezo.tone(NOTE_A4, 100);
-	Piezo.tone(NOTE_C4, 100);
-	Piezo.tone(NOTE_D4, 100);
-	Piezo.tone(NOTE_D4, 100);
-	Piezo.tone(NOTE_C4, 100);
-	Piezo.tone(NOTE_A4, 100);
-	Piezo.tone(NOTE_G4, 100);
-	Piezo.tone(NOTE_F4, 100);
-	Piezo.tone(NOTE_F4, 100);
+	if(millis() - previousTime >= 500){
+		previousTime = millis();
+		Piezo.tone(notesArray[index % 10], 100);
+		index++;
+	}
+
 }

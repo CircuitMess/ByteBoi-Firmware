@@ -26,6 +26,8 @@ public:
 private:
 	uint8_t doneCounter = 0;
 	bool soundIsDone = false;
+	const uint16_t notesArray[10] = {NOTE_G4,NOTE_A4,NOTE_C4,NOTE_D4,NOTE_D4,NOTE_C4,NOTE_A4,NOTE_G4,NOTE_F4,NOTE_F4};
+	uint8_t index = 0;
 	uint32_t previousTime = 0;
 
 };
