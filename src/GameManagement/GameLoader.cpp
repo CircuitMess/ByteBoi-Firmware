@@ -2,11 +2,15 @@
 #include <Update.h>
 #include <SD.h>
 #include "../GameInfo.hpp"
+#include "GameManager.h"
 #include <ByteBoi.h>
 #include <SPIFFS.h>
 #include <esp_ota_ops.h>
 
 GameLoader Loader;
+
+const char* GameLoader::loadedImage = "/launcher/loaded.raw";
+const char* GameLoader::loadedInfo = "/launcher/loaded.info";
 
 GameLoader::GameLoader() : loadTask("GameLoad", GameLoader::loadFunc, 4096, this){}
 
@@ -64,6 +68,8 @@ void GameLoader::loadFunc(Task* task){
 
 	GameInfo* game = job->game;
 	if(game == nullptr || checkAbort(job)) return;
+
+	clearLoaded();
 
 	//create game folder if not present
 	if(!SPIFFS.exists(ByteBoiImpl::SPIFFSgameRoot)){
@@ -196,6 +202,8 @@ void GameLoader::loadFunc(Task* task){
 		printf("Update aborted after being done.\n"); // Possible memory leak
 	}
 
+	saveLoaded(game);
+
 	printf("Update finished\n");
 }
 
@@ -213,3 +221,92 @@ bool GameLoader::checkAbort(Job* job){
 	return false;
 }
 
+GameLoader::Job* GameLoader::getCurrent(){
+	return current;
+}
+
+void GameLoader::clearLoaded(){
+	SPIFFS.remove(loadedImage);
+	SPIFFS.remove(loadedInfo);
+}
+
+bool GameLoader::saveLoaded(GameInfo* game){
+	if(game == nullptr) return false;
+
+	auto copy = [](fs::File& src, fs::File& dst){
+		src.seek(0);
+		dst.seek(0);
+
+		uint8_t* buffer = static_cast<uint8_t*>(malloc(512));
+
+		size_t totalWritten = 0;
+		while(totalWritten < src.size()){
+			size_t read = src.read(buffer, min((size_t) 512, src.size() - totalWritten));
+			if(read == 0){
+				free(buffer);
+				return false;
+			}
+
+			size_t written = 0;
+			while(written < read){
+				size_t w = dst.write(buffer + written, read - written);
+				written += w;
+
+				if(w == 0){
+					free(buffer);
+					return false;
+				}
+			}
+
+			totalWritten += written;
+		}
+
+		free(buffer);
+		return true;
+	};
+
+	auto checkCopy = [&copy](const char* src, const char* dst){
+		fs::File fS = SD.open(src);
+		if(SPIFFS.exists(dst)){
+			SPIFFS.remove(dst);
+		}
+		fs::File fD = SPIFFS.open(dst, "w");
+
+		if(!fS || !fD || !copy(fS, fD)){
+			fS.close();
+			fD.close();
+			clearLoaded();
+
+			return false;
+		}
+
+		return true;
+	};
+
+	if(!checkCopy((game->root + "/game.properties").c_str(), loadedInfo)) return false;
+
+	if(!game->icon.empty()){
+		if(!checkCopy(game->icon.c_str(), loadedImage)) return false;
+	}
+
+	return true;
+}
+
+bool GameLoader::hasLoaded(){
+	return SPIFFS.exists(loadedInfo);
+}
+
+GameInfo* GameLoader::getLoaded(){
+	if(!SPIFFS.exists(loadedInfo)) return nullptr;
+
+	GameInfo* game = Games.parseInfo((String("/spiffs") + loadedInfo).c_str(), "loaded", false);
+	if(game == nullptr) return nullptr;
+
+	game->root = "loaded";
+	game->icon = "";
+	if(SPIFFS.exists(loadedImage)){
+		game->icon = loadedImage;
+	}
+
+	return game;
+}

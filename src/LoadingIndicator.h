@@ -11,13 +11,14 @@ class Logo;
 class GameScroller;
 class GameTitle;
 struct GameInfo;
+class Launcher;
 
 class LoadingIndicator : public LoopListener {
 public:
-	LoadingIndicator(Sprite* canvas, Logo* logo, GameScroller* scroller, GameTitle* title);
+	LoadingIndicator(Launcher* launcher, Sprite* canvas, Logo* logo, GameScroller* scroller, GameTitle* title);
 	void setCanvas(Sprite* canvas);
 
-	void start(GameInfo* game, GameImage* image);
+	void start(GameInfo* game, GameImage* image, bool loaded = false);
 	void abort(bool immediate = false);
 
 	bool isActive() const;
@@ -28,6 +29,7 @@ public:
 	void loop(uint micros) override;
 
 private:
+	Launcher* launcher;
 	Sprite* canvas = nullptr;
 	Logo* logo = nullptr;
 	GameScroller* scroller = nullptr;
@@ -39,6 +41,8 @@ private:
 
 	String currentText;
 	bool boot = false;
+	bool loaded = false;
+	Color* loadedIcon = nullptr;
 
 	enum { OUT, ENTER, IN, EXIT, FINISH } state = OUT;
 	float f = 0;

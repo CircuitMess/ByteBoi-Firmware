@@ -33,12 +33,20 @@ public:
 
 	static void loadFunc(Task* task);
 
+	static GameInfo* getLoaded();
+	static bool hasLoaded();
+
 private:
 	Task loadTask;
 
 	Job* current = nullptr;
 
 	static bool checkAbort(Job* job);
+	static void clearLoaded();
+	static bool saveLoaded(GameInfo* game);
+
+	static const char* loadedImage;
+	static const char* loadedInfo;
 };
 
 extern GameLoader Loader;
