@@ -7,12 +7,17 @@
 #include "src/Launcher.h"
 #include "src/GameManagement/GameManager.h"
 #include "src/IntroScreen.h"
+#include "src/JigHWTest/JigHWTest.h"
 
 void setup(){
 	Serial.begin(115200);
 	ByteBoi.begin();
 	ByteBoi.unbindMenu();
 	BatteryPopup.enablePopups(true);
+
+
+	JigHWTest test(*ByteBoi.getDisplay());
+	test.start();
 
 	Games.scanGames();
 	LoopManager::addListener(&Games);
