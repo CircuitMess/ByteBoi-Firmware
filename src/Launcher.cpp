@@ -149,7 +149,7 @@ void Launcher::load(){
 			item.image = genericIcon;
 		}
 
-		icon = SPIFFS.open("/launcher/reload.raw");
+		icon = SPIFFS.open("/launcher/loading.raw");
 		if(icon){
 			for(int y = 0; y < 64; y++){
 				for(int x = 0; x < 64; x++){
