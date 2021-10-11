@@ -355,3 +355,13 @@ void Launcher::checkLoaded(){
 		}
 	}
 }
+
+void Launcher::openGameImageSPIFFS(String path, GameImage& gameImage){
+	fs::File icon = SPIFFS.open(path);
+	if(icon){
+		icon.read(reinterpret_cast<uint8_t*>(gameImage.getBuffer()),64 * 64 * 2);
+	}else{
+		gameImage = GameImage();
+	}
+	icon.close();
+}

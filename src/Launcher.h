@@ -62,6 +62,7 @@ private:
 	void prev();
 	void next();
 
+	void openGameImageSPIFFS(String path, GameImage& gameImage);
 	void bindInput();
 
 protected:
