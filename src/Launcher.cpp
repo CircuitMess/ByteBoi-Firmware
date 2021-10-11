@@ -22,7 +22,7 @@ Launcher* Launcher::instance = nullptr;
 
 LauncherItem::LauncherItem(String text, const GameImage& image, std::function<void()> primary, std::function<void()> secondary) : text(std::move(text)), image(image), primary(primary), secondary(secondary){}
 
-Launcher::Launcher(Display* display) : Context(*display), display(display), genericIcon(screen.getSprite()), settingsIcon(screen.getSprite()){
+Launcher::Launcher(Display* display) : Context(*display), display(display), genericIcon(screen.getSprite()), settingsIcon(screen.getSprite()), noSDcardIcon(screen.getSprite()), SDcardEmptyIcon(screen.getSprite()){
 	canvas = screen.getSprite();
 	scroller = new GameScroller(canvas, items);
 	logo = new Logo(canvas);
@@ -32,22 +32,10 @@ Launcher::Launcher(Display* display) : Context(*display), display(display), gene
 	instance = this;
 	canvas->setChroma(TFT_TRANSPARENT);
 	splash = new Splash(scroller, logo);
-
-	fs::File icon = SPIFFS.open("/Launcher/genericGame.raw");
-	if(icon){
-		icon.read(reinterpret_cast<uint8_t*>(genericIcon.getBuffer()), 64 * 64 * 2);
-	}else{
-		genericIcon = GameImage();
-	}
-	icon.close();
-
-	fs::File settIcon = SPIFFS.open("/launcher/SettingsIcon.raw");
-	if(settIcon){
-		settIcon.read(reinterpret_cast<uint8_t*>(settingsIcon.getBuffer()), 64 * 64 * 2);
-	}else{
-		settingsIcon = GameImage();
-	}
-	settIcon.close();
+	openGameImageSPIFFS("/launcher/noIconGame.raw",genericIcon);
+	openGameImageSPIFFS("/launcher/SettingsIcon.raw",settingsIcon);
+	openGameImageSPIFFS("/launcher/EmptySDcard.raw",SDcardEmptyIcon);
+	openGameImageSPIFFS("/launcher/NoSDcard.raw",noSDcardIcon);
 
 	Games.setGameListener(this);
 	load();
@@ -71,9 +59,9 @@ void Launcher::load(){
 	items.clear();
 
 	if(!Games.SDinserted()){
-		items.emplace_back("No SD card", GameImage()); // TODO: icon
+		items.emplace_back("No SD card", noSDcardIcon); 
 	}else if(Games.getGames().empty()){
-		items.emplace_back("SD card empty", GameImage()); // TODO: icon
+		items.emplace_back("SD card empty", SDcardEmptyIcon);
 	}else{
 		for(const auto& game : Games.getGames()){
 			items.emplace_back(game->name.c_str(), GameImage(), [this, game](){
