@@ -10,7 +10,7 @@ IntroScreen* IntroScreen::instance = nullptr;
 IntroScreen::IntroScreen(Display& display, Context* menu) : Context(display), menu(menu){
 	instance = this;
 
-	fs::File f = SPIFFS.open("/launcher/intro.g565.hs");
+	fs::File f = SPIFFS.open("/launcher/intro/intro.g565.hs");
 	if(!f){
 		Serial.println("Error opening intro gif");
 		return;

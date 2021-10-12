@@ -62,7 +62,7 @@ void SettingsScreen::SettingsScreen::init(){
 		return;
 	}
 
-	fs::File bgFile = CompressedFile::open(SPIFFS.open("/launcher/SettingsBg.raw.hs"), 9, 8);
+	fs::File bgFile = CompressedFile::open(SPIFFS.open("/launcher/Setts/SettsBg.raw.hs"), 9, 8);
 	bgFile.read(reinterpret_cast<uint8_t*>(backgroundBuffer), 160 * 120 * 2);
 	bgFile.close();
 }
