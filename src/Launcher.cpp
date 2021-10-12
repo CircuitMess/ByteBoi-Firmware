@@ -32,10 +32,10 @@ Launcher::Launcher(Display* display) : Context(*display), display(display), gene
 	instance = this;
 	canvas->setChroma(TFT_TRANSPARENT);
 	splash = new Splash(scroller, logo);
-	openGameImageSPIFFS("/launcher/noIconGame.raw",genericIcon);
-	openGameImageSPIFFS("/launcher/SettingsIcon.raw",settingsIcon);
-	openGameImageSPIFFS("/launcher/EmptySDcard.raw",SDcardEmptyIcon);
-	openGameImageSPIFFS("/launcher/NoSDcard.raw",noSDcardIcon);
+	openGameImageSPIFFS("/launcher/stock/noIcon.raw",genericIcon);
+	openGameImageSPIFFS("/launcher/stock/Setts.raw",settingsIcon);
+	openGameImageSPIFFS("/launcher/stock/emptySD.raw",SDcardEmptyIcon);
+	openGameImageSPIFFS("/launcher/stock/NoSD.raw",noSDcardIcon);
 
 	Games.setGameListener(this);
 	load();
@@ -137,7 +137,7 @@ void Launcher::load(){
 			item.image = genericIcon;
 		}
 
-		icon = SPIFFS.open("/launcher/loading.raw");
+		icon = SPIFFS.open("/launcher/stock/load.raw");
 		if(icon){
 			for(int y = 0; y < 64; y++){
 				for(int x = 0; x < 64; x++){
