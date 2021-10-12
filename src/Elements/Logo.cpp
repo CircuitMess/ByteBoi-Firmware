@@ -12,7 +12,7 @@ Logo::Logo(Sprite* canvas) : canvas(canvas), startX((canvas->width() - width) / 
 		return;
 	}
 
-	fs::File iconFile = SPIFFS.open("/launcher/ByteBoiLogo.raw");
+	fs::File iconFile = SPIFFS.open("/launcher/Logo/BBLogo.raw");
 
 	iconFile.read(reinterpret_cast<uint8_t*>(logoBuffer), 93 * 26 * 2);
 	iconFile.close();
