@@ -54,6 +54,8 @@ private:
 
 	GameImage genericIcon;
 	GameImage settingsIcon;
+	GameImage SDcardEmptyIcon;
+	GameImage noSDcardIcon;
 	std::vector<LauncherItem> items;
 	void load();
 	GameInfo* loaded = nullptr;
@@ -62,6 +64,7 @@ private:
 	void prev();
 	void next();
 
+	void openGameImageSPIFFS(String path, GameImage& gameImage);
 	void bindInput();
 
 protected:
