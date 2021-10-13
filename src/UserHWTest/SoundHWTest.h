@@ -7,6 +7,7 @@
 #include <Input/Input.h>
 #include <UI/LinearLayout.h>
 #include "HWTestPart.h"
+#include <Audio/Notes.hpp>
 
 class SoundHWTest : public HWTestPart, public LoopListener{
 public:

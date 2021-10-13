@@ -1,6 +1,5 @@
 #include <Pins.hpp>
 #include <Audio/Piezo.h>
-#include <Audio/Notes.hpp>
 #include "SoundHWTest.h"
 
 SoundHWTest::SoundHWTest(UserHWTest* userHwTest) : HWTestPart(userHwTest){
