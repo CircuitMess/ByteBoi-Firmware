@@ -107,7 +107,7 @@ void LoadingIndicator::loop(uint micros){
 	}
 
 	if(state == EXIT || state == FINISH){
-		if(state == FINISH && millis() - finishTime < 2000) return;
+		if(state == FINISH && millis() - finishTime < 1000) return;
 		if(state == FINISH && currentText != ""){
 			title->change("");
 			currentText = "";
