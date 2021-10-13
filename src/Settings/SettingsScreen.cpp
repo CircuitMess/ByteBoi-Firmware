@@ -1,9 +1,11 @@
 #include "SettingsScreen.h"
+#include "../UserHWTest/UserHWTest.h"
 #include <Input/Input.h>
 #include <FS/CompressedFile.h>
 #include <Settings.h>
 #include <SPIFFS.h>
 #include <Pins.hpp>
+#include <ByteBoi.h>
 
 SettingsScreen::SettingsScreen::SettingsScreen(Display& display) : Context(display), screenLayout(new LinearLayout(&screen, VERTICAL)),
 																   shutDownSlider(new DiscreteSlider(screenLayout, "Auto shutdown", {0, 1, 5, 15, 30})),
@@ -187,6 +189,12 @@ void SettingsScreen::SettingsScreen::buttonPressed(uint id){
 		case BTN_A:
 			if(selectedSetting == 2){
 				enableLED->toggle();
+			}else if(selectedSetting == 3){
+				Context* hwTest = new UserHWTest(*ByteBoi.getDisplay());
+				hwTest->push(this);
+				draw();
+				screen.commit();
+				break;
 			}else if(selectedSetting == 4){
 				Settings.get().shutdownTime = shutDownSlider->getIndex();
 				Settings.get().volume = volumeSlider->getSliderValue();
