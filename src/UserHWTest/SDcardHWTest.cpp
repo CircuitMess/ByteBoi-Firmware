@@ -27,12 +27,17 @@ void SDcardHWTest::draw(){
 		userHwTest->getScreen().getSprite()->setCursor(userHwTest->getScreen().getSprite()->width()/2 - userHwTest->getScreen().getSprite()->textWidth("and empty")/2, 50);
 		userHwTest->getScreen().getSprite()->print("and empty");
 	}else if(Games.SDinserted() && !Games.getGames().empty()){
+		userHwTest->getScreen().getSprite()->setTextFont(1);
+		userHwTest->getScreen().getSprite()->setTextSize(1);
+		userHwTest->getScreen().getSprite()->setTextColor(TFT_WHITE);
+		userHwTest->getScreen().getSprite()->setCursor(userHwTest->getScreen().getSprite()->width() / 2 - userHwTest->getScreen().getSprite()->textWidth("Games on SD card:") / 2,20);
+		userHwTest->getScreen().getSprite()->print("Games on SD card:");
 		uint8_t i = 0;
 		for(const auto& game : Games.getGames()){
 			userHwTest->getScreen().getSprite()->setTextFont(1);
 			userHwTest->getScreen().getSprite()->setTextSize(1);
 			userHwTest->getScreen().getSprite()->setTextColor(TFT_WHITE);
-			userHwTest->getScreen().getSprite()->setCursor(userHwTest->getScreen().getSprite()->width() / 2 - userHwTest->getScreen().getSprite()->textWidth(game->name.c_str()) / 2,20+(i*10) );
+			userHwTest->getScreen().getSprite()->setCursor(userHwTest->getScreen().getSprite()->width() / 2 - userHwTest->getScreen().getSprite()->textWidth(game->name.c_str()) / 2,33+(i*10) );
 			userHwTest->getScreen().getSprite()->print(game->name.c_str());
 			Serial.printf("Games : %s\n", game->name.c_str());
 			i++;
