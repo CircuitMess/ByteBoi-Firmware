@@ -5,6 +5,7 @@
 #include <UI/Screen.h>
 #include <Loop/LoopListener.h>
 #include <Display/AnimatedSprite.h>
+#include <ByteBoiLED.h>
 
 class IntroScreen: public Context, public LoopListener {
 public:
@@ -25,7 +26,9 @@ private:
 	static IntroScreen *instance;
 	AnimatedSprite* gif = nullptr;
 	Context* menu = nullptr;
+	LEDColor lastColor = LEDColor::WHITE;
 
+	uint32_t previousTime = 0;
 };
 
 #endif //WHEELSON_FIRMWARE_INTROSCREEN_H

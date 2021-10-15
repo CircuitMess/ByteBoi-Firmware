@@ -65,7 +65,18 @@ void IntroScreen::stop(){
 }
 
 void IntroScreen::loop(uint micros){
-	if(gif && gif->checkFrame()){
+	if(millis() - previousTime >= 300){
+		previousTime = millis();
+
+		LEDColor color;
+		do {
+			color = static_cast<LEDColor>(random(1, 6));
+		} while(color == lastColor);
+		LED.setRGB(color);
+
+		lastColor = color;
+	}
+		if(gif && gif->checkFrame()){
 		draw();
 		screen.commit();
 	}
