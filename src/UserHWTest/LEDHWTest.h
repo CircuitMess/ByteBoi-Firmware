@@ -27,7 +27,6 @@ public:
 
 private:
 	uint32_t previousTime = 0;
-	ByteBoiLED rgbLED;
 
 	const LEDColor ledArray[3] = {LEDColor::RED, LEDColor::GREEN, LEDColor::BLUE};
 	uint8_t index = 0;

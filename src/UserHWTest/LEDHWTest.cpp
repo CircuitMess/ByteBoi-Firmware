@@ -54,11 +54,11 @@ void LEDHWTest::buttonPressed(uint id){
 void LEDHWTest::loop(uint micros){
 	if(millis() - previousTime >= 500){
 		previousTime = millis();
-		if(rgbLED.getRGB() == OFF){
-			rgbLED.setRGB(static_cast<LEDColor>(ledArray[index%3]));
+		if(LED.getRGB() == OFF){
+			LED.setRGB(static_cast<LEDColor>(ledArray[index%3]));
 			index++;
 		}else{
-			rgbLED.setRGB(OFF);
+			LED.setRGB(OFF);
 		}
 	}
 }
