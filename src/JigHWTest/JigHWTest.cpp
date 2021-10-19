@@ -9,13 +9,15 @@
 #include "../GameInfo.hpp"
 
 JigHWTest *JigHWTest::test = nullptr;
-static const char* preloadedGames[] = {"Bonk", "Invaderz", "SpaceRocks", "Snake", "Wheelson RC"};
+static const char* preloadedGames[] = {"Bonk", "Invaderz", "SpaceRocks", "Snake", "Wheelson RC", "CastleJump"};
 JigHWTest::JigHWTest(Display &_display) : canvas(_display.getBaseSprite()), display(&_display){
 
 	test = this;
 
 	tests.push_back({JigHWTest::psram, "PSRAM"});
 	tests.push_back({JigHWTest::SPIFFSTest, "SPIFFS"});
+	tests.push_back({JigHWTest::BatteryCheck,"Battery"});
+	tests.push_back({JigHWTest::SDcheck,"SD"});
 
 	Wire.begin(I2C_SDA, I2C_SCL);
 }
@@ -120,6 +122,7 @@ bool JigHWTest::SDcheck(){
 	Games.detectSD();
 	if(!Games.SDinserted()){
 		test->log("SD inserted", "false");
+		return false;
 	}
 	Games.scanGames();
 
@@ -128,8 +131,10 @@ bool JigHWTest::SDcheck(){
 		if(it == Games.getGames().end())
 		{
 			test->log("Missing game", name);
+			return false;
 		}
 	}
+	return true;
 }
 
 bool JigHWTest::BatteryCheck(){
