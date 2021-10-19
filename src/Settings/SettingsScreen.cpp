@@ -5,13 +5,14 @@
 #include <SPIFFS.h>
 #include <Pins.hpp>
 
+SettingsScreen::SettingsScreen* SettingsScreen::SettingsScreen::instance = nullptr;
 SettingsScreen::SettingsScreen::SettingsScreen(Display& display) : Context(display), screenLayout(new LinearLayout(&screen, VERTICAL)),
 																   shutDownSlider(new DiscreteSlider(screenLayout, "Auto shutdown", {0, 1, 5, 15, 30})),
 																   volumeSlider(new SliderElement(screenLayout, "Volume")),
 																   enableLED(new BooleanElement(screenLayout, "LED enable")),
 																   inputTest(new TextElement(screenLayout, "Hardware test")),
 																   save(new TextElement(screenLayout, "Save")){
-
+	instance = this;
 	buildUI();
 	shutDownSlider->setIsSelected(true);
 	shutDownSlider->setIndex(Settings.get().shutdownTime);
@@ -22,6 +23,20 @@ SettingsScreen::SettingsScreen::SettingsScreen(Display& display) : Context(displ
 
 void SettingsScreen::SettingsScreen::start(){
 	Input::getInstance()->addListener(this);
+	Input::getInstance()->setButtonHeldRepeatCallback(BTN_RIGHT, 200, [](uint){
+		if(instance->selectedSetting == 1){
+			instance->volumeSlider->moveSliderValue(1);
+		}
+		instance->draw();
+		instance->screen.commit();
+	});
+	Input::getInstance()->setButtonHeldRepeatCallback(BTN_LEFT, 200, [](uint){
+		if(instance->selectedSetting == 1){
+			instance->volumeSlider->moveSliderValue(-1);
+		}
+		instance->draw();
+		instance->screen.commit();
+	});
 	draw();
 	screen.commit();
 
@@ -62,7 +77,7 @@ void SettingsScreen::SettingsScreen::init(){
 		return;
 	}
 
-	fs::File bgFile = CompressedFile::open(SPIFFS.open("/launcher/SettingsBg.raw.hs"), 9, 8);
+	fs::File bgFile = CompressedFile::open(SPIFFS.open("/launcher/Setts/SettsBg.raw.hs"), 9, 8);
 	bgFile.read(reinterpret_cast<uint8_t*>(backgroundBuffer), 160 * 120 * 2);
 	bgFile.close();
 }
