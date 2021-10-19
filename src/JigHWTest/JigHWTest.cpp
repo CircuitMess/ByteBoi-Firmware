@@ -138,7 +138,11 @@ bool JigHWTest::SDcheck(){
 }
 
 bool JigHWTest::BatteryCheck(){
-	return false;
+	if(!(ByteBoi.getExpander()->getPortState() & (1 << CHARGE_DETECT_PIN))){
+		test->log("Battery not charging", "false");
+		return false;
+	}
+	return true;
 }
 
 
