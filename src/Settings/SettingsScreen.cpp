@@ -44,6 +44,8 @@ void SettingsScreen::SettingsScreen::start(){
 
 void SettingsScreen::SettingsScreen::stop(){
 	Input::getInstance()->removeListener(this);
+	Input::getInstance()->removeButtonHeldRepeatCallback(BTN_RIGHT);
+	Input::getInstance()->removeButtonHeldRepeatCallback(BTN_LEFT);
 }
 
 void SettingsScreen::SettingsScreen::draw(){
@@ -83,7 +85,7 @@ void SettingsScreen::SettingsScreen::init(){
 }
 
 SettingsScreen::SettingsScreen::~SettingsScreen(){
-
+	instance = nullptr;
 }
 
 void SettingsScreen::SettingsScreen::buildUI(){
