@@ -14,10 +14,10 @@ void setup(){
 	ByteBoi.unbindMenu();
 	BatteryPopup.enablePopups(true);
 
-	Games.scanGames();
-	LoopManager::addListener(&Games);
-
 	Launcher* launcher = new Launcher(ByteBoi.getDisplay());
+
+	LoopManager::addListener(&Games);
+	Games.detectSD();
 
 	Context* intro = new IntroScreen(*ByteBoi.getDisplay(), launcher);
 	intro->unpack();
