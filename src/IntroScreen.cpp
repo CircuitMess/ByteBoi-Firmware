@@ -22,7 +22,7 @@ IntroScreen::IntroScreen(Display& display, Context* menu) : Context(display), me
 	gif->setSwapBytes(true);
 	gif->setXY(0, 0);
 
-	intro = new Sample(SPIFFS.open("/launcher/intro/intro.aac"), false);
+	intro = new Sample(SPIFFS.open("/launcher/intro/intro.aac"), true);
 
 	IntroScreen::pack();
 }
