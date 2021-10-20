@@ -4,6 +4,7 @@
 #include <Settings.h>
 #include <SPIFFS.h>
 #include <Pins.hpp>
+#include <Audio/Piezo.h>
 
 SettingsScreen::SettingsScreen* SettingsScreen::SettingsScreen::instance = nullptr;
 SettingsScreen::SettingsScreen::SettingsScreen(Display& display) : Context(display), screenLayout(new LinearLayout(&screen, VERTICAL)),
@@ -23,20 +24,29 @@ SettingsScreen::SettingsScreen::SettingsScreen(Display& display) : Context(displ
 
 void SettingsScreen::SettingsScreen::start(){
 	Input::getInstance()->addListener(this);
+
 	Input::getInstance()->setButtonHeldRepeatCallback(BTN_RIGHT, 200, [](uint){
-		if(instance->selectedSetting == 1){
-			instance->volumeSlider->moveSliderValue(1);
-		}
+		if(instance == nullptr || instance->selectedSetting != 1) return;
+		instance->volumeSlider->moveSliderValue(1);
+
+		Piezo.setVolume(instance->volumeSlider->getSliderValue());
+		Piezo.tone(500, 100);
+
 		instance->draw();
 		instance->screen.commit();
 	});
+
 	Input::getInstance()->setButtonHeldRepeatCallback(BTN_LEFT, 200, [](uint){
-		if(instance->selectedSetting == 1){
-			instance->volumeSlider->moveSliderValue(-1);
-		}
+		if(instance == nullptr || instance->selectedSetting != 1) return;
+		instance->volumeSlider->moveSliderValue(-1);
+
+		Piezo.setVolume(instance->volumeSlider->getSliderValue());
+		Piezo.tone(500, 100);
+
 		instance->draw();
 		instance->screen.commit();
 	});
+
 	draw();
 	screen.commit();
 
@@ -113,6 +123,8 @@ void SettingsScreen::SettingsScreen::buttonPressed(uint id){
 				shutDownSlider->selectPrev();
 			}else if(selectedSetting == 1){
 				volumeSlider->moveSliderValue(-1);
+				Piezo.setVolume(volumeSlider->getSliderValue());
+				Piezo.tone(500, 100);
 			}else if(selectedSetting == 2){
 				enableLED->toggle();
 			}
@@ -125,6 +137,8 @@ void SettingsScreen::SettingsScreen::buttonPressed(uint id){
 				shutDownSlider->selectNext();
 			}else if(selectedSetting == 1){
 				volumeSlider->moveSliderValue(1);
+				Piezo.setVolume(volumeSlider->getSliderValue());
+				Piezo.tone(500, 100);
 			}else if(selectedSetting == 2){
 				enableLED->toggle();
 			}
@@ -209,6 +223,7 @@ void SettingsScreen::SettingsScreen::buttonPressed(uint id){
 				Settings.get().volume = volumeSlider->getSliderValue();
 				Settings.get().RGBenable = enableLED->getBooleanSwitch();
 				Settings.store();
+				Piezo.setVolume(Settings.get().volume);
 				this->pop();
 			}
 			draw();
@@ -220,6 +235,7 @@ void SettingsScreen::SettingsScreen::buttonPressed(uint id){
 			Settings.get().volume = volumeSlider->getSliderValue();
 			Settings.get().RGBenable = enableLED->getBooleanSwitch();
 			Settings.store();
+			Piezo.setVolume(Settings.get().volume);
 			this->pop();
 			draw();
 			screen.commit();
