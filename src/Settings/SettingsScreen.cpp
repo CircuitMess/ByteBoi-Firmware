@@ -216,7 +216,15 @@ void SettingsScreen::SettingsScreen::buttonPressed(uint id){
 			break;
 
 		case BTN_A:
-			if(selectedSetting == 2){
+			if(selectedSetting == 1){
+				if(volumeSlider->getSliderValue() == 0){
+					volumeSlider->setSliderValue(180);
+				}else{
+					volumeSlider->setSliderValue(0);
+				}
+				Piezo.setVolume(volumeSlider->getSliderValue());
+				Piezo.tone(500, 100);
+			}else if(selectedSetting == 2){
 				enableLED->toggle();
 			}else if(selectedSetting == 4){
 				Settings.get().shutdownTime = shutDownSlider->getIndex();
