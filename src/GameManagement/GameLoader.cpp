@@ -35,7 +35,6 @@ float GameLoader::Job::getProgress(){
 }
 
 GameLoader::Job* GameLoader::loadGame(GameInfo* game){
-	if(!ByteBoiImpl::inFirmware()) return nullptr;
 	if(current){
 		if(current->done || current->aborted){
 			// Wait for task to finish if it's still running
