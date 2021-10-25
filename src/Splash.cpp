@@ -1,7 +1,6 @@
 #include "Splash.h"
 #include "Elements/Logo.h"
 #include "GameScroller.h"
-#include <Audio/Piezo.h>
 
 Splash::Splash(GameScroller* scroller, Logo* logo) : scroller(scroller), logo(logo){
 

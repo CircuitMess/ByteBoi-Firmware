@@ -4,7 +4,7 @@
 #include <Settings.h>
 #include <SPIFFS.h>
 #include <Pins.hpp>
-#include <Audio/Piezo.h>
+#include <ByteBoi.h>
 
 SettingsScreen::SettingsScreen* SettingsScreen::SettingsScreen::instance = nullptr;
 SettingsScreen::SettingsScreen::SettingsScreen(Display& display) : Context(display), screenLayout(new LinearLayout(&screen, VERTICAL)),
@@ -29,8 +29,9 @@ void SettingsScreen::SettingsScreen::start(){
 		if(instance == nullptr || instance->selectedSetting != 1) return;
 		instance->volumeSlider->moveSliderValue(1);
 
-		Piezo.setVolume(instance->volumeSlider->getSliderValue());
-		Piezo.tone(500, 100);
+		Settings.get().volume = instance->volumeSlider->getSliderValue();
+		Playback.updateGain();
+		Playback.tone(500, 50);
 
 		instance->draw();
 		instance->screen.commit();
@@ -40,8 +41,9 @@ void SettingsScreen::SettingsScreen::start(){
 		if(instance == nullptr || instance->selectedSetting != 1) return;
 		instance->volumeSlider->moveSliderValue(-1);
 
-		Piezo.setVolume(instance->volumeSlider->getSliderValue());
-		Piezo.tone(500, 100);
+		Settings.get().volume = instance->volumeSlider->getSliderValue();
+		Playback.updateGain();
+		Playback.tone(500, 50);
 
 		instance->draw();
 		instance->screen.commit();
@@ -123,8 +125,9 @@ void SettingsScreen::SettingsScreen::buttonPressed(uint id){
 				shutDownSlider->selectPrev();
 			}else if(selectedSetting == 1){
 				volumeSlider->moveSliderValue(-1);
-				Piezo.setVolume(volumeSlider->getSliderValue());
-				Piezo.tone(500, 100);
+				Settings.get().volume = volumeSlider->getSliderValue();
+				Playback.updateGain();
+				Playback.tone(500, 50);
 			}else if(selectedSetting == 2){
 				enableLED->toggle();
 			}
@@ -137,8 +140,9 @@ void SettingsScreen::SettingsScreen::buttonPressed(uint id){
 				shutDownSlider->selectNext();
 			}else if(selectedSetting == 1){
 				volumeSlider->moveSliderValue(1);
-				Piezo.setVolume(volumeSlider->getSliderValue());
-				Piezo.tone(500, 100);
+				Settings.get().volume = volumeSlider->getSliderValue();
+				Playback.updateGain();
+				Playback.tone(500, 50);
 			}else if(selectedSetting == 2){
 				enableLED->toggle();
 			}
@@ -222,8 +226,9 @@ void SettingsScreen::SettingsScreen::buttonPressed(uint id){
 				}else{
 					volumeSlider->setSliderValue(0);
 				}
-				Piezo.setVolume(volumeSlider->getSliderValue());
-				Piezo.tone(500, 100);
+				Settings.get().volume = instance->volumeSlider->getSliderValue();
+				Playback.updateGain();
+				Playback.tone(500, 50);
 			}else if(selectedSetting == 2){
 				enableLED->toggle();
 			}else if(selectedSetting == 4){
@@ -231,7 +236,7 @@ void SettingsScreen::SettingsScreen::buttonPressed(uint id){
 				Settings.get().volume = volumeSlider->getSliderValue();
 				Settings.get().RGBenable = enableLED->getBooleanSwitch();
 				Settings.store();
-				Piezo.setVolume(Settings.get().volume);
+				Playback.updateGain();
 				this->pop();
 			}
 			draw();
@@ -243,7 +248,7 @@ void SettingsScreen::SettingsScreen::buttonPressed(uint id){
 			Settings.get().volume = volumeSlider->getSliderValue();
 			Settings.get().RGBenable = enableLED->getBooleanSwitch();
 			Settings.store();
-			Piezo.setVolume(Settings.get().volume);
+			Playback.updateGain();
 			this->pop();
 			draw();
 			screen.commit();

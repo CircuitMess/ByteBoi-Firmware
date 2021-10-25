@@ -4,7 +4,6 @@
 #include "GameScroller.h"
 #include "Elements/Logo.h"
 #include "Elements/GameTitle.h"
-#include <Audio/Piezo.h>
 #include <Loop/LoopManager.h>
 #include <ByteBoi.h>
 #include "GameManagement/GameManager.h"
@@ -223,19 +222,19 @@ void Launcher::bindInput(){
 	Input::getInstance()->setBtnPressCallback(BTN_RIGHT, [](){
 		if(instance == nullptr) return;
 		instance->next();
-		Piezo.tone(800, 50);
+		Playback.tone(800, 50);
 	});
 
 	Input::getInstance()->setBtnPressCallback(BTN_LEFT, [](){
 		if(instance == nullptr) return;
 		instance->prev();
-		Piezo.tone(800, 50);
+		Playback.tone(800, 50);
 	});
 
 	Input::getInstance()->setBtnPressCallback(BTN_A, [](){
 		if(instance == nullptr) return;
 		if(instance->scroller->scrolling() || instance->loader->isActive()) return;
-		Piezo.tone(800, 50);
+		//Playback.tone(800, 50);
 		if(instance->items[instance->selectedGame].primary){
 			instance->items[instance->selectedGame].primary();
 		}
@@ -243,7 +242,7 @@ void Launcher::bindInput(){
 
 	Input::getInstance()->setBtnPressCallback(BTN_B, [](){
 		if(instance == nullptr) return;
-		Piezo.tone(800, 50);
+		Playback.tone(800, 50);
 		if(instance->loader->isActive()){
 			instance->loader->abort();
 		}
@@ -252,7 +251,7 @@ void Launcher::bindInput(){
 	Input::getInstance()->setBtnPressCallback(BTN_C, [](){
 		if(instance == nullptr) return;
 		if(instance->scroller->scrolling() || instance->loader->isActive()) return;
-		Piezo.tone(800, 50);
+		Playback.tone(800, 50);
 		if(instance->items[instance->selectedGame].secondary){
 			instance->items[instance->selectedGame].secondary();
 		}
