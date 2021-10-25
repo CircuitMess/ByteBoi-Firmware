@@ -23,6 +23,7 @@ IntroScreen::IntroScreen(Display& display, Context* menu) : Context(display), me
 	gif->setXY(0, 0);
 
 	intro = new Sample(SPIFFS.open("/launcher/intro/intro.aac"), true);
+	intro->setLooping(false);
 
 	IntroScreen::pack();
 }
@@ -60,7 +61,6 @@ void IntroScreen::start(){
 
 	LoopManager::addListener(this);
 	Playback.play(intro);
-	Playback.setLoop(false);
 
 	draw();
 	screen.commit();
