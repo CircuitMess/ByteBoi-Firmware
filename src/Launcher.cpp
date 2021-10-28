@@ -198,6 +198,8 @@ void Launcher::setCanvas(Sprite* canvas){
 	scroller->setCanvas(canvas);
 	genericIcon.setCanvas(canvas);
 	settingsIcon.setCanvas(canvas);
+	noSDcardIcon.setCanvas(canvas);
+	SDcardEmptyIcon.setCanvas(canvas);
 }
 
 void Launcher::prev(){
