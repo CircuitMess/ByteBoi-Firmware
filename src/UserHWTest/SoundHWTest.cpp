@@ -1,5 +1,7 @@
 #include <Pins.hpp>
 #include <Audio/Piezo.h>
+#include <Playback/PlaybackSystem.h>
+#include <Loop/LoopManager.h>
 #include "SoundHWTest.h"
 
 SoundHWTest::SoundHWTest(UserHWTest* userHwTest) : HWTestPart(userHwTest){
@@ -23,12 +25,16 @@ void SoundHWTest::draw(){
 
 void SoundHWTest::start(){
 	Input::getInstance()->addListener(this);
+	LoopManager::addListener(this);
 	userHwTest->draw();
 	userHwTest->getScreen().commit();
 }
 
 void SoundHWTest::stop(){
 	Input::getInstance()->removeListener(this);
+	LoopManager::removeListener(this);
+	Playback.noTone();
+	Playback.stop();
 }
 
 void SoundHWTest::buttonPressed(uint id){
@@ -48,7 +54,8 @@ void SoundHWTest::buttonPressed(uint id){
 void SoundHWTest::loop(uint micros){
 	if(millis() - previousTime >= 500){
 		previousTime = millis();
-		Piezo.tone(notesArray[index % 10], 100);
+
+		Playback.tone(notesArray[index % 10], 100, Wave::SINE);
 		index++;
 	}
 
