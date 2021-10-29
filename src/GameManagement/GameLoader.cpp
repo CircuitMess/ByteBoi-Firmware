@@ -68,7 +68,7 @@ void GameLoader::loadFunc(Task* task){
 	GameInfo* game = job->game;
 	if(game == nullptr || checkAbort(job)) return;
 
-	clearLoaded();
+	loader->clearLoaded();
 
 	//create game folder if not present
 	if(!SPIFFS.exists(ByteBoiImpl::SPIFFSgameRoot)){
@@ -198,10 +198,10 @@ void GameLoader::loadFunc(Task* task){
 
 	job->done = true;
 	if(job->aborted){
-		printf("Update aborted after being done.\n"); // Possible memory leak
+		printf("Update aborted after being done.\n"); // Possible memory leak / race condition
 	}
 
-	saveLoaded(game);
+	loader->saveLoaded(game);
 
 	printf("Update finished\n");
 }
@@ -227,6 +227,8 @@ GameLoader::Job* GameLoader::getCurrent(){
 void GameLoader::clearLoaded(){
 	SPIFFS.remove(loadedImage);
 	SPIFFS.remove(loadedInfo);
+	delete loadedGame;
+	loadedGame = nullptr;
 }
 
 bool GameLoader::saveLoaded(GameInfo* game){
@@ -274,7 +276,6 @@ bool GameLoader::saveLoaded(GameInfo* game){
 		if(!fS || !fD || !copy(fS, fD)){
 			fS.close();
 			fD.close();
-			clearLoaded();
 
 			return false;
 		}
@@ -282,24 +283,38 @@ bool GameLoader::saveLoaded(GameInfo* game){
 		return true;
 	};
 
-	if(!checkCopy((game->root + "/game.properties").c_str(), loadedInfo)) return false;
-
-	if(!game->icon.empty()){
-		if(!checkCopy(game->icon.c_str(), loadedImage)) return false;
+	if(!checkCopy((game->root + "/game.properties").c_str(), loadedInfo)){
+		clearLoaded();
+		return false;
 	}
 
-	return true;
+	if(!game->icon.empty()){
+		if(!checkCopy(game->icon.c_str(), loadedImage)){
+			clearLoaded();
+			return false;
+		}
+	}
+
+	checkLoaded();
+	return hasLoaded();
 }
 
 bool GameLoader::hasLoaded(){
-	return SPIFFS.exists(loadedInfo);
+	return loadedGame != nullptr;
 }
 
 GameInfo* GameLoader::getLoaded(){
-	if(!SPIFFS.exists(loadedInfo)) return nullptr;
+	return loadedGame;
+}
+
+void GameLoader::checkLoaded(){
+	delete loadedGame;
+	loadedGame = nullptr;
+
+	if(!SPIFFS.exists(loadedInfo)) return;
 
 	GameInfo* game = Games.parseInfo((String("/spiffs") + loadedInfo).c_str(), "loaded", false);
-	if(game == nullptr) return nullptr;
+	if(game == nullptr) return;
 
 	game->root = "loaded";
 	game->icon = "";
@@ -307,5 +322,5 @@ GameInfo* GameLoader::getLoaded(){
 		game->icon = loadedImage;
 	}
 
-	return game;
+	loadedGame = game;
 }

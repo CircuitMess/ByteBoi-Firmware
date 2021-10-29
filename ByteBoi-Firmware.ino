@@ -16,6 +16,8 @@ void setup(){
 
 	Launcher* launcher = new Launcher(ByteBoi.getDisplay());
 
+	Loader.checkLoaded();
+
 	LoopManager::addListener(&Games);
 	Games.detectSD();
 
