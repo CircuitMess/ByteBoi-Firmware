@@ -5,6 +5,7 @@
 #include <UI/Screen.h>
 #include <Loop/LoopListener.h>
 #include <Display/AnimatedSprite.h>
+#include <Playback/Sample.h>
 
 class IntroScreen: public Context, public LoopListener {
 public:
@@ -25,7 +26,7 @@ private:
 	static IntroScreen *instance;
 	AnimatedSprite* gif = nullptr;
 	Context* menu = nullptr;
-
+	Sample* intro = nullptr;
 };
 
 #endif //WHEELSON_FIRMWARE_INTROSCREEN_H

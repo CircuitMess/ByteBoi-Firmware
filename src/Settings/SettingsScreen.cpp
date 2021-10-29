@@ -7,13 +7,14 @@
 #include <Pins.hpp>
 #include <ByteBoi.h>
 
+SettingsScreen::SettingsScreen* SettingsScreen::SettingsScreen::instance = nullptr;
 SettingsScreen::SettingsScreen::SettingsScreen(Display& display) : Context(display), screenLayout(new LinearLayout(&screen, VERTICAL)),
 																   shutDownSlider(new DiscreteSlider(screenLayout, "Auto shutdown", {0, 1, 5, 15, 30})),
 																   volumeSlider(new SliderElement(screenLayout, "Volume")),
 																   enableLED(new BooleanElement(screenLayout, "LED enable")),
 																   inputTest(new TextElement(screenLayout, "Hardware test")),
 																   save(new TextElement(screenLayout, "Save")){
-
+	instance = this;
 	buildUI();
 	shutDownSlider->setIsSelected(true);
 	shutDownSlider->setIndex(Settings.get().shutdownTime);
@@ -24,6 +25,31 @@ SettingsScreen::SettingsScreen::SettingsScreen(Display& display) : Context(displ
 
 void SettingsScreen::SettingsScreen::start(){
 	Input::getInstance()->addListener(this);
+
+	Input::getInstance()->setButtonHeldRepeatCallback(BTN_RIGHT, 200, [](uint){
+		if(instance == nullptr || instance->selectedSetting != 1) return;
+		instance->volumeSlider->moveSliderValue(1);
+
+		Settings.get().volume = instance->volumeSlider->getSliderValue();
+		Playback.updateGain();
+		Playback.tone(500, 50);
+
+		instance->draw();
+		instance->screen.commit();
+	});
+
+	Input::getInstance()->setButtonHeldRepeatCallback(BTN_LEFT, 200, [](uint){
+		if(instance == nullptr || instance->selectedSetting != 1) return;
+		instance->volumeSlider->moveSliderValue(-1);
+
+		Settings.get().volume = instance->volumeSlider->getSliderValue();
+		Playback.updateGain();
+		Playback.tone(500, 50);
+
+		instance->draw();
+		instance->screen.commit();
+	});
+
 	draw();
 	screen.commit();
 
@@ -31,6 +57,8 @@ void SettingsScreen::SettingsScreen::start(){
 
 void SettingsScreen::SettingsScreen::stop(){
 	Input::getInstance()->removeListener(this);
+	Input::getInstance()->removeButtonHeldRepeatCallback(BTN_RIGHT);
+	Input::getInstance()->removeButtonHeldRepeatCallback(BTN_LEFT);
 }
 
 void SettingsScreen::SettingsScreen::draw(){
@@ -70,7 +98,7 @@ void SettingsScreen::SettingsScreen::init(){
 }
 
 SettingsScreen::SettingsScreen::~SettingsScreen(){
-
+	instance = nullptr;
 }
 
 void SettingsScreen::SettingsScreen::buildUI(){
@@ -98,6 +126,9 @@ void SettingsScreen::SettingsScreen::buttonPressed(uint id){
 				shutDownSlider->selectPrev();
 			}else if(selectedSetting == 1){
 				volumeSlider->moveSliderValue(-1);
+				Settings.get().volume = volumeSlider->getSliderValue();
+				Playback.updateGain();
+				Playback.tone(500, 50);
 			}else if(selectedSetting == 2){
 				enableLED->toggle();
 			}
@@ -110,6 +141,9 @@ void SettingsScreen::SettingsScreen::buttonPressed(uint id){
 				shutDownSlider->selectNext();
 			}else if(selectedSetting == 1){
 				volumeSlider->moveSliderValue(1);
+				Settings.get().volume = volumeSlider->getSliderValue();
+				Playback.updateGain();
+				Playback.tone(500, 50);
 			}else if(selectedSetting == 2){
 				enableLED->toggle();
 			}
@@ -187,7 +221,16 @@ void SettingsScreen::SettingsScreen::buttonPressed(uint id){
 			break;
 
 		case BTN_A:
-			if(selectedSetting == 2){
+			if(selectedSetting == 1){
+				if(volumeSlider->getSliderValue() == 0){
+					volumeSlider->setSliderValue(180);
+				}else{
+					volumeSlider->setSliderValue(0);
+				}
+				Settings.get().volume = instance->volumeSlider->getSliderValue();
+				Playback.updateGain();
+				Playback.tone(500, 50);
+			}else if(selectedSetting == 2){
 				enableLED->toggle();
 			}else if(selectedSetting == 3){
 				Context* hwTest = new UserHWTest(*ByteBoi.getDisplay());
@@ -200,6 +243,7 @@ void SettingsScreen::SettingsScreen::buttonPressed(uint id){
 				Settings.get().volume = volumeSlider->getSliderValue();
 				Settings.get().RGBenable = enableLED->getBooleanSwitch();
 				Settings.store();
+				Playback.updateGain();
 				this->pop();
 			}
 			draw();
@@ -211,6 +255,7 @@ void SettingsScreen::SettingsScreen::buttonPressed(uint id){
 			Settings.get().volume = volumeSlider->getSliderValue();
 			Settings.get().RGBenable = enableLED->getBooleanSwitch();
 			Settings.store();
+			Playback.updateGain();
 			this->pop();
 			draw();
 			screen.commit();
