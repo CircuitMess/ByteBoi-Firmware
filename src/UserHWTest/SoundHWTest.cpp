@@ -52,10 +52,10 @@ void SoundHWTest::buttonPressed(uint id){
 }
 
 void SoundHWTest::loop(uint micros){
-	if(millis() - previousTime >= 500){
+	if(millis() - previousTime >= 400){
 		previousTime = millis();
 
-		Playback.tone(notesArray[index % 10], 100, Wave::SINE);
+		Playback.tone(notesArray[index % 10], 200, Wave::SINE);
 		index++;
 	}
 
