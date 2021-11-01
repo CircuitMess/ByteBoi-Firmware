@@ -146,6 +146,7 @@ void GameLoader::loadFunc(Task* task){
 	size_t totalWritten = 0;
 	const size_t at_once = 512;
 	uint8_t* buffer = static_cast<uint8_t*>(malloc(at_once));
+	uint32_t start = millis();
 	while(totalWritten < updateSize){
 		size_t read = file.read(buffer, min((size_t) at_once, updateSize - totalWritten));
 		if(read == 0){
@@ -183,6 +184,8 @@ void GameLoader::loadFunc(Task* task){
 	}
 	file.close();
 	free(buffer);
+	uint32_t tdiff = millis() - start;
+	printf("Update operation finished in %.2fs, effective %.2f kB/s\n", (float) start / 1000.0f, ((float) totalWritten / 1024.0f) / ((float) start / 1000.0f));
 
 	if(!Update.end(true)){
 		error("Update finalization failed.");
