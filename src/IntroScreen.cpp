@@ -71,18 +71,29 @@ void IntroScreen::stop(){
 }
 
 void IntroScreen::loop(uint micros){
-	if(millis() - previousTime >= 300){
+	if(millis() - previousTime >= (colorCounter > 7 ? colorHoldTime : 200)){
 		previousTime = millis();
 
 		LEDColor color;
-		do {
-			color = static_cast<LEDColor>(random(1, 6));
-		} while(color == lastColor);
-		LED.setRGB(color);
 
+		if(colorCounter <= 7){
+			do {
+				color = static_cast<LEDColor>(random(1, 7));
+			} while(color == lastColor);
+			colorCounter++;
+		}else{
+			if(lastColor == LEDColor::WHITE){
+				color = LEDColor::OFF;
+			}else{
+				color = LEDColor::WHITE;
+			}
+			colorHoldTime += 10;
+		}
+
+		LED.setRGB(color);
 		lastColor = color;
 	}
-		if(gif && gif->checkFrame()){
+	if(gif && gif->checkFrame()){
 		draw();
 		screen.commit();
 	}

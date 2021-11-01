@@ -30,6 +30,8 @@ private:
 
 	LEDColor lastColor = LEDColor::WHITE;
 	uint32_t previousTime = 0;
+	uint8_t colorCounter = 0;
+	uint16_t colorHoldTime = 20;
 };
 
 #endif //WHEELSON_FIRMWARE_INTROSCREEN_H
