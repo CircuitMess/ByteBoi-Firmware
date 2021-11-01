@@ -275,10 +275,10 @@ void Launcher::loop(uint _micros){
 
 	draw();
 
-	canvas->setTextColor(TFT_WHITE);
-	canvas->setTextSize(1);
-	canvas->setCursor(2, 5);
-	canvas->printf("%.1f fps", (1000000.0 / (float) _micros));
+	// canvas->setTextColor(TFT_WHITE);
+	// canvas->setTextSize(1);
+	// canvas->setCursor(2, 5);
+	// canvas->printf("%.1f fps", (1000000.0 / (float) _micros));
 	display->commit();
 }
 
