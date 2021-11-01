@@ -3,6 +3,7 @@
 #include <Playback/PlaybackSystem.h>
 #include <Loop/LoopManager.h>
 #include "SoundHWTest.h"
+#include <ByteBoi.h>
 
 SoundHWTest::SoundHWTest(UserHWTest* userHwTest) : HWTestPart(userHwTest){
 }
@@ -24,6 +25,10 @@ void SoundHWTest::draw(){
 }
 
 void SoundHWTest::start(){
+	volume = Settings.get().volume;
+	Settings.get().volume = 180;
+	Playback.updateGain();
+
 	Input::getInstance()->addListener(this);
 	LoopManager::addListener(this);
 	userHwTest->draw();
@@ -35,6 +40,9 @@ void SoundHWTest::stop(){
 	LoopManager::removeListener(this);
 	Playback.noTone();
 	Playback.stop();
+
+	Settings.get().volume = volume;
+	Playback.updateGain();
 }
 
 void SoundHWTest::buttonPressed(uint id){
