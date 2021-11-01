@@ -68,6 +68,7 @@ void IntroScreen::start(){
 
 void IntroScreen::stop(){
 	LoopManager::removeListener(this);
+	LED.setRGB(LEDColor::OFF);
 }
 
 void IntroScreen::loop(uint micros){
