@@ -23,6 +23,9 @@ void LEDHWTest::draw(){
 }
 
 void LEDHWTest::start(){
+	LEDenabled = Settings.get().RGBenable;
+	Settings.get().RGBenable = true;
+
 	LED.setRGB(OFF);
 	LoopManager::addListener(this);
 	Input::getInstance()->addListener(this);
@@ -32,6 +35,7 @@ void LEDHWTest::start(){
 }
 
 void LEDHWTest::stop(){
+	Settings.get().RGBenable = LEDenabled;
 	LED.setRGB(OFF);
 	LoopManager::removeListener(this);
 	Input::getInstance()->removeListener(this);

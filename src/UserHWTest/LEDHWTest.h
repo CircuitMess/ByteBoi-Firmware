@@ -33,6 +33,8 @@ private:
 
 	uint8_t doneCounter = 0;
 	bool soundIsDone = false;
+
+	bool LEDenabled;
 };
 
 #endif //BYTEBOI_FIRMWARE_LEDHWTEST_H
