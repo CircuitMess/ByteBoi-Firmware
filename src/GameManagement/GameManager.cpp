@@ -71,7 +71,7 @@ GameInfo* GameManager::parseInfo(const char* infoFilePath, const char* dirName, 
 	strncat(path, binaryPath.c_str(), 100);
 
 	char resourcesPath[100] = {0};
-	std::string resources = props.GetProperty("Resources");
+	std::string resources = props.GetProperty("Resources", "");
 	if(resources.empty()) resources = gameDefaults.resources;
 	memset(resourcesPath, 0, 100);
 	strncat(resourcesPath, dirName, 100);
@@ -79,7 +79,7 @@ GameInfo* GameManager::parseInfo(const char* infoFilePath, const char* dirName, 
 	strncat(resourcesPath, resources.c_str(), 100);
 
 	char iconPath[100] = {0};
-	std::string icon = props.GetProperty("Icon");
+	std::string icon = props.GetProperty("Icon", "");
 	if(icon.empty()) icon = gameDefaults.icon;
 	memset(iconPath, 0, 100);
 	strncat(iconPath, dirName, 100);
