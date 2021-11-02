@@ -204,6 +204,15 @@ void GameLoader::loadFunc(Task* task){
 		printf("Update aborted after being done.\n"); // Possible memory leak / race condition
 	}
 
+	const char* rootFilePath = "/launcher/gameRoot.path";
+	if(SPIFFS.exists(rootFilePath)){
+		SPIFFS.remove(rootFilePath);
+	}
+
+	fs::File rootFile = SPIFFS.open(rootFilePath, "w");
+	rootFile.write(reinterpret_cast<const uint8_t*>(game->root.c_str()), game->root.size());
+	rootFile.close();
+
 	loader->saveLoaded(game);
 
 	printf("Update finished\n");
