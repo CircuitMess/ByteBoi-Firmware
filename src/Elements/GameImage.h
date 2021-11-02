@@ -17,7 +17,7 @@ public:
 	GameImage& operator=(const GameImage& other);
 	virtual ~GameImage();
 
-	operator bool() const;
+	explicit operator bool() const;
 	Color* getBuffer() const;
 
 	void setCanvas(Sprite* canvas);

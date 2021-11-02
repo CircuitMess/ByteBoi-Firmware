@@ -95,24 +95,9 @@ void Launcher::load(){
 		logo->reset();
 	});
 
-	if(!items.empty() && items.size() < 4){ // scroller expects at least 4 items
-		if(items.size() == 1){ // if only one element, duplicate it 3 times
-			for(int i = 0; i < 3; i++){
-				items.emplace_back(items.front());
-			}
-		}else{ // for 2 and 3 elements, duplicate them so we get to at least 4
-			int count = items.size();
-			for(int i = 0; i < count; i++){
-				items.emplace_back(items[i]);
-			}
-		}
-	}
-
-	delete loaded;
 	loaded = Loader.getLoaded();
-
 	if(loaded){
-		items.emplace_back(loaded->name.c_str(), GameImage(canvas), [this](){
+		items.emplace_back(loaded->name.c_str(), GameImage(), [this](){
 			if(loaded == nullptr) return;
 			loader->start(loaded, &items[scroller->getSelectedIndex()].image, true);
 		}, [this](){
@@ -148,6 +133,21 @@ void Launcher::load(){
 				}
 			}
 			icon.close();
+		}
+
+		item.loaded = true;
+	}
+
+	if(!items.empty() && items.size() < 4){ // scroller expects at least 4 items
+		if(items.size() == 1){ // if only one element, duplicate it 3 times
+			for(int i = 0; i < 3; i++){
+				items.emplace_back(items.front());
+			}
+		}else{ // for 2 and 3 elements, duplicate them so we get to at least 4
+			int count = items.size();
+			for(int i = 0; i < count; i++){
+				items.emplace_back(items[i]);
+			}
 		}
 	}
 
@@ -333,12 +333,11 @@ void Launcher::gamesChanged(bool inserted){
 
 void Launcher::checkLoaded(){
 	if(loaded == nullptr) return;
-	delete loaded;
 	loaded = Loader.getLoaded();
 	if(loaded == nullptr){
-		items.erase(items.end());
+		items.erase(std::remove_if(items.begin(),  items.end(), [](const LauncherItem& item){ return item.loaded; }), items.end());
 
-		if(selectedGame == items.size()){
+		if(selectedGame >= items.size()){
 			selectedGame = 0;
 			scroller->reset();
 			title->change(items[selectedGame].text);
