@@ -31,8 +31,10 @@ void InputHWTest::draw(){
 		userHwTest->getScreen().getSprite()->setTextFont(1);
 		userHwTest->getScreen().getSprite()->setTextSize(1);
 		userHwTest->getScreen().getSprite()->setTextColor(TFT_WHITE);
-		userHwTest->getScreen().getSprite()->setCursor(userHwTest->getScreen().getSprite()->width() / 2 - userHwTest->getScreen().getSprite()->textWidth("Press buttons to test them.") / 2, 110);
-		userHwTest->getScreen().getSprite()->print("Press buttons to test them.");
+		userHwTest->getScreen().getSprite()->setCursor(userHwTest->getScreen().getSprite()->width() / 2 - userHwTest->getScreen().getSprite()->textWidth("Press all buttons") / 2, 100);
+		userHwTest->getScreen().getSprite()->print("Press all buttons");
+		userHwTest->getScreen().getSprite()->setCursor(userHwTest->getScreen().getSprite()->width() / 2 - userHwTest->getScreen().getSprite()->textWidth("to test them.") / 2, 110);
+		userHwTest->getScreen().getSprite()->print("to test them.");
 	}else{
 		userHwTest->getScreen().getSprite()->setTextFont(1);
 		userHwTest->getScreen().getSprite()->setTextSize(1);
