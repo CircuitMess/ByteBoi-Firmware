@@ -232,6 +232,12 @@ void SettingsScreen::SettingsScreen::buttonPressed(uint id){
 				Playback.tone(500, 50);
 			}else if(selectedSetting == 2){
 				enableLED->toggle();
+				if(!Settings.get().RGBenable){
+					LED.setRGB(OFF);
+				}else{
+					LED.setRGB(LEDColor::WHITE);
+					instance->blinkTime = millis();
+				}
 			}else if(selectedSetting == 3){
 				Context* hwTest = new UserHWTest(*ByteBoi.getDisplay());
 				hwTest->push(this);
@@ -262,4 +268,11 @@ void SettingsScreen::SettingsScreen::buttonPressed(uint id){
 			break;
 	}
 
+}
+
+void SettingsScreen::SettingsScreen::loop(uint micros){
+	if(blinkTime != 0 && millis() - blinkTime >= 200){
+		blinkTime = 0;
+		LED.setRGB(LEDColor::OFF);
+	}
 }
