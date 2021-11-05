@@ -11,7 +11,7 @@
 #include <FS.h>
 
 namespace SettingsScreen {
-	class SettingsScreen : public Context, private InputListener {
+	class SettingsScreen : public Context, private InputListener, public LoopListener{
 	public:
 
 		SettingsScreen(Display &display);
@@ -23,6 +23,8 @@ namespace SettingsScreen {
 		void stop();
 
 		void draw();
+
+		void loop(uint micros) override;
 
 	protected:
 		void deinit() override;
@@ -49,6 +51,7 @@ namespace SettingsScreen {
 
 		Color* backgroundBuffer= nullptr;
 		fs::File introSong;
+		uint32_t blinkTime = 0;
 	};
 }
 

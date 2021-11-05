@@ -6,6 +6,7 @@
 #include <SPIFFS.h>
 #include <Pins.hpp>
 #include <ByteBoi.h>
+#include <Loop/LoopManager.h>
 
 SettingsScreen::SettingsScreen* SettingsScreen::SettingsScreen::instance = nullptr;
 SettingsScreen::SettingsScreen::SettingsScreen(Display& display) : Context(display), screenLayout(new LinearLayout(&screen, VERTICAL)),
@@ -25,7 +26,7 @@ SettingsScreen::SettingsScreen::SettingsScreen(Display& display) : Context(displ
 
 void SettingsScreen::SettingsScreen::start(){
 	Input::getInstance()->addListener(this);
-
+	LoopManager::addListener(this);
 	Input::getInstance()->setButtonHeldRepeatCallback(BTN_RIGHT, 200, [](uint){
 		if(instance == nullptr || instance->selectedSetting != 1) return;
 		instance->volumeSlider->moveSliderValue(1);
@@ -57,8 +58,10 @@ void SettingsScreen::SettingsScreen::start(){
 
 void SettingsScreen::SettingsScreen::stop(){
 	Input::getInstance()->removeListener(this);
+	LoopManager::removeListener(this);
 	Input::getInstance()->removeButtonHeldRepeatCallback(BTN_RIGHT);
 	Input::getInstance()->removeButtonHeldRepeatCallback(BTN_LEFT);
+	LED.setRGB(LEDColor::OFF);
 }
 
 void SettingsScreen::SettingsScreen::draw(){
@@ -131,6 +134,13 @@ void SettingsScreen::SettingsScreen::buttonPressed(uint id){
 				Playback.tone(500, 50);
 			}else if(selectedSetting == 2){
 				enableLED->toggle();
+				Settings.get().RGBenable = enableLED->getBooleanSwitch();
+				if(!Settings.get().RGBenable){
+					LED.setRGB(OFF);
+				}else{
+					LED.setRGB(LEDColor::WHITE);
+					instance->blinkTime = millis();
+				}
 			}
 			draw();
 			screen.commit();
@@ -146,6 +156,13 @@ void SettingsScreen::SettingsScreen::buttonPressed(uint id){
 				Playback.tone(500, 50);
 			}else if(selectedSetting == 2){
 				enableLED->toggle();
+				Settings.get().RGBenable = enableLED->getBooleanSwitch();
+				if(!Settings.get().RGBenable){
+					LED.setRGB(OFF);
+				}else{
+					LED.setRGB(LEDColor::WHITE);
+					instance->blinkTime = millis();
+				}
 			}
 			draw();
 			screen.commit();
@@ -232,6 +249,13 @@ void SettingsScreen::SettingsScreen::buttonPressed(uint id){
 				Playback.tone(500, 50);
 			}else if(selectedSetting == 2){
 				enableLED->toggle();
+				Settings.get().RGBenable = enableLED->getBooleanSwitch();
+				if(!Settings.get().RGBenable){
+					LED.setRGB(OFF);
+				}else{
+					LED.setRGB(LEDColor::WHITE);
+					instance->blinkTime = millis();
+				}
 			}else if(selectedSetting == 3){
 				Context* hwTest = new UserHWTest(*ByteBoi.getDisplay());
 				hwTest->push(this);
@@ -262,4 +286,12 @@ void SettingsScreen::SettingsScreen::buttonPressed(uint id){
 			break;
 	}
 
+}
+
+void SettingsScreen::SettingsScreen::loop(uint micros){
+	if(blinkTime != 0 && millis() - blinkTime >= 200){
+		blinkTime = 0;
+		LED.setRGB(LEDColor::OFF);
+		LoopManager::removeListener(this);
+	}
 }
