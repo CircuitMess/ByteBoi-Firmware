@@ -292,5 +292,6 @@ void SettingsScreen::SettingsScreen::loop(uint micros){
 	if(blinkTime != 0 && millis() - blinkTime >= 200){
 		blinkTime = 0;
 		LED.setRGB(LEDColor::OFF);
+		LoopManager::removeListener(this);
 	}
 }
