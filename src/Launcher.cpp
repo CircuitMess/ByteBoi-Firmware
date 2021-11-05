@@ -224,12 +224,14 @@ void Launcher::next(){
 void Launcher::bindInput(){
 	Input::getInstance()->setBtnPressCallback(BTN_RIGHT, [](){
 		if(instance == nullptr) return;
+		if(instance->loader->isActive()) return;
 		instance->next();
 		Playback.tone(800, 50);
 	});
 
 	Input::getInstance()->setBtnPressCallback(BTN_LEFT, [](){
 		if(instance == nullptr) return;
+		if(instance->loader->isActive()) return;
 		instance->prev();
 		Playback.tone(800, 50);
 	});
