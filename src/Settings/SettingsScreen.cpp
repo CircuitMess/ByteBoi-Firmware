@@ -61,6 +61,7 @@ void SettingsScreen::SettingsScreen::stop(){
 	LoopManager::removeListener(this);
 	Input::getInstance()->removeButtonHeldRepeatCallback(BTN_RIGHT);
 	Input::getInstance()->removeButtonHeldRepeatCallback(BTN_LEFT);
+	LED.setRGB(LEDColor::OFF);
 }
 
 void SettingsScreen::SettingsScreen::draw(){
