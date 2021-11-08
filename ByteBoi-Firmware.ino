@@ -7,10 +7,12 @@
 #include "src/Launcher.h"
 #include "src/GameManagement/GameManager.h"
 #include "src/IntroScreen.h"
+#include <SleepService.h>
 
 void setup(){
 	Serial.begin(115200);
 	ByteBoi.begin();
+	Sleep.begin();
 	ByteBoi.unbindMenu();
 	BatteryPopup.enablePopups(true);
 
