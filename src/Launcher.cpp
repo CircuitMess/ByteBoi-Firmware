@@ -247,7 +247,6 @@ void Launcher::bindInput(){
 
 	Input::getInstance()->setBtnPressCallback(BTN_B, [](){
 		if(instance == nullptr) return;
-		Playback.tone(800, 50);
 		if(instance->loader->isActive()){
 			instance->loader->abort();
 		}
