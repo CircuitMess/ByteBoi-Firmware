@@ -26,7 +26,6 @@ SettingsScreen::SettingsScreen::SettingsScreen(Display& display) : Context(displ
 
 void SettingsScreen::SettingsScreen::start(){
 	Input::getInstance()->addListener(this);
-	LoopManager::addListener(this);
 	Input::getInstance()->setButtonHeldRepeatCallback(BTN_RIGHT, 200, [](uint){
 		if(instance == nullptr || instance->selectedSetting != 1) return;
 		instance->volumeSlider->moveSliderValue(1);
@@ -140,6 +139,7 @@ void SettingsScreen::SettingsScreen::buttonPressed(uint id){
 				}else{
 					LED.setRGB(LEDColor::WHITE);
 					instance->blinkTime = millis();
+					LoopManager::addListener(this);
 				}
 			}
 			draw();
@@ -162,6 +162,7 @@ void SettingsScreen::SettingsScreen::buttonPressed(uint id){
 				}else{
 					LED.setRGB(LEDColor::WHITE);
 					instance->blinkTime = millis();
+					LoopManager::addListener(this);
 				}
 			}
 			draw();
@@ -255,6 +256,7 @@ void SettingsScreen::SettingsScreen::buttonPressed(uint id){
 				}else{
 					LED.setRGB(LEDColor::WHITE);
 					instance->blinkTime = millis();
+					LoopManager::addListener(this);
 				}
 			}else if(selectedSetting == 3){
 				Context* hwTest = new UserHWTest(*ByteBoi.getDisplay());
