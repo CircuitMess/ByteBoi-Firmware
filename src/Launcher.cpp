@@ -14,6 +14,7 @@
 #include <SD.h>
 #include <SPIFFS.h>
 #include <FS/CompressedFile.h>
+#include <Battery/BatteryPopupService.h>
 
 #include <utility>
 
@@ -163,6 +164,8 @@ void Launcher::load(){
 }
 
 void Launcher::start(){
+	BatteryPopup.enablePopups(true);
+
 	setCanvas(display->getBaseSprite());
 
 	if(splash == nullptr){
