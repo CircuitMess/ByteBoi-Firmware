@@ -21,11 +21,16 @@ public:
 
 	GameInfo* parseInfo(const char* infoFilePath, const char* dirName, bool checkBinary = true);
 
+	bool isGamesRescanned() const;
+	void resetGamesRescanned();
+
 private:
 	std::vector<GameInfo*> games;
 	bool SDinsertedFlag = false;
 	GameListener* listener = nullptr;
 	void clearGames();
+
+	bool gamesRescanned = false;
 };
 
 extern GameManager Games;

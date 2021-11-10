@@ -308,7 +308,10 @@ void Launcher::draw(){
 }
 
 void Launcher::init(){
-
+	if(Games.isGamesRescanned()){
+		load();
+		Games.resetGamesRescanned();
+	}
 }
 
 void Launcher::deinit(){

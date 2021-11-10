@@ -22,6 +22,7 @@ void setup(){
 
 	LoopManager::addListener(&Games);
 	Games.detectSD();
+	Games.resetGamesRescanned();
 
 	Context* intro = new IntroScreen(*ByteBoi.getDisplay(), launcher);
 	intro->unpack();

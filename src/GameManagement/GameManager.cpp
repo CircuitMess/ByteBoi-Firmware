@@ -31,6 +31,7 @@ std::string getValueOrDefault(Properties& props, const char* key, const char* de
 }
 
 void GameManager::scanGames(){
+	gamesRescanned = true;
 	clearGames();
 
 	if((ByteBoi.getExpander()->getPortState() & (1 << SD_DETECT_PIN))) return;
@@ -141,4 +142,13 @@ void GameManager::clearGames(){
 		delete game;
 	}
 	games.clear();
+}
+
+bool GameManager::isGamesRescanned() const{
+	return gamesRescanned;
+}
+
+void GameManager::resetGamesRescanned(){
+	gamesRescanned = 0;
+
 }
