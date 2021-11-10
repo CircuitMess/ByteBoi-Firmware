@@ -19,6 +19,9 @@ void LoadingIndicator::start(GameInfo* game, GameImage* image, bool loaded){
 	currentText = title->getCurrent();
 	if(loaded){
 		fs::File icon = SPIFFS.open(game->icon.c_str());
+		if(!icon){
+			icon = SPIFFS.open("/launcher/stock/noIcon.raw");
+		}
 		if(icon){
 			loadedIcon = static_cast<Color*>(malloc(64 * 64 * 2));
 			icon.read(reinterpret_cast<uint8_t*>(loadedIcon), 64 * 64 * 2);

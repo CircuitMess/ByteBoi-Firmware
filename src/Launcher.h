@@ -22,6 +22,7 @@ struct LauncherItem {
 	GameImage image;
 	std::function<void()> primary;
 	std::function<void()> secondary;
+	bool loaded = false;
 
 	LauncherItem(String text, const GameImage& image = GameImage(), std::function<void()> primary = {}, std::function<void()> secondary = {});
 };

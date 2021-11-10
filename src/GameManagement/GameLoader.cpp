@@ -35,7 +35,6 @@ float GameLoader::Job::getProgress(){
 }
 
 GameLoader::Job* GameLoader::loadGame(GameInfo* game){
-	if(!ByteBoiImpl::inFirmware()) return nullptr;
 	if(current){
 		if(current->done || current->aborted){
 			// Wait for task to finish if it's still running
@@ -69,7 +68,7 @@ void GameLoader::loadFunc(Task* task){
 	GameInfo* game = job->game;
 	if(game == nullptr || checkAbort(job)) return;
 
-	clearLoaded();
+	loader->clearLoaded();
 
 	//create game folder if not present
 	if(!SPIFFS.exists(ByteBoiImpl::SPIFFSgameRoot)){
@@ -147,6 +146,7 @@ void GameLoader::loadFunc(Task* task){
 	size_t totalWritten = 0;
 	const size_t at_once = 512;
 	uint8_t* buffer = static_cast<uint8_t*>(malloc(at_once));
+	uint32_t start = millis();
 	while(totalWritten < updateSize){
 		size_t read = file.read(buffer, min((size_t) at_once, updateSize - totalWritten));
 		if(read == 0){
@@ -184,6 +184,8 @@ void GameLoader::loadFunc(Task* task){
 	}
 	file.close();
 	free(buffer);
+	uint32_t tdiff = millis() - start;
+	printf("Update operation finished in %.2fs, effective %.2f kB/s\n", (float) start / 1000.0f, ((float) totalWritten / 1024.0f) / ((float) start / 1000.0f));
 
 	if(!Update.end(true)){
 		error("Update finalization failed.");
@@ -199,10 +201,19 @@ void GameLoader::loadFunc(Task* task){
 
 	job->done = true;
 	if(job->aborted){
-		printf("Update aborted after being done.\n"); // Possible memory leak
+		printf("Update aborted after being done.\n"); // Possible memory leak / race condition
 	}
 
-	saveLoaded(game);
+	const char* rootFilePath = "/launcher/gameRoot.path";
+	if(SPIFFS.exists(rootFilePath)){
+		SPIFFS.remove(rootFilePath);
+	}
+
+	fs::File rootFile = SPIFFS.open(rootFilePath, "w");
+	rootFile.write(reinterpret_cast<const uint8_t*>(game->root.c_str()), game->root.size());
+	rootFile.close();
+
+	loader->saveLoaded(game);
 
 	printf("Update finished\n");
 }
@@ -228,6 +239,8 @@ GameLoader::Job* GameLoader::getCurrent(){
 void GameLoader::clearLoaded(){
 	SPIFFS.remove(loadedImage);
 	SPIFFS.remove(loadedInfo);
+	delete loadedGame;
+	loadedGame = nullptr;
 }
 
 bool GameLoader::saveLoaded(GameInfo* game){
@@ -275,7 +288,6 @@ bool GameLoader::saveLoaded(GameInfo* game){
 		if(!fS || !fD || !copy(fS, fD)){
 			fS.close();
 			fD.close();
-			clearLoaded();
 
 			return false;
 		}
@@ -283,24 +295,38 @@ bool GameLoader::saveLoaded(GameInfo* game){
 		return true;
 	};
 
-	if(!checkCopy((game->root + "/game.properties").c_str(), loadedInfo)) return false;
-
-	if(!game->icon.empty()){
-		if(!checkCopy(game->icon.c_str(), loadedImage)) return false;
+	if(!checkCopy((game->root + "/game.properties").c_str(), loadedInfo)){
+		clearLoaded();
+		return false;
 	}
 
-	return true;
+	if(!game->icon.empty()){
+		if(!checkCopy(game->icon.c_str(), loadedImage)){
+			clearLoaded();
+			return false;
+		}
+	}
+
+	checkLoaded();
+	return hasLoaded();
 }
 
 bool GameLoader::hasLoaded(){
-	return SPIFFS.exists(loadedInfo);
+	return loadedGame != nullptr;
 }
 
 GameInfo* GameLoader::getLoaded(){
-	if(!SPIFFS.exists(loadedInfo)) return nullptr;
+	return loadedGame;
+}
+
+void GameLoader::checkLoaded(){
+	delete loadedGame;
+	loadedGame = nullptr;
+
+	if(!SPIFFS.exists(loadedInfo)) return;
 
 	GameInfo* game = Games.parseInfo((String("/spiffs") + loadedInfo).c_str(), "loaded", false);
-	if(game == nullptr) return nullptr;
+	if(game == nullptr) return;
 
 	game->root = "loaded";
 	game->icon = "";
@@ -308,5 +334,5 @@ GameInfo* GameLoader::getLoaded(){
 		game->icon = loadedImage;
 	}
 
-	return game;
+	loadedGame = game;
 }

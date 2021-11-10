@@ -4,7 +4,6 @@
 #include "GameScroller.h"
 #include "Elements/Logo.h"
 #include "Elements/GameTitle.h"
-#include <Audio/Piezo.h>
 #include <Loop/LoopManager.h>
 #include <ByteBoi.h>
 #include "GameManagement/GameManager.h"
@@ -15,6 +14,7 @@
 #include <SD.h>
 #include <SPIFFS.h>
 #include <FS/CompressedFile.h>
+#include <Battery/BatteryPopupService.h>
 
 #include <utility>
 
@@ -96,24 +96,9 @@ void Launcher::load(){
 		logo->reset();
 	});
 
-	if(!items.empty() && items.size() < 4){ // scroller expects at least 4 items
-		if(items.size() == 1){ // if only one element, duplicate it 3 times
-			for(int i = 0; i < 3; i++){
-				items.emplace_back(items.front());
-			}
-		}else{ // for 2 and 3 elements, duplicate them so we get to at least 4
-			int count = items.size();
-			for(int i = 0; i < count; i++){
-				items.emplace_back(items[i]);
-			}
-		}
-	}
-
-	delete loaded;
 	loaded = Loader.getLoaded();
-
 	if(loaded){
-		items.emplace_back(loaded->name.c_str(), GameImage(canvas), [this](){
+		items.emplace_back(loaded->name.c_str(), GameImage(), [this](){
 			if(loaded == nullptr) return;
 			loader->start(loaded, &items[scroller->getSelectedIndex()].image, true);
 		}, [this](){
@@ -150,6 +135,21 @@ void Launcher::load(){
 			}
 			icon.close();
 		}
+
+		item.loaded = true;
+	}
+
+	if(!items.empty() && items.size() < 4){ // scroller expects at least 4 items
+		if(items.size() == 1){ // if only one element, duplicate it 3 times
+			for(int i = 0; i < 3; i++){
+				items.emplace_back(items.front());
+			}
+		}else{ // for 2 and 3 elements, duplicate them so we get to at least 4
+			int count = items.size();
+			for(int i = 0; i < count; i++){
+				items.emplace_back(items[i]);
+			}
+		}
 	}
 
 	if(items.size() == size){
@@ -164,6 +164,8 @@ void Launcher::load(){
 }
 
 void Launcher::start(){
+	BatteryPopup.enablePopups(true);
+
 	setCanvas(display->getBaseSprite());
 
 	if(splash == nullptr){
@@ -188,6 +190,7 @@ void Launcher::stop(){
 	Input::getInstance()->removeBtnPressCallback(BTN_RIGHT);
 	Input::getInstance()->removeBtnPressCallback(BTN_LEFT);
 	Input::getInstance()->removeBtnPressCallback(BTN_A);
+	Input::getInstance()->removeBtnPressCallback(BTN_B);
 	Input::getInstance()->removeBtnPressCallback(BTN_C);
 }
 
@@ -199,6 +202,8 @@ void Launcher::setCanvas(Sprite* canvas){
 	scroller->setCanvas(canvas);
 	genericIcon.setCanvas(canvas);
 	settingsIcon.setCanvas(canvas);
+	noSDcardIcon.setCanvas(canvas);
+	SDcardEmptyIcon.setCanvas(canvas);
 }
 
 void Launcher::prev(){
@@ -222,20 +227,22 @@ void Launcher::next(){
 void Launcher::bindInput(){
 	Input::getInstance()->setBtnPressCallback(BTN_RIGHT, [](){
 		if(instance == nullptr) return;
+		if(instance->loader->isActive()) return;
 		instance->next();
-		Piezo.tone(800, 50);
+		Playback.tone(800, 50);
 	});
 
 	Input::getInstance()->setBtnPressCallback(BTN_LEFT, [](){
 		if(instance == nullptr) return;
+		if(instance->loader->isActive()) return;
 		instance->prev();
-		Piezo.tone(800, 50);
+		Playback.tone(800, 50);
 	});
 
 	Input::getInstance()->setBtnPressCallback(BTN_A, [](){
 		if(instance == nullptr) return;
 		if(instance->scroller->scrolling() || instance->loader->isActive()) return;
-		Piezo.tone(800, 50);
+		//Playback.tone(800, 50);
 		if(instance->items[instance->selectedGame].primary){
 			instance->items[instance->selectedGame].primary();
 		}
@@ -243,7 +250,6 @@ void Launcher::bindInput(){
 
 	Input::getInstance()->setBtnPressCallback(BTN_B, [](){
 		if(instance == nullptr) return;
-		Piezo.tone(800, 50);
 		if(instance->loader->isActive()){
 			instance->loader->abort();
 		}
@@ -252,7 +258,7 @@ void Launcher::bindInput(){
 	Input::getInstance()->setBtnPressCallback(BTN_C, [](){
 		if(instance == nullptr) return;
 		if(instance->scroller->scrolling() || instance->loader->isActive()) return;
-		Piezo.tone(800, 50);
+		Playback.tone(800, 50);
 		if(instance->items[instance->selectedGame].secondary){
 			instance->items[instance->selectedGame].secondary();
 		}
@@ -274,10 +280,10 @@ void Launcher::loop(uint _micros){
 
 	draw();
 
-	canvas->setTextColor(TFT_WHITE);
-	canvas->setTextSize(1);
-	canvas->setCursor(2, 5);
-	canvas->printf("%.1f fps", (1000000.0 / (float) _micros));
+	// canvas->setTextColor(TFT_WHITE);
+	// canvas->setTextSize(1);
+	// canvas->setCursor(2, 5);
+	// canvas->printf("%.1f fps", (1000000.0 / (float) _micros));
 	display->commit();
 }
 
@@ -305,7 +311,10 @@ void Launcher::draw(){
 }
 
 void Launcher::init(){
-
+	if(Games.isGamesRescanned()){
+		load();
+		Games.resetGamesRescanned();
+	}
 }
 
 void Launcher::deinit(){
@@ -331,12 +340,11 @@ void Launcher::gamesChanged(bool inserted){
 
 void Launcher::checkLoaded(){
 	if(loaded == nullptr) return;
-	delete loaded;
 	loaded = Loader.getLoaded();
 	if(loaded == nullptr){
-		items.erase(items.end());
+		items.erase(std::remove_if(items.begin(),  items.end(), [](const LauncherItem& item){ return item.loaded; }), items.end());
 
-		if(selectedGame == items.size()){
+		if(selectedGame >= items.size()){
 			selectedGame = 0;
 			scroller->reset();
 			title->change(items[selectedGame].text);
