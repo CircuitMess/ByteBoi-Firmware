@@ -109,10 +109,17 @@ bool JigHWTest::psram(){
 }
 
 bool JigHWTest::BatteryCheck(){
-	if(!Battery.chargePinDetected()){
-		test->log("charging", false);
+	if(Battery.chargePinDetected()){
+		test->log("charging", true);
 		return false;
 	}
+
+	uint8_t level = Battery.getLevel();
+	if(level != 0){
+		test->log("level", (uint32_t) level);
+		return false;
+	}
+
 	return true;
 }
 
