@@ -22,9 +22,13 @@ public:
 	void stop() override;
 
 private:
-	void splitPrintSentence(std::string sentence);
+	void splitPrintSentence(Sprite* canvas, std::string sentence);
 
 	void buttonPressed(uint id) override;
+
+	void draw(Sprite* canvas);
+
+	uint16_t calculateHeight(GameInfo* gameInfo);
 
 	GameInfo* gameInfo;
 };
