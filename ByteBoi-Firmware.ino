@@ -9,13 +9,17 @@
 #include <SleepService.h>
 #include "src/UserHWTest/UserHWTest.h"
 
-
 void setup(){
 	Serial.begin(115200);
 	ByteBoi.begin();
 	Battery.disableShutdown(true);
 	Sleep.begin();
 	ByteBoi.unbindMenu();
+
+	Games.detectSD();
+	Games.resetGamesRescanned();
+	Loader.checkLoaded();
+	LoopManager::addListener(&Games);
 
 	if(!Settings.get().hwTested){
 		UserHWTest* test = new UserHWTest(*ByteBoi.getDisplay());
@@ -33,12 +37,6 @@ void setup(){
 	}
 
 	Launcher* launcher = new Launcher(ByteBoi.getDisplay());
-
-	Loader.checkLoaded();
-
-	LoopManager::addListener(&Games);
-	Games.detectSD();
-	Games.resetGamesRescanned();
 
 	Context* intro = new IntroScreen(*ByteBoi.getDisplay(), launcher);
 	intro->unpack();
