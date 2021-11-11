@@ -33,10 +33,11 @@ private:
 	void log(const char *property, String value);
 
 	static bool psram();
-	static bool SPIFFSTest();
-	static bool SDcheck();
 	static bool BatteryCheck();
+	static bool SDtest();
+	static bool SPIFFSTest();
 
+	static uint32_t calcChecksum(fs::File& file);
 
 };
 
