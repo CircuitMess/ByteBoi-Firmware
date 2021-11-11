@@ -89,9 +89,12 @@ GameInfo* GameManager::parseInfo(const char* infoFilePath, const char* dirName, 
 
 	if(checkBinary && !SD.exists(path)) return nullptr;
 
+	std::string author = props.GetProperty("Author", "");
+	if(author == "CM Team") author = "CM team";
+
 	return new GameInfo(GameInfo{
 		getValueOrDefault(props, "Name", gameDefaults.name),
-		props.GetProperty("Author", ""),
+		author,
 		props.GetProperty("Description", ""),
 		(SD.exists(iconPath) ? iconPath : ""),
 		path,
