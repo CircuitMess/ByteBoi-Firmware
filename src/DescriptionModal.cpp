@@ -37,7 +37,7 @@ void DescriptionModal::draw(){
 
 void DescriptionModal::draw(Sprite* canvas){
 	canvas->setTextColor(TFT_WHITE);
-	canvas->setCursor(screen.getSprite()->width()/2 - screen.getSprite()->textWidth(gameInfo->name.c_str())/2, 3);
+	canvas->setCursor(canvas->width()/2 - canvas->textWidth(gameInfo->name.c_str())/2, 3);
 	canvas->setFont(&adobex11font);
 	canvas->print(gameInfo->name.c_str());
 	canvas->setTextFont(0);
