@@ -64,7 +64,7 @@ void GameManager::scanGames(){
 GameInfo* GameManager::parseInfo(const char* infoFilePath, const char* dirName, bool checkBinary){
 	Properties props = PropertiesParser::Read(infoFilePath);
 	char path[100] = {0};
-	std::string binaryPath = props.GetProperty("Binary");
+	std::string binaryPath = props.GetProperty("Binary", "");
 	if(binaryPath.empty()) binaryPath = gameDefaults.binary;
 	memset(path, 0, 100);
 	strncat(path, dirName, 100);
@@ -91,8 +91,8 @@ GameInfo* GameManager::parseInfo(const char* infoFilePath, const char* dirName, 
 
 	return new GameInfo(GameInfo{
 		getValueOrDefault(props, "Name", gameDefaults.name),
-		props.GetProperty("Author"),
-		props.GetProperty("Description"),
+		props.GetProperty("Author", ""),
+		props.GetProperty("Description", ""),
 		(SD.exists(iconPath) ? iconPath : ""),
 		path,
 		(SD.exists(resourcesPath) ? resourcesPath : ""),
