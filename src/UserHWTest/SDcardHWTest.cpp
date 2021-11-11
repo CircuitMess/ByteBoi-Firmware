@@ -67,6 +67,8 @@ void SDcardHWTest::stop(){
 }
 
 void SDcardHWTest::buttonPressed(uint id){
+	if(!Games.SDinserted()) return;
+
 	switch(id){
 		case BTN_A:
 		case BTN_B:

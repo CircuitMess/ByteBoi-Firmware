@@ -8,6 +8,8 @@
 #include "src/IntroScreen.h"
 #include <SleepService.h>
 #include "src/JigHWTest/JigHWTest.h"
+#include "src/UserHWTest/UserHWTest.h"
+
 
 bool checkJig(){
 #define JIG_A 12
@@ -30,6 +32,7 @@ bool checkJig(){
 void setup(){
 	Serial.begin(115200);
 	ByteBoi.begin();
+	Battery.disableShutdown(true);
 	Sleep.begin();
 	ByteBoi.unbindMenu();
 
@@ -38,6 +41,21 @@ void setup(){
 		test->start();
 
 		for(;;);
+	}
+
+	if(!Settings.get().hwTested){
+		UserHWTest* test = new UserHWTest(*ByteBoi.getDisplay());
+		test->setDoneCallback([](UserHWTest* test){
+			Settings.get().hwTested = true;
+			Settings.store();
+
+			ESP.restart();
+		});
+
+		test->unpack();
+		test->start();
+
+		return;
 	}
 
 	Launcher* launcher = new Launcher(ByteBoi.getDisplay());
