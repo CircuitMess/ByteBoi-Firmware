@@ -9,6 +9,7 @@
 struct Test {
 	bool (*test)();
 	const char* name;
+	void (*onFail)();
 };
 
 class JigHWTest

@@ -13,10 +13,10 @@ JigHWTest::JigHWTest(Display &_display) : canvas(_display.getBaseSprite()), disp
 
 	test = this;
 
-	tests.push_back({JigHWTest::psram, "PSRAM"});
-	tests.push_back({JigHWTest::BatteryCheck, "Battery"});
-	tests.push_back({JigHWTest::SDtest, "SD"});
-	tests.push_back({JigHWTest::SPIFFSTest, "SPIFFS"});
+	tests.push_back({JigHWTest::psram, "PSRAM", [](){ LED.setRGB(LEDColor::CYAN); }});
+	tests.push_back({JigHWTest::BatteryCheck, "Battery", [](){ LED.setRGB(LEDColor::BLUE); }});
+	tests.push_back({JigHWTest::SDtest, "SD", nullptr});
+	tests.push_back({JigHWTest::SPIFFSTest, "SPIFFS", [](){ LED.setRGB(LEDColor::MAGENTA); }});
 }
 
 void JigHWTest::start(){
@@ -58,7 +58,13 @@ void JigHWTest::start(){
 
 		Serial.printf("TEST:endTest:%s\n", result ? "pass" : "fail");
 
-		if(!(pass &= result)) break;
+		if(!(pass &= result)){
+			if(test.onFail){
+				test.onFail();
+			}
+
+			break;
+		}
 	}
 
 	if(!pass){
