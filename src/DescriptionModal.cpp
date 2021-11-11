@@ -8,7 +8,7 @@ using namespace std;
 
 static const lgfx::U8g2font adobex11font(u8g2_font_helvB08_tr);
 
-DescriptionModal::DescriptionModal(Context& context, GameInfo* gameInfo) : Modal(context, 100, 80),gameInfo(gameInfo){
+DescriptionModal::DescriptionModal(Context& context, GameInfo* gameInfo) : Modal(context, 100, 85),gameInfo(gameInfo){
 }
 
 DescriptionModal::~DescriptionModal(){
@@ -27,7 +27,7 @@ void DescriptionModal::draw(){
 	screen.getSprite()->setTextSize(1);
 	screen.getSprite()->setCursor(4, 17);
 	screen.getSprite()->print(gameInfo->author.c_str());
-	screen.getSprite()->setCursor(4, 32);
+	screen.getSprite()->setCursor(4, 31);
 	splitPrintSentence(gameInfo->description.c_str());
 	screen.draw();
 }

@@ -43,6 +43,11 @@ void setup(){
 		for(;;);
 	}
 
+	Games.detectSD();
+	Games.resetGamesRescanned();
+	Loader.checkLoaded();
+	LoopManager::addListener(&Games);
+
 	if(!Settings.get().hwTested){
 		UserHWTest* test = new UserHWTest(*ByteBoi.getDisplay());
 		test->setDoneCallback([](UserHWTest* test){
@@ -59,12 +64,6 @@ void setup(){
 	}
 
 	Launcher* launcher = new Launcher(ByteBoi.getDisplay());
-
-	Loader.checkLoaded();
-
-	LoopManager::addListener(&Games);
-	Games.detectSD();
-	Games.resetGamesRescanned();
 
 	Context* intro = new IntroScreen(*ByteBoi.getDisplay(), launcher);
 	intro->unpack();

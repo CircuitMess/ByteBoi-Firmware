@@ -14,8 +14,10 @@ UserHWTest::UserHWTest(Display& display) : Context(display){
 }
 
 UserHWTest::~UserHWTest(){
+	if(hwTestPart){
+		hwTestPart->stop();
+	}
 	delete hwTestPart;
-
 }
 
 void UserHWTest::draw(){

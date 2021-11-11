@@ -2,6 +2,7 @@
 #include "SDcardHWTest.h"
 #include "../GameManagement/GameManager.h"
 #include "../GameInfo.hpp"
+#include <Loop/LoopManager.h>
 
 SDcardHWTest::SDcardHWTest(UserHWTest* userHwTest) : HWTestPart(userHwTest){
 
@@ -12,13 +13,13 @@ SDcardHWTest::~SDcardHWTest(){
 }
 
 void SDcardHWTest::draw(){
-	if(!Games.SDinserted()){
+	if(!inserted){
 		userHwTest->getScreen().getSprite()->setTextFont(1);
 		userHwTest->getScreen().getSprite()->setTextSize(1);
 		userHwTest->getScreen().getSprite()->setTextColor(TFT_WHITE);
 		userHwTest->getScreen().getSprite()->setCursor(userHwTest->getScreen().getSprite()->width()/2 - userHwTest->getScreen().getSprite()->textWidth("SD card not detected")/2, 40);
 		userHwTest->getScreen().getSprite()->print("SD card not detected");
-	}else if(Games.SDinserted() && Games.getGames().empty()){
+	}else if(inserted && Games.getGames().empty()){
 		userHwTest->getScreen().getSprite()->setTextFont(1);
 		userHwTest->getScreen().getSprite()->setTextSize(1);
 		userHwTest->getScreen().getSprite()->setTextColor(TFT_WHITE);
@@ -26,7 +27,7 @@ void SDcardHWTest::draw(){
 		userHwTest->getScreen().getSprite()->print("SD card detected");
 		userHwTest->getScreen().getSprite()->setCursor(userHwTest->getScreen().getSprite()->width()/2 - userHwTest->getScreen().getSprite()->textWidth("and empty")/2, 50);
 		userHwTest->getScreen().getSprite()->print("and empty");
-	}else if(Games.SDinserted() && !Games.getGames().empty()){
+	}else if(inserted && !Games.getGames().empty()){
 		userHwTest->getScreen().getSprite()->setTextFont(1);
 		userHwTest->getScreen().getSprite()->setTextSize(1);
 		userHwTest->getScreen().getSprite()->setTextColor(TFT_WHITE);
@@ -56,19 +57,18 @@ void SDcardHWTest::start(){
 	userHwTest->getScreen().getSprite()->setCursor(userHwTest->getScreen().getSprite()->width()/2 - userHwTest->getScreen().getSprite()->textWidth("Checking SD card")/2, 10);
 	userHwTest->getScreen().getSprite()->print("Checking SD card");
 	userHwTest->getScreen().commit();
-	Games.scanGames();
+	Games.detectSD();
 	userHwTest->draw();
 	userHwTest->getScreen().commit();
+	LoopManager::addListener(this);
 }
 
 void SDcardHWTest::stop(){
 	Input::getInstance()->removeListener(this);
-
+	LoopManager::removeListener(this);
 }
 
 void SDcardHWTest::buttonPressed(uint id){
-	if(!Games.SDinserted()) return;
-
 	switch(id){
 		case BTN_A:
 		case BTN_B:
@@ -79,5 +79,13 @@ void SDcardHWTest::buttonPressed(uint id){
 		case BTN_RIGHT:
 			userHwTest->currentTestDone();
 			break;
+	}
+}
+
+void SDcardHWTest::loop(uint micros){
+	if(inserted != Games.SDinserted()){
+		inserted = Games.SDinserted();
+		userHwTest->draw();
+		userHwTest->getScreen().commit();
 	}
 }
