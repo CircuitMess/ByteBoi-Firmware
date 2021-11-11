@@ -7,12 +7,29 @@
 #include "src/GameManagement/GameManager.h"
 #include "src/IntroScreen.h"
 #include <SleepService.h>
+#include "src/UserHWTest/UserHWTest.h"
+
 
 void setup(){
 	Serial.begin(115200);
 	ByteBoi.begin();
 	Sleep.begin();
 	ByteBoi.unbindMenu();
+
+	if(!Settings.get().hwTested){
+		UserHWTest* test = new UserHWTest(*ByteBoi.getDisplay());
+		test->setDoneCallback([](UserHWTest* test){
+			Settings.get().hwTested = true;
+			Settings.store();
+
+			ESP.restart();
+		});
+
+		test->unpack();
+		test->start();
+
+		return;
+	}
 
 	Launcher* launcher = new Launcher(ByteBoi.getDisplay());
 
