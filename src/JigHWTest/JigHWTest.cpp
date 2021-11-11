@@ -136,11 +136,13 @@ uint32_t JigHWTest::calcChecksum(fs::File& file){
 
 bool JigHWTest::SDtest(){
 	if(ByteBoi.getExpander()->getPortState() & (1 << SD_DETECT_PIN)){
+		LED.setRGB(LEDColor::RED);
 		test->log("inserted", false);
 		return false;
 	}
 
 	if(!SD.begin(SD_CS, SPI)){
+		LED.setRGB(LEDColor::RED);
 		test->log("begin", false);
 
 		SD.end();
@@ -150,6 +152,7 @@ bool JigHWTest::SDtest(){
 	for(const auto& f : SDSizes){
 		fs::File file = SD.open(f.name, "r");
 		if(!file){
+			LED.setRGB(LEDColor::GREEN);
 			test->log("missing", f.name);
 
 			file.close();
@@ -159,6 +162,7 @@ bool JigHWTest::SDtest(){
 
 		uint32_t size = file.size();
 		if(size != f.size){
+			LED.setRGB(LEDColor::YELLOW);
 			test->log("file", f.name);
 			test->log("expected", f.size);
 			test->log("got", size);
