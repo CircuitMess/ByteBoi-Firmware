@@ -66,7 +66,7 @@ void DescriptionModal::splitPrintSentence(Sprite* canvas, std::string sentence){
 	for(auto x : sentence){
 		i++;
 		if(i == sentence.size() || x == ' ' || x == ('!') || x == ('.')){
-			if(i == sentence.size()){
+			if(i == sentence.size() || x == ('!') || x == ('.')){
 				word = word + x;
 			}
 			if(((canvas->getCursorX()) + canvas->textWidth(word.c_str())) > canvas->width()-4){
