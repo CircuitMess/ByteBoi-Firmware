@@ -79,20 +79,14 @@ void JigHWTest::start(){
 
 	Playback.play(new Sample(SPIFFS.open("/launcher/intro/intro.aac")));
 
-	for(int i = 0; i < 3; i++){
+	for(;;){
 		LED.setRGB(LEDColor::RED);
 		delay(500);
-
 		LED.setRGB(LEDColor::GREEN);
 		delay(500);
-
 		LED.setRGB(LEDColor::BLUE);
 		delay(500);
 	}
-
-	LED.setRGB(LEDColor::WHITE);
-
-	for(;;);
 }
 
 bool JigHWTest::psram(){
