@@ -32,7 +32,6 @@ bool checkJig(){
 void setup(){
 	Serial.begin(115200);
 	ByteBoi.begin();
-	Battery.disableShutdown(true);
 	Sleep.begin();
 	ByteBoi.unbindMenu();
 
