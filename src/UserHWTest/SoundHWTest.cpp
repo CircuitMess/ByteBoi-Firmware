@@ -26,7 +26,7 @@ void SoundHWTest::draw(){
 
 void SoundHWTest::start(){
 	volume = Settings.get().volume;
-	Settings.get().volume = 180;
+	Settings.get().volume = 40;
 	Playback.updateGain();
 
 	Input::getInstance()->addListener(this);
@@ -63,7 +63,8 @@ void SoundHWTest::loop(uint micros){
 	if(millis() - previousTime >= 400){
 		previousTime = millis();
 
-		Playback.tone(notesArray[index % 10], 200, Wave::SINE);
+		Playback.noTone();
+		Playback.tone(notesArray[index % 10], 400, Wave::SQUARE);
 		index++;
 	}
 
