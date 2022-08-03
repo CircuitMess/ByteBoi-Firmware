@@ -130,7 +130,7 @@ void SettingsScreen::SettingsScreen::buttonPressed(uint id){
 				volumeSlider->moveSliderValue(-1);
 				Settings.get().volume = volumeSlider->getSliderValue();
 				Playback.updateGain();
-				Playback.tone(500, 50);
+				Playback.tone(500, 200);
 			}else if(selectedSetting == 2){
 				enableLED->toggle();
 				Settings.get().RGBenable = enableLED->getBooleanSwitch();
@@ -153,7 +153,7 @@ void SettingsScreen::SettingsScreen::buttonPressed(uint id){
 				volumeSlider->moveSliderValue(1);
 				Settings.get().volume = volumeSlider->getSliderValue();
 				Playback.updateGain();
-				Playback.tone(500, 50);
+				Playback.tone(500, 200);
 			}else if(selectedSetting == 2){
 				enableLED->toggle();
 				Settings.get().RGBenable = enableLED->getBooleanSwitch();

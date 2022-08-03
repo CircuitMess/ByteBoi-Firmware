@@ -229,14 +229,14 @@ void Launcher::bindInput(){
 		if(instance == nullptr) return;
 		if(instance->loader->isActive()) return;
 		instance->next();
-		Playback.tone(800, 50);
+		Playback.tone(800, 200);
 	});
 
 	Input::getInstance()->setBtnPressCallback(BTN_LEFT, [](){
 		if(instance == nullptr) return;
 		if(instance->loader->isActive()) return;
 		instance->prev();
-		Playback.tone(800, 50);
+		Playback.tone(800, 200);
 	});
 
 	Input::getInstance()->setBtnPressCallback(BTN_A, [](){
@@ -258,7 +258,7 @@ void Launcher::bindInput(){
 	Input::getInstance()->setBtnPressCallback(BTN_C, [](){
 		if(instance == nullptr) return;
 		if(instance->scroller->scrolling() || instance->loader->isActive()) return;
-		Playback.tone(800, 50);
+		Playback.tone(800, 200);
 		if(instance->items[instance->selectedGame].secondary){
 			instance->items[instance->selectedGame].secondary();
 		}
