@@ -13,7 +13,7 @@
 
 bool checkJig(){
 #define JIG_A 12
-#define JIG_B 14
+#define JIG_B 34
 
 	pinMode(JIG_A, OUTPUT);
 	pinMode(JIG_B, INPUT_PULLDOWN);

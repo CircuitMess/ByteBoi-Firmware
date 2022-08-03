@@ -135,19 +135,21 @@ uint32_t JigHWTest::calcChecksum(fs::File& file){
 }
 
 bool JigHWTest::SDtest(){
-	if(ByteBoi.getExpander()->getPortState() & (1 << SD_DETECT_PIN)){
+	ByteBoi.checkSD();
+
+	if(!ByteBoi.sdDetected()){
 		LED.setRGB(LEDColor::RED);
 		test->log("inserted", false);
 		return false;
 	}
 
-	if(!SD.begin(SD_CS, SPI)){
+/*	if(!SD.begin(SD_CS, SPI)){
 		LED.setRGB(LEDColor::RED);
 		test->log("begin", false);
 
 		SD.end();
 		return false;
-	}
+	}*/
 
 	for(const auto& f : SDSizes){
 		fs::File file = SD.open(f.name, "r");
