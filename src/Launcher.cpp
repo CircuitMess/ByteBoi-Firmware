@@ -28,6 +28,7 @@ Launcher::Launcher(Display* display) : Context(*display), display(display), gene
 	logo = new Logo(canvas);
 	title = new GameTitle(canvas);
 	loader = new LoadingIndicator(this, canvas, logo, scroller, title);
+	loader->startChecker();
 
 	instance = this;
 	canvas->setChroma(TFT_TRANSPARENT);

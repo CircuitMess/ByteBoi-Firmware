@@ -34,7 +34,8 @@ void GameManager::scanGames(){
 	gamesRescanned = true;
 	clearGames();
 
-	if((ByteBoi.getExpander()->getPortState() & (1 << SD_DETECT_PIN))) return;
+	ByteBoi.checkSD();
+	if(!ByteBoi.sdDetected()) return;
 
 	File root = SD.open("/");
 	File gameFolder = root.openNextFile();
@@ -116,15 +117,15 @@ void GameManager::loop(uint){
 }
 
 void GameManager::detectSD(){
-	bool SDdetected = !(ByteBoi.getExpander()->getPortState() & (1 << SD_DETECT_PIN));
+	bool SDdetected = ByteBoi.sdDetected();
 	if(SDdetected && !SDinsertedFlag){
-		SD.begin(SD_CS, SPI);
+		// SD.begin(SD_CS, SPI);
 		SDinsertedFlag = true;
 		scanGames();
 		if(listener == nullptr) return;
 		listener->gamesChanged(SDinsertedFlag);
 	}else if(!SDdetected && SDinsertedFlag){
-		SD.end();
+		// SD.end();
 		SDinsertedFlag = false;
 		clearGames();
 		if(listener == nullptr) return;

@@ -42,6 +42,7 @@ void setup(){
 		for(;;);
 	}
 
+	ByteBoi.checkSD();
 	Games.detectSD();
 	Games.resetGamesRescanned();
 	Loader.checkLoaded();

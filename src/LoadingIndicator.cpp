@@ -49,6 +49,8 @@ void LoadingIndicator::stop(){
 	state = EXIT;
 	loadJob = nullptr;
 	LoopManager::addListener(this);
+	ByteBoi.checkSD();
+	checker->start();
 	launcher->checkLoaded();
 	free(loadedIcon);
 	loadedIcon = nullptr;
@@ -100,7 +102,7 @@ void LoadingIndicator::loop(uint micros){
 
 	if(boot){
 		ByteBoi.fadeout();
-		ByteBoi.getExpander()->pinWrite(BL_PIN, HIGH);
+		ByteBoi.setBacklight(false);
 		Loader.boot();
 	}
 
@@ -157,6 +159,7 @@ void LoadingIndicator::loop(uint micros){
 				finish();
 			}else{
 				loadJob = Loader.loadGame(game);
+				checker->stop();
 			}
 			return;
 		}
@@ -251,4 +254,14 @@ bool LoadingIndicator::isBooting() const{
 
 void LoadingIndicator::setCanvas(Sprite* canvas){
 	LoadingIndicator::canvas = canvas;
+}
+
+void LoadingIndicator::startChecker(){
+	if(checker){
+		checker->start();
+		return;
+	}
+
+	checker = new SDChecker();
+	checker->start();
 }

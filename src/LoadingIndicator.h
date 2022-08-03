@@ -6,6 +6,7 @@
 #include <Loop/LoopListener.h>
 #include "Elements/GameImage.h"
 #include "GameManagement/GameLoader.h"
+#include "SDChecker.h"
 
 class Logo;
 class GameScroller;
@@ -27,6 +28,8 @@ public:
 	void draw();
 
 	void loop(uint micros) override;
+
+	void startChecker();
 
 private:
 	Launcher* launcher;
@@ -52,6 +55,8 @@ private:
 
 	void stop();
 	void finish();
+
+	SDChecker* checker = nullptr;
 };
 
 
