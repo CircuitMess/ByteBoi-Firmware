@@ -12,21 +12,31 @@
 
 
 bool checkJig(){
-#define JIG_A 12
-#define JIG_B 34
+	char buf[7];
+	int wp = 0;
 
-	pinMode(JIG_A, OUTPUT);
-	pinMode(JIG_B, INPUT_PULLDOWN);
+	uint32_t start = millis();
+	int c;
+	while(millis() - start < 500){
+		vTaskDelay(1);
+		c = getchar();
+		if(c == EOF) continue;
+		buf[wp] = (char) c;
+		wp = (wp + 1) % 7;
 
-	digitalWrite(JIG_A, HIGH);
-	delay(10);
-	if(digitalRead(JIG_B) != HIGH) return false;
+		for(int i = 0; i < 7; i++){
+			int match = 0;
+			static const char* target = "JIGTEST";
 
-	digitalWrite(JIG_A, LOW);
-	delay(10);
-	if(digitalRead(JIG_B) != LOW) return false;
+			for(int j = 0; j < 7; j++){
+				match += buf[(i + j) % 7] == target[j];
+			}
 
-	return true;
+			if(match == 7) return true;
+		}
+	}
+
+	return false;
 }
 
 void setup(){
