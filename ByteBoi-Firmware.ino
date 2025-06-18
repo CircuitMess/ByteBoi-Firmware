@@ -41,16 +41,23 @@ bool checkJig(){
 
 void setup(){
 	Serial.begin(115200);
-	ByteBoi.begin();
-	Sleep.begin();
-	ByteBoi.unbindMenu();
 
 	if(checkJig()){
+		ByteBoi.initVer(1);
+		ByteBoi.begin();
+		ByteBoi.unbindMenu();
+
 		JigHWTest* test = new JigHWTest(*ByteBoi.getDisplay());
 		test->start();
 
 		for(;;);
+	}else{
+		printf("Hello\n");
 	}
+
+	ByteBoi.begin();
+	Sleep.begin();
+	ByteBoi.unbindMenu();
 
 	ByteBoi.checkSD();
 	Games.detectSD();
