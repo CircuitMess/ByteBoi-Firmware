@@ -3,6 +3,7 @@
 #include <ByteBoi.h>
 #include <Loop/LoopManager.h>
 #include <Support/Context.h>
+#include <Util/HWRevision.h>
 #include "src/Launcher.h"
 #include "src/GameManagement/GameManager.h"
 #include "src/IntroScreen.h"
@@ -66,18 +67,23 @@ void setup(){
 	LoopManager::addListener(&Games);
 
 	if(!Settings.get().hwTested){
-		UserHWTest* test = new UserHWTest(*ByteBoi.getDisplay());
-		test->setDoneCallback([](UserHWTest* test){
+		if(HWRevision::get() > 0){
 			Settings.get().hwTested = true;
 			Settings.store();
+		}else{
+			UserHWTest* test = new UserHWTest(*ByteBoi.getDisplay());
+			test->setDoneCallback([](UserHWTest* test){
+				Settings.get().hwTested = true;
+				Settings.store();
 
-			ESP.restart();
-		});
+				ESP.restart();
+			});
 
-		test->unpack();
-		test->start();
+			test->unpack();
+			test->start();
 
-		return;
+			return;
+		}
 	}
 
 	Launcher* launcher = new Launcher(ByteBoi.getDisplay());
