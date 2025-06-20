@@ -132,14 +132,14 @@ bool JigHWTest::psram(){
 }
 
 bool JigHWTest::BatteryCheck(){
-	if(Battery.chargePinDetected()){
-		test->log("charging", true);
+	if(!Battery.isCharging()){
+		test->log("charging", false);
 		return false;
 	}
 
-	uint8_t level = Battery.getLevel();
-	if(level != 0){
-		test->log("level", (uint32_t) level);
+	const uint32_t voltage = Battery.getVoltage(true);
+	if(voltage < 4050){
+		test->log("voltage", voltage);
 		return false;
 	}
 
