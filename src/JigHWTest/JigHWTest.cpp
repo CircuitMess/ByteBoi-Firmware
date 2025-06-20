@@ -8,6 +8,7 @@
 #include <SPIFFS.h>
 #include <Audio/Notes.hpp>
 #include <Loop/LoopManager.h>
+#include <Util/HWRevision.h>
 
 JigHWTest *JigHWTest::test = nullptr;
 
@@ -20,6 +21,7 @@ JigHWTest::JigHWTest(Display &_display) : canvas(_display.getBaseSprite()), disp
 	tests.push_back({JigHWTest::SDtest, "SD"});
 	tests.push_back({JigHWTest::SPIFFSTest, "SPIFFS"});
 	tests.push_back({JigHWTest::buttons, "Buttons"});
+	tests.push_back({JigHWTest::hwRevision, "HW rev"});
 }
 
 void JigHWTest::start(){
@@ -102,7 +104,7 @@ void JigHWTest::start(){
 
 		LoopManager::loop();
 		auto press = false;
-		for(int i = 0; i < 6; i++){
+		for(int i = 0; i < ButtonCount; i++){
 			if(ByteBoi.getInput()->getButtonState(Pins.get((Pin) ((int) Pin::BtnUp + i)))){
 				press = true;
 				break;
@@ -234,7 +236,6 @@ bool JigHWTest::buttons(){
 	bool flash = false;
 	uint32_t flashTime = 0;
 
-	static constexpr auto ButtonCount = 6;
 	std::vector<bool> pressed(ButtonCount, false);
 	std::vector<bool> released(ButtonCount, false);
 	uint8_t pressCount = 0;
@@ -273,7 +274,7 @@ bool JigHWTest::buttons(){
 		test->canvas->setCursor(cX-3, cY+10);
 		test->canvas->printf("[");
 		for(int i = 0; i < ButtonCount; i++){
-			if(input->getButtonState(i)){
+			if(input->getButtonState(Pins.get((Pin) ((int) Pin::BtnUp + i)))){
 				test->canvas->setTextColor(TFT_GOLD);
 			}else if(pressed[i] && released[i]){
 				test->canvas->setTextColor(TFT_BLUE);
@@ -291,6 +292,23 @@ bool JigHWTest::buttons(){
 	test->canvas->fillRect(cX-3, cY-4, 120, 20, TFT_BLACK);
 	test->canvas->setCursor(cX, cY);
 	return pressCount == ButtonCount && releaseCount == ButtonCount;
+}
+
+bool JigHWTest::hwRevision(){
+	const auto rev = HWRevision::get();
+	if(rev != 0){
+		test->canvas->printf("Fused: ");
+		test->canvas->setTextColor(TFT_GOLD);
+		test->canvas->printf("%d ", rev);
+		test->canvas->setTextColor(TFT_WHITE);
+
+		return rev == CurrentVersion;
+	}
+
+	HWRevision::write(CurrentVersion);
+	HWRevision::commit();
+
+	return true;
 }
 
 void JigHWTest::log(const char *property, char *value){

@@ -37,8 +37,12 @@ private:
 	static bool SDtest();
 	static bool SPIFFSTest();
 	static bool buttons();
+	static bool hwRevision();
 
 	static uint32_t calcChecksum(fs::File& file);
+
+	static constexpr uint8_t CurrentVersion = 1;
+	static constexpr auto ButtonCount = 6;
 
 };
 
