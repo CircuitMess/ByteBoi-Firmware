@@ -36,6 +36,7 @@ private:
 	static bool BatteryCheck();
 	static bool SDtest();
 	static bool SPIFFSTest();
+	static bool buttons();
 
 	static uint32_t calcChecksum(fs::File& file);
 

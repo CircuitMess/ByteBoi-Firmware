@@ -19,6 +19,7 @@ JigHWTest::JigHWTest(Display &_display) : canvas(_display.getBaseSprite()), disp
 	tests.push_back({JigHWTest::BatteryCheck, "Battery"});
 	tests.push_back({JigHWTest::SDtest, "SD"});
 	tests.push_back({JigHWTest::SPIFFSTest, "SPIFFS"});
+	tests.push_back({JigHWTest::buttons, "Buttons"});
 }
 
 void JigHWTest::start(){
@@ -225,6 +226,72 @@ bool JigHWTest::SPIFFSTest(){
 	return true;
 }
 
+bool JigHWTest::buttons(){
+	auto input = ByteBoi.getInput();
+
+	const auto cX = test->canvas->getCursorX();
+	const auto cY = test->canvas->getCursorY();
+	bool flash = false;
+	uint32_t flashTime = 0;
+
+	static constexpr auto ButtonCount = 6;
+	std::vector<bool> pressed(ButtonCount, false);
+	std::vector<bool> released(ButtonCount, false);
+	uint8_t pressCount = 0;
+	uint8_t releaseCount = 0;
+	for(;;){
+		LoopManager::loop();
+
+		for(int i = 0; i < ButtonCount; i++){
+			if(input->getButtonState(Pins.get((Pin) ((int) Pin::BtnUp + i))) && !pressed[i]){
+				pressed[i] = true;
+				pressCount++;
+			}else if(!input->getButtonState(Pins.get((Pin) ((int) Pin::BtnUp + i))) && pressed[i] && !released[i]){
+				released[i] = true;
+				releaseCount++;
+			}
+		}
+
+		if(pressCount == ButtonCount && releaseCount == ButtonCount) break;
+
+		if(millis() - flashTime > 500){
+			if(flash){
+				test->canvas->fillRect(cX, cY-4, 120, 8, TFT_BLACK);
+			}else{
+				test->canvas->setCursor(cX, cY);
+				test->canvas->setTextColor(TFT_GOLD);
+				test->canvas->printf("- PRESS BUTTONS -");
+			}
+
+			ByteBoi.getDisplay()->commit();
+			flash = !flash;
+			flashTime = millis();
+		}
+
+		test->canvas->fillRect(cX, cY+6, 120, 8, TFT_BLACK);
+		test->canvas->setTextColor(TFT_LIGHTGRAY);
+		test->canvas->setCursor(cX-3, cY+10);
+		test->canvas->printf("[");
+		for(int i = 0; i < ButtonCount; i++){
+			if(input->getButtonState(i)){
+				test->canvas->setTextColor(TFT_GOLD);
+			}else if(pressed[i] && released[i]){
+				test->canvas->setTextColor(TFT_BLUE);
+			}else{
+				test->canvas->setTextColor(TFT_DARKGRAY);
+			}
+			test->canvas->printf("-");
+		}
+		test->canvas->setTextColor(TFT_LIGHTGRAY);
+		test->canvas->printf("]");
+
+		ByteBoi.getDisplay()->commit();
+	}
+
+	test->canvas->fillRect(cX-3, cY-4, 120, 20, TFT_BLACK);
+	test->canvas->setCursor(cX, cY);
+	return pressCount == ButtonCount && releaseCount == ButtonCount;
+}
 
 void JigHWTest::log(const char *property, char *value){
 	Serial.printf("%s:%s:%s\n", currentTest, property, value);
