@@ -6,6 +6,8 @@
 #include <SD.h>
 #include "Wire.h"
 #include <SPIFFS.h>
+#include <Audio/Notes.hpp>
+#include <Loop/LoopManager.h>
 
 JigHWTest *JigHWTest::test = nullptr;
 
@@ -13,10 +15,10 @@ JigHWTest::JigHWTest(Display &_display) : canvas(_display.getBaseSprite()), disp
 
 	test = this;
 
-	tests.push_back({JigHWTest::psram, "PSRAM", [](){ LED.setRGB(LEDColor::CYAN); }});
-	tests.push_back({JigHWTest::BatteryCheck, "Battery", [](){ LED.setRGB(LEDColor::BLUE); }});
-	tests.push_back({JigHWTest::SDtest, "SD", nullptr});
-	tests.push_back({JigHWTest::SPIFFSTest, "SPIFFS", [](){ LED.setRGB(LEDColor::MAGENTA); }});
+	tests.push_back({JigHWTest::psram, "PSRAM"});
+	tests.push_back({JigHWTest::BatteryCheck, "Battery"});
+	tests.push_back({JigHWTest::SDtest, "SD"});
+	tests.push_back({JigHWTest::SPIFFSTest, "SPIFFS"});
 }
 
 void JigHWTest::start(){
@@ -52,40 +54,67 @@ void JigHWTest::start(){
 
 		bool result = test.test();
 
-		canvas->setTextColor(result ? TFT_GREEN : TFT_RED);
-		canvas->printf("%s\n", result ? "PASSED" : "FAILED");
+		canvas->setTextColor(result ? TFT_SILVER : TFT_ORANGE);
+		canvas->printf("%s\n", result ? "PASS" : "FAIL");
 		display->commit();
 
 		Serial.printf("TEST:endTest:%s\n", result ? "pass" : "fail");
 
-		if(!(pass &= result)){
-			if(test.onFail){
-				test.onFail();
-			}
-
-			break;
-		}
+		if(!(pass &= result)) break;
 	}
 
-	if(!pass){
+	if(pass){
+		Serial.println("TEST:passall");
+	}else{
 		Serial.printf("TEST:fail:%s\n", currentTest);
-		for(;;);
 	}
 
-	Serial.println("TEST:passall");
+	canvas->print("\n\n");
+	canvas->setTextColor(pass ? TFT_BLUE : TFT_ORANGE);
+	canvas->printCenter(pass ? "All OK!" : "FAIL!");
+	display->commit();
 
 	Settings.get().volume = 255;
 	Playback.updateGain();
 
-	Playback.play(new Sample(SPIFFS.open("/launcher/intro/intro.aac")));
-
+	bool painted = false;
+	const auto color = pass ? TFT_GREEN : TFT_RED;
+	auto flashTime = 0;
+	bool tone = false;
+	const auto note = NOTE_C6 + ((rand() * 20) % 400) - 200;
 	for(;;){
-		LED.setRGB(LEDColor::RED);
-		delay(500);
-		LED.setRGB(LEDColor::GREEN);
-		delay(500);
-		LED.setRGB(LEDColor::BLUE);
-		delay(500);
+		if(millis() - flashTime >= 500){
+			for(int x = 0; x < canvas->width(); x++){
+				for(int y = 0; y <  canvas->height(); y++){
+					if(!painted && canvas->readPixel(x, y) == TFT_BLACK){
+						canvas->drawPixel(x, y, color);
+					}else if(painted && canvas->readPixel(x, y) == color){
+						canvas->drawPixel(x, y, TFT_BLACK);
+					}
+				}
+			}
+
+			flashTime = millis();
+			painted = !painted;
+			display->commit();
+		}
+
+		LoopManager::loop();
+		auto press = false;
+		for(int i = 0; i < 6; i++){
+			if(ByteBoi.getInput()->getButtonState(Pins.get((Pin) ((int) Pin::BtnUp + i)))){
+				press = true;
+				break;
+			}
+		}
+
+		if(press && !tone){
+			Playback.tone(note, 0);
+			tone = true;
+		}else if(!press && tone){
+			Playback.noTone();
+			tone = false;
+		}
 	}
 }
 
@@ -142,14 +171,6 @@ bool JigHWTest::SDtest(){
 		test->log("inserted", false);
 		return false;
 	}
-
-/*	if(!SD.begin(SD_CS, SPI)){
-		LED.setRGB(LEDColor::RED);
-		test->log("begin", false);
-
-		SD.end();
-		return false;
-	}*/
 
 	for(const auto& f : SDSizes){
 		fs::File file = SD.open(f.name, "r");
