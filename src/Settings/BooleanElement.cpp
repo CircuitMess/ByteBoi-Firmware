@@ -1,12 +1,24 @@
 #include "BooleanElement.h"
 
-SettingsScreen::BooleanElement::BooleanElement(ElementContainer *partent, String name)
-		: SettingsElement(partent, name){
+SettingsScreen::BooleanElement::BooleanElement(ElementContainer* partent, String name, std::function<void(int)> onChange) : SettingsElement(partent, name, onChange){
 
 }
 
-void SettingsScreen::BooleanElement::toggle(){
+void SettingsScreen::BooleanElement::click(){
 	booleanSwitch = !booleanSwitch;
+	onChange(booleanSwitch);
+}
+
+void SettingsScreen::BooleanElement::left(){
+	booleanSwitch = !booleanSwitch;
+	onChange(booleanSwitch);
+
+}
+
+void SettingsScreen::BooleanElement::right(){
+	booleanSwitch = !booleanSwitch;
+	onChange(booleanSwitch);
+
 }
 
 void SettingsScreen::BooleanElement::drawControl(){

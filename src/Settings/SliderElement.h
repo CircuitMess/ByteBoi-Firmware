@@ -5,28 +5,30 @@
 
 
 namespace SettingsScreen {
-	class SliderElement : public SettingsElement {
-	public:
-		SliderElement(ElementContainer* partent, String name);
+class SliderElement : public SettingsElement {
+public:
+	SliderElement(ElementContainer* parent, String name, std::function<void(int)> onChange);
 
-		void toggle() override;
+	void click() override;
 
-		void moveSliderValue(int8_t value);
+	void left() override;
+	void right() override;
 
-		void setSliderValue(uint8_t sliderValue);
+	void setSliderValue(uint8_t sliderValue);
 
-		uint8_t getSliderValue() const;
+	uint8_t getSliderValue() const;
 
-	private:
+private:
+	void moveSliderValue(int8_t value);
 
-		bool sliderIsSelected = false;
+	bool sliderIsSelected = false;
 
-		uint8_t sliderValue = 255;
+	uint8_t sliderValue = 255;
 
 
-	protected:
-		void drawControl() override;
-	};
+protected:
+	void drawControl() override;
+};
 }
 
 

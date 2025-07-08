@@ -11,48 +11,53 @@
 #include <FS.h>
 
 namespace SettingsScreen {
-	class SettingsScreen : public Context, private InputListener, public LoopListener{
-	public:
+class SettingsScreen : public Context, private InputListener, public LoopListener {
+public:
 
-		SettingsScreen(Display &display);
+	SettingsScreen(Display& display);
 
-		virtual ~SettingsScreen();
+	virtual ~SettingsScreen();
 
-		void start();
+	void start();
 
-		void stop();
+	void stop();
 
-		void draw();
+	void draw();
 
-		void loop(uint micros) override;
+	void loop(uint micros) override;
 
-	protected:
-		void deinit() override;
+protected:
+	void deinit() override;
 
-		void init() override;
+	void init() override;
 
 
-	private:
-		static SettingsScreen *instance;
+private:
+	static SettingsScreen* instance;
 
-		LinearLayout* screenLayout;
-		DiscreteSlider* shutDownSlider;
-		SliderElement* volumeSlider;
-		BooleanElement* enableLED;
-		TextElement* inputTest;
-		TextElement* save;
+	LinearLayout* screenLayout;
+	DiscreteSlider* shutDownSlider;
+	SliderElement* volumeSlider;
+	BooleanElement* enableLED;
+	TextElement* inputTest;
+	TextElement* save;
 
-		int selectedSetting = 0;
-		bool disableMainSelector = false;
+	std::array<SettingsElement*, 5> elements;
+	int NumElements = 5;
 
-		void buildUI();
-		void buttonPressed(uint id) override;
-		void selectApp(int8_t num);
+	int selectedSetting = 0;
+	bool disableMainSelector = false;
 
-		Color* backgroundBuffer= nullptr;
-		fs::File introSong;
-		uint32_t blinkTime = 0;
-	};
+	void buildUI();
+	void buttonPressed(uint id) override;
+	void selectApp(int8_t num);
+
+	Color* backgroundBuffer = nullptr;
+	fs::File introSong;
+	uint32_t blinkTime = 0;
+
+	void exitAndSave();
+};
 }
 
 #endif //BYTEBOI_FIRMWARE_SETTINGSSCREEN_H

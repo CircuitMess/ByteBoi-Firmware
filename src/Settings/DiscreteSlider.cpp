@@ -1,33 +1,29 @@
 #include "DiscreteSlider.h"
 
 
-SettingsScreen::DiscreteSlider::DiscreteSlider(ElementContainer* parent, String name, std::vector<uint8_t> shutDownTime) : SettingsElement(parent, name), shutDownTime(shutDownTime){
+SettingsScreen::DiscreteSlider::DiscreteSlider(ElementContainer* parent, String name, std::vector<uint8_t> shutDownTime, std::function<void(int)> onChange) : SettingsElement(parent, name, onChange), shutDownTime(shutDownTime){
 
 }
 
-void SettingsScreen::DiscreteSlider::toggle(){
+void SettingsScreen::DiscreteSlider::click(){
 	sliderIsSelected = !sliderIsSelected;
 }
 
-void SettingsScreen::DiscreteSlider::selectNext(){
-	Serial.println("SelectNext");
-	if(shutDownTime.empty()) return;
+void SettingsScreen::DiscreteSlider::right(){
+	if(shutDownTime.empty() || !sliderIsSelected) return;
 	index += 1;
 	index = min(index, (int) shutDownTime.size() - 1);
 }
 
-void SettingsScreen::DiscreteSlider::selectPrev(){
-	Serial.println("SelectPrev");
-	if(shutDownTime.empty()) return;
+void SettingsScreen::DiscreteSlider::left(){
+	if(shutDownTime.empty() || !sliderIsSelected) return;
 	index -= 1;
 	index = max(index, 0);
 
 }
 
 void SettingsScreen::DiscreteSlider::drawControl(){
-	long movingCursor;
-
-	movingCursor = map(index, 0, shutDownTime.size()-1, 0, 51);
+	long movingCursor = map(index, 0, shutDownTime.size() - 1, 0, 51);
 
 	getSprite()->drawRect(getTotalX() + 100, getTotalY() + 12, 2, 5, TFT_WHITE);
 	getSprite()->drawRect(getTotalX() + 153, getTotalY() + 12, 2, 5, TFT_WHITE);

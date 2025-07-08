@@ -4,23 +4,26 @@
 #include "SettingsElement.h"
 
 namespace SettingsScreen {
-	class BooleanElement : public SettingsElement {
-	public:
-		BooleanElement(ElementContainer *partent, String name);
+class BooleanElement : public SettingsElement {
+public:
+	BooleanElement(ElementContainer* partent, String name, std::function<void(int)> onChange);
 
-		void toggle() override;
+	void click() override;
 
-		bool getBooleanSwitch() const;
+	void left() override;
+	void right() override;
 
-		void setBooleanSwitch(bool booleanSwitch);
+	bool getBooleanSwitch() const;
 
-	private:
+	void setBooleanSwitch(bool booleanSwitch);
 
-		bool booleanSwitch = false;
+private:
 
-	protected:
-		void drawControl() override;
-	};
+	bool booleanSwitch = false;
+
+protected:
+	void drawControl() override;
+};
 }
 
 #endif //BYTEBOI_FIRMWARE_BOOLEANELEMENT_H

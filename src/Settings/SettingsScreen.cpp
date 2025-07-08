@@ -9,18 +9,60 @@
 #include <Loop/LoopManager.h>
 
 SettingsScreen::SettingsScreen* SettingsScreen::SettingsScreen::instance = nullptr;
-SettingsScreen::SettingsScreen::SettingsScreen(Display& display) : Context(display), screenLayout(new LinearLayout(&screen, VERTICAL)),
-																   shutDownSlider(new DiscreteSlider(screenLayout, "Auto shutdown", {0, 1, 5, 15, 30})),
-																   volumeSlider(new SliderElement(screenLayout, "Volume")),
-																   enableLED(new BooleanElement(screenLayout, "LED enable")),
-																   inputTest(new TextElement(screenLayout, "Hardware test")),
-																   save(new TextElement(screenLayout, "Save")){
+
+SettingsScreen::SettingsScreen::SettingsScreen(Display& display) : Context(display), screenLayout(new LinearLayout(&screen, VERTICAL)){
+
+	shutDownSlider = new DiscreteSlider(screenLayout, "Auto shutdown", { 0, 1, 5, 15, 30 }, {});
+	volumeSlider = new SliderElement(screenLayout, "Volume", [](int value){
+		Settings.get().volume = value;
+		Playback.updateGain();
+		Playback.tone(500, 100);
+	});
+
+	const auto version = ByteBoi.getVer();
+	if(version != ByteBoiImpl::v2_0){
+		enableLED = new BooleanElement(screenLayout, "LED enable", [](int value){
+			Settings.get().RGBenable = value;
+			if(!value){
+				LED.setRGB(OFF);
+			}else{
+				LED.setRGB(LEDColor::WHITE);
+				instance->blinkTime = millis();
+				LoopManager::addListener(instance);
+			}
+		});
+		enableLED->setBooleanSwitch(Settings.get().RGBenable);
+		inputTest = new TextElement(screenLayout, "Hardware test", [](int value){
+			Context* hwTest = new UserHWTest(*ByteBoi.getDisplay());
+			hwTest->push(instance);
+			instance->draw();
+			instance->screen.commit();
+		});
+	}else{
+		enableLED = nullptr;
+		inputTest = nullptr;
+	}
+
+	save = new TextElement(screenLayout, "Save", [](int value){
+		instance->exitAndSave();
+	});
+
+	elements.fill(nullptr);
+
+	if(version == ByteBoiImpl::v2_0){
+		NumElements = 3;
+		elements = { shutDownSlider, volumeSlider, save };
+	}else{
+		NumElements = 5;
+		elements = { shutDownSlider, volumeSlider, enableLED, inputTest, save };
+	}
+
+
 	instance = this;
 	buildUI();
 	shutDownSlider->setIsSelected(true);
 	shutDownSlider->setIndex(Settings.get().shutdownTime);
 	volumeSlider->setSliderValue(Settings.get().volume);
-	enableLED->setBooleanSwitch(Settings.get().RGBenable);
 	SettingsScreen::pack();
 }
 
@@ -28,11 +70,8 @@ void SettingsScreen::SettingsScreen::start(){
 	Input::getInstance()->addListener(this);
 	Input::getInstance()->setButtonHeldRepeatCallback(BTN_RIGHT, 200, [](uint){
 		if(instance == nullptr || instance->selectedSetting != 1) return;
-		instance->volumeSlider->moveSliderValue(1);
 
-		Settings.get().volume = instance->volumeSlider->getSliderValue();
-		Playback.updateGain();
-		Playback.tone(500, 50);
+		instance->volumeSlider->right();
 
 		instance->draw();
 		instance->screen.commit();
@@ -40,11 +79,8 @@ void SettingsScreen::SettingsScreen::start(){
 
 	Input::getInstance()->setButtonHeldRepeatCallback(BTN_LEFT, 200, [](uint){
 		if(instance == nullptr || instance->selectedSetting != 1) return;
-		instance->volumeSlider->moveSliderValue(-1);
 
-		Settings.get().volume = instance->volumeSlider->getSliderValue();
-		Playback.updateGain();
-		Playback.tone(500, 50);
+		instance->volumeSlider->left();
 
 		instance->draw();
 		instance->screen.commit();
@@ -71,12 +107,12 @@ void SettingsScreen::SettingsScreen::draw(){
 	screen.getSprite()->setCursor(screenLayout->getTotalX() + 42, screenLayout->getTotalY() + 110);
 	screen.getSprite()->print("Version 1.1");
 
-	for(int i = 0; i < 5; i++){
+	for(int i = 0; i < NumElements; i++){
 		if(!reinterpret_cast<SettingsElement*>(screenLayout->getChild(i))->isSelected()){
 			screenLayout->getChild(i)->draw();
 		}
 	}
-	for(int i = 0; i < 5; i++){
+	for(int i = 0; i < NumElements; i++){
 		if(reinterpret_cast<SettingsElement*>(screenLayout->getChild(i))->isSelected()){
 			screenLayout->getChild(i)->draw();
 		}
@@ -106,11 +142,10 @@ SettingsScreen::SettingsScreen::~SettingsScreen(){
 void SettingsScreen::SettingsScreen::buildUI(){
 	screenLayout->setWHType(PARENT, PARENT);
 	screenLayout->setGutter(5);
-	screenLayout->addChild(shutDownSlider);
-	screenLayout->addChild(volumeSlider);
-	screenLayout->addChild(enableLED);
-	screenLayout->addChild(inputTest);
-	screenLayout->addChild(save);
+
+	for(uint8_t i = 0; i < NumElements; i++){
+		screenLayout->addChild(elements[i]);
+	}
 
 	screenLayout->reflow();
 	screen.addChild(screenLayout);
@@ -124,169 +159,51 @@ void SettingsScreen::SettingsScreen::selectApp(int8_t num){
 void SettingsScreen::SettingsScreen::buttonPressed(uint id){
 	switch(id){
 		case BTN_LEFT:
-			if(selectedSetting == 0){
-				shutDownSlider->selectPrev();
-			}else if(selectedSetting == 1){
-				volumeSlider->moveSliderValue(-1);
-				Settings.get().volume = volumeSlider->getSliderValue();
-				Playback.updateGain();
-				Playback.tone(500, 200);
-			}else if(selectedSetting == 2){
-				enableLED->toggle();
-				Settings.get().RGBenable = enableLED->getBooleanSwitch();
-				if(!Settings.get().RGBenable){
-					LED.setRGB(OFF);
-				}else{
-					LED.setRGB(LEDColor::WHITE);
-					instance->blinkTime = millis();
-					LoopManager::addListener(this);
-				}
-			}
-			draw();
-			screen.commit();
+			elements[selectedSetting]->left();
 			break;
 
 		case BTN_RIGHT:
-			if(selectedSetting == 0){
-				shutDownSlider->selectNext();
-			}else if(selectedSetting == 1){
-				volumeSlider->moveSliderValue(1);
-				Settings.get().volume = volumeSlider->getSliderValue();
-				Playback.updateGain();
-				Playback.tone(500, 200);
-			}else if(selectedSetting == 2){
-				enableLED->toggle();
-				Settings.get().RGBenable = enableLED->getBooleanSwitch();
-				if(!Settings.get().RGBenable){
-					LED.setRGB(OFF);
-				}else{
-					LED.setRGB(LEDColor::WHITE);
-					instance->blinkTime = millis();
-					LoopManager::addListener(this);
-				}
-			}
-			draw();
-			screen.commit();
+			elements[selectedSetting]->right();
+
 			break;
 
 		case BTN_UP:
+			elements[selectedSetting]->setIsSelected(false);
+
 			selectedSetting--;
 			if(selectedSetting < 0){
 				selectedSetting = 4;
 			}
-			if(selectedSetting == 0){
-				shutDownSlider->setIsSelected(true);
-			}else{
-				shutDownSlider->setIsSelected(false);
-			}
-			if(selectedSetting == 1){
-				volumeSlider->setIsSelected(true);
-			}else{
-				volumeSlider->setIsSelected(false);
-			}
-			if(selectedSetting == 2){
-				enableLED->setIsSelected(true);
-			}else{
-				enableLED->setIsSelected(false);
-			}
-			if(selectedSetting == 3){
-				inputTest->setIsSelected(true);
-			}else{
-				inputTest->setIsSelected(false);
-			}
-			if(selectedSetting == 4){
-				save->setIsSelected(true);
-			}else{
-				save->setIsSelected(false);
-			}
 
-			draw();
-			screen.commit();
+			elements[selectedSetting]->setIsSelected(true);
+
 			break;
 
 		case BTN_DOWN:
+			elements[selectedSetting]->setIsSelected(false);
+
+
 			selectedSetting++;
 			if(selectedSetting > 4){
 				selectedSetting = 0;
 			}
-			if(selectedSetting == 0){
-				shutDownSlider->setIsSelected(true);
-			}else{
-				shutDownSlider->setIsSelected(false);
-			}
-			if(selectedSetting == 1){
-				volumeSlider->setIsSelected(true);
-			}else{
-				volumeSlider->setIsSelected(false);
-			}
-			if(selectedSetting == 2){
-				enableLED->setIsSelected(true);
-			}else{
-				enableLED->setIsSelected(false);
-			}
-			if(selectedSetting == 3){
-				inputTest->setIsSelected(true);
-			}else{
-				inputTest->setIsSelected(false);
-			}
-			if(selectedSetting == 4){
-				save->setIsSelected(true);
-			}else{
-				save->setIsSelected(false);
-			}
-			draw();
-			screen.commit();
+
+			elements[selectedSetting]->setIsSelected(true);
+
 			break;
 
 		case BTN_A:
-			if(selectedSetting == 1){
-				if(volumeSlider->getSliderValue() == 0){
-					volumeSlider->setSliderValue(180);
-				}else{
-					volumeSlider->setSliderValue(0);
-				}
-				Settings.get().volume = instance->volumeSlider->getSliderValue();
-				Playback.updateGain();
-				Playback.tone(500, 50);
-			}else if(selectedSetting == 2){
-				enableLED->toggle();
-				Settings.get().RGBenable = enableLED->getBooleanSwitch();
-				if(!Settings.get().RGBenable){
-					LED.setRGB(OFF);
-				}else{
-					LED.setRGB(LEDColor::WHITE);
-					instance->blinkTime = millis();
-					LoopManager::addListener(this);
-				}
-			}else if(selectedSetting == 3){
-				Context* hwTest = new UserHWTest(*ByteBoi.getDisplay());
-				hwTest->push(this);
-				draw();
-				screen.commit();
-				break;
-			}else if(selectedSetting == 4){
-				Settings.get().shutdownTime = shutDownSlider->getIndex();
-				Settings.get().volume = volumeSlider->getSliderValue();
-				Settings.get().RGBenable = enableLED->getBooleanSwitch();
-				Settings.store();
-				Playback.updateGain();
-				this->pop();
-			}
-			draw();
-			screen.commit();
+			elements[selectedSetting]->click();
 			break;
+
 		case BTN_B:
 		case BTN_C:
-			Settings.get().shutdownTime = shutDownSlider->getIndex();
-			Settings.get().volume = volumeSlider->getSliderValue();
-			Settings.get().RGBenable = enableLED->getBooleanSwitch();
-			Settings.store();
-			Playback.updateGain();
-			this->pop();
-			draw();
-			screen.commit();
+			exitAndSave();
 			break;
 	}
+
+	draw();
+	screen.commit();
 
 }
 
@@ -296,4 +213,15 @@ void SettingsScreen::SettingsScreen::loop(uint micros){
 		LED.setRGB(LEDColor::OFF);
 		LoopManager::removeListener(this);
 	}
+}
+
+void SettingsScreen::SettingsScreen::exitAndSave(){
+	Settings.get().shutdownTime = shutDownSlider->getIndex();
+	Settings.get().volume = volumeSlider->getSliderValue();
+	if(enableLED){
+		Settings.get().RGBenable = enableLED->getBooleanSwitch();
+	}
+	Settings.store();
+	Playback.updateGain();
+	this->pop();
 }

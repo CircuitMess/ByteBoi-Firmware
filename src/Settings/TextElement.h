@@ -4,17 +4,19 @@
 #include "SettingsElement.h"
 
 namespace SettingsScreen {
-	class TextElement : public SettingsElement {
-	public:
-		TextElement(ElementContainer *partent, String name);
+class TextElement : public SettingsElement {
+public:
+	TextElement(ElementContainer* parent, String name, std::function<void(int)> onChange);
 
-		void toggle() override;
+	void click() override;
 
-	private:
+private:
+	void left() override final;
+	void right() override final;
 
-	protected:
-		void drawControl() override;
-	};
+protected:
+	void drawControl() override;
+};
 }
 
 #endif //WHEELSON_FIRMWARE_TEXTELEMENT_H

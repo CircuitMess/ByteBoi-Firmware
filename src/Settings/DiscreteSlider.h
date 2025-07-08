@@ -4,31 +4,31 @@
 #include "SettingsElement.h"
 
 namespace SettingsScreen {
-	class DiscreteSlider : public SettingsElement {
-	public:
-		DiscreteSlider(ElementContainer* parent, String name, std::vector<uint8_t> shutDownTime);
+class DiscreteSlider : public SettingsElement {
+public:
+	DiscreteSlider(ElementContainer* parent, String name, std::vector<uint8_t> shutDownTime, std::function<void(int)> onChange);
 
-		void toggle() override;
+	void click() override;
 
-		void selectNext();
+	void right() override;
 
-		void selectPrev();
+	void left() override;
 
-		bool isSliderSelected() const;
+	bool isSliderSelected() const;
 
-		void setIndex(int index);
+	void setIndex(int index);
 
-		int getIndex() const;
+	int getIndex() const;
 
-	private:
-		bool sliderIsSelected = false;
+private:
+	bool sliderIsSelected = false;
 
-		int index = 4;
+	int index = 4;
 
-		std::vector<uint8_t> shutDownTime;
-	protected:
-		void drawControl() override;
-	};
+	std::vector<uint8_t> shutDownTime;
+protected:
+	void drawControl() override;
+};
 }
 
 

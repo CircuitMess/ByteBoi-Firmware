@@ -1,6 +1,6 @@
 #include "SettingsElement.h"
 
-SettingsScreen::SettingsElement::SettingsElement(ElementContainer* parent, String name) : CustomElement(parent,160,17), name(name){
+SettingsScreen::SettingsElement::SettingsElement(ElementContainer* parent, String name, std::function<void(int)> onChange) : CustomElement(parent, 160, 17), name(name), onChange(onChange){
 
 }
 
