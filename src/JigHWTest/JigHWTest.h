@@ -36,14 +36,19 @@ private:
 	static bool BatteryCheck();
 	static bool SDtest();
 	static bool SPIFFSTest();
-	static bool buttons();
 	static bool hwRevision();
+
+	/** UNUSED */
+	static bool buttons();
 
 	static uint32_t calcChecksum(fs::File& file);
 
 	static constexpr uint8_t CurrentVersion = 1;
 	static constexpr auto ButtonCount = 6;
+	static constexpr uint32_t USBVoltageMinimum = 3300; //[mV]
 
+	static constexpr uint16_t MeasureCount = 10;
+	static constexpr uint8_t Factor = 4;
 };
 
 

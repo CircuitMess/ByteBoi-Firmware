@@ -9,6 +9,7 @@
 #include <Audio/Notes.hpp>
 #include <Loop/LoopManager.h>
 #include <Util/HWRevision.h>
+#include <esp_adc_cal.h>
 
 JigHWTest *JigHWTest::test = nullptr;
 
@@ -20,7 +21,6 @@ JigHWTest::JigHWTest(Display &_display) : canvas(_display.getBaseSprite()), disp
 	tests.push_back({JigHWTest::BatteryCheck, "Battery"});
 	tests.push_back({JigHWTest::SDtest, "SD"});
 	tests.push_back({JigHWTest::SPIFFSTest, "SPIFFS"});
-	tests.push_back({JigHWTest::buttons, "Buttons"});
 	tests.push_back({JigHWTest::hwRevision, "HW rev"});
 }
 
@@ -87,6 +87,11 @@ void JigHWTest::start(){
 	const auto note = NOTE_C6 + ((rand() * 20) % 400) - 200;
 	for(;;){
 		if(millis() - flashTime >= 500){
+			if(!painted){
+				Playback.tone(note, 0);
+			}else{
+				Playback.noTone();
+			}
 			for(int x = 0; x < canvas->width(); x++){
 				for(int y = 0; y <  canvas->height(); y++){
 					if(!painted && canvas->readPixel(x, y) == TFT_BLACK){
@@ -103,21 +108,6 @@ void JigHWTest::start(){
 		}
 
 		LoopManager::loop();
-		auto press = false;
-		for(int i = 0; i < ButtonCount; i++){
-			if(ByteBoi.getInput()->getButtonState(Pins.get((Pin) ((int) Pin::BtnUp + i)))){
-				press = true;
-				break;
-			}
-		}
-
-		if(press && !tone){
-			Playback.tone(note, 0);
-			tone = true;
-		}else if(!press && tone){
-			Playback.noTone();
-			tone = false;
-		}
 	}
 }
 
@@ -135,14 +125,31 @@ bool JigHWTest::psram(){
 }
 
 bool JigHWTest::BatteryCheck(){
-	if(!Battery.isCharging()){
-		test->log("charging", false);
+	pinMode(BATTERY_PIN, INPUT);
+	pinMode(CHARGE_DETECT_PIN, INPUT_PULLDOWN);
+
+	//USB voltage can be a little shaky immediately after startup
+	delay(100);
+
+	esp_adc_cal_characteristics_t calChars;
+
+	analogSetAttenuation(ADC_2_5db);
+
+	//Newer ESP32's used in HWRevision 2.X SHOULD have calibration in efuse
+	if(esp_adc_cal_characterize(ADC_UNIT_1, ADC_ATTEN_DB_2_5, ADC_WIDTH_BIT_12, 0, &calChars) == ESP_ADC_CAL_VAL_DEFAULT_VREF){
+		test->log("efuse calib", false);
 		return false;
 	}
 
-	const uint32_t voltage = Battery.getVoltage(true);
-	if(voltage < 4050){
-		test->log("voltage", voltage);
+	uint32_t sum = 0;
+	for(int i = 0; i < MeasureCount; i++){
+		sum += esp_adc_cal_raw_to_voltage(analogRead(BATTERY_PIN), &calChars) * Factor;
+	}
+	const uint32_t measured = std::round(sum / (float) MeasureCount);
+
+	test->log("voltage", measured);
+
+	if(measured < USBVoltageMinimum){
 		return false;
 	}
 
@@ -170,7 +177,6 @@ bool JigHWTest::SDtest(){
 	ByteBoi.checkSD();
 
 	if(!ByteBoi.sdDetected()){
-		LED.setRGB(LEDColor::RED);
 		test->log("inserted", false);
 		return false;
 	}
@@ -178,7 +184,6 @@ bool JigHWTest::SDtest(){
 	for(const auto& f : SDSizes){
 		fs::File file = SD.open(f.name, "r");
 		if(!file){
-			LED.setRGB(LEDColor::GREEN);
 			test->log("missing", f.name);
 
 			file.close();
@@ -188,7 +193,6 @@ bool JigHWTest::SDtest(){
 
 		uint32_t size = file.size();
 		if(size != f.size){
-			LED.setRGB(LEDColor::YELLOW);
 			test->log("file", f.name);
 			test->log("expected", f.size);
 			test->log("got", size);
