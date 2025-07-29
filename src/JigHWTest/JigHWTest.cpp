@@ -145,7 +145,7 @@ bool JigHWTest::BatteryCheck(){
 	for(int i = 0; i < MeasureCount; i++){
 		sum += esp_adc_cal_raw_to_voltage(analogRead(BATTERY_PIN), &calChars) * Factor;
 	}
-	const uint32_t measured = std::round(sum / (float) MeasureCount);
+	const uint32_t measured = round(sum / (float) MeasureCount);
 
 	test->log("voltage", measured);
 
