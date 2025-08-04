@@ -86,7 +86,7 @@ for Windows).
 Then create the binary SPIFFS image using the command in the root of the project:
 
 ```
-mkspiffs -c data -s 0x1EF000 -b 4096 -p 256 spiffs.bin
+mkspiffs -c data -s 0xFF000 -b 4096 -p 256 spiffs.bin
 ```
 
 The block size (-b) and page size (-p) parameters should stay as-is.
@@ -106,7 +106,7 @@ This parameter is used in the
 following esptool command call (before referencing the built image):
 
 ```
-esptool --chip esp32 --baud 921600  --before default_reset --after hard_reset write_flash -z --flash_mode dio --flash_freq 80m --flash_size detect 0x211000 spiffs.bin
+esptool --chip esp32 --baud 921600  --before default_reset --after hard_reset write_flash -z --flash_mode dio --flash_freq 80m --flash_size detect 0x11000 spiffs.bin
 ```
 
 ---
