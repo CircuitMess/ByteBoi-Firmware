@@ -11,7 +11,6 @@
 #include "DescriptionModal.h"
 #include "ErrorModal.h"
 #include "Settings/SettingsScreen.h"
-#include <SD.h>
 #include <SPIFFS.h>
 #include <FS/CompressedFile.h>
 #include <Battery/BatteryPopupService.h>
@@ -75,7 +74,7 @@ void Launcher::load(){
 
 			LauncherItem& item = items.back();
 
-			fs::File icon = SD.open(game->icon.c_str());
+			fs::File icon = ByteBoi.SD_open(game->icon.c_str());
 			if(icon){
 				item.image = GameImage(canvas);
 				if(icon.read(reinterpret_cast<uint8_t*>(item.image.getBuffer()), 64 * 64 * 2) != 64 * 64 * 2){
