@@ -20,7 +20,7 @@ SettingsScreen::SettingsScreen::SettingsScreen(Display& display) : Context(displ
 	});
 
 	const auto version = ByteBoi.getVer();
-	if(version != ByteBoiImpl::v2_0){
+	if(version != ByteBoiImpl::v2_0 && version != ByteBoiImpl::v2_6){
 		enableLED = new BooleanElement(screenLayout, "LED enable", [](int value){
 			Settings.get().RGBenable = value;
 			if(!value){
