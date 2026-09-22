@@ -20,7 +20,7 @@ SettingsScreen::SettingsScreen::SettingsScreen(Display& display) : Context(displ
 	});
 
 	const auto version = ByteBoi.getVer();
-	if(version != ByteBoiImpl::v2_0){
+	if(version != ByteBoiImpl::v2_0 && version != ByteBoiImpl::v2_6){
 		enableLED = new BooleanElement(screenLayout, "LED enable", [](int value){
 			Settings.get().RGBenable = value;
 			if(!value){
@@ -105,7 +105,7 @@ void SettingsScreen::SettingsScreen::draw(){
 	screen.getSprite()->setTextSize(1);
 	screen.getSprite()->setTextFont(1);
 	screen.getSprite()->setCursor(screenLayout->getTotalX() + 42, screenLayout->getTotalY() + 110);
-	screen.getSprite()->print("Version 2.0");
+	screen.getSprite()->print("Version 2.6");
 
 	for(int i = 0; i < NumElements; i++){
 		if(!reinterpret_cast<SettingsElement*>(screenLayout->getChild(i))->isSelected()){

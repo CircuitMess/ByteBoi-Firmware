@@ -50,7 +50,7 @@ void setup(){
 
 	if(checkJig()){
 		printf("Jig\n");
-		ByteBoi.initVer(1);
+		ByteBoi.initVer(2);
 		ByteBoi.begin();
 		ByteBoi.unbindMenu();
 

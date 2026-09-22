@@ -1,6 +1,5 @@
 #include "GameLoader.h"
 #include <Update.h>
-#include <SD.h>
 #include "../GameInfo.hpp"
 #include "GameManager.h"
 #include <ByteBoi.h>
@@ -90,8 +89,8 @@ void GameLoader::loadFunc(Task* task){
 #define error(message) printf("E: %s\n", String(message).c_str()); job->error = message; job->done = true; return
 
 	//copy resources
-	if(!game->resources.empty() && SD.exists(game->resources.c_str())){
-		root = SD.open(game->resources.c_str());
+	if(!game->resources.empty() && ByteBoi.SD_exists(game->resources.c_str())){
+		root = ByteBoi.SD_open(game->resources.c_str());
 		file = root.openNextFile();
 		while(file){
 			String fileName = file.name();
@@ -126,7 +125,7 @@ void GameLoader::loadFunc(Task* task){
 
 	if(checkAbort(job)) return;
 
-	file = SD.open(game->binary.c_str());
+	file = ByteBoi.SD_open(game->binary.c_str());
 	if(!file || file.isDirectory()){
 		file.close();
 		error(String("Error opening binary: ") + game->binary.c_str());
@@ -279,7 +278,7 @@ bool GameLoader::saveLoaded(GameInfo* game){
 	};
 
 	auto checkCopy = [&copy](const char* src, const char* dst){
-		fs::File fS = SD.open(src);
+		fs::File fS = ByteBoi.SD_open(src);
 		if(SPIFFS.exists(dst)){
 			SPIFFS.remove(dst);
 		}

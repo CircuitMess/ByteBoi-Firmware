@@ -1,6 +1,5 @@
 #include "GameManager.h"
 #include <SPIFFS.h>
-#include <SD.h>
 #include <SPI.h>
 #include <esp_partition.h>
 #include <esp_ota_ops.h>
@@ -37,7 +36,7 @@ void GameManager::scanGames(){
 	ByteBoi.checkSD();
 	if(!ByteBoi.sdDetected()) return;
 
-	File root = SD.open("/");
+	File root = ByteBoi.SD_open("/");
 	File gameFolder = root.openNextFile();
 	while(gameFolder){
 		if(gameFolder.isDirectory()){
@@ -45,7 +44,7 @@ void GameManager::scanGames(){
 			strncat(path, gameFolder.name(), 100);
 			strncat(path, "/game.properties", 100);
 
-			if(SD.exists(path)){
+			if(ByteBoi.SD_exists(path)){
 				strncpy(path, "/sd", 100);
 				strncat(path, gameFolder.name(), 100);
 				strncat(path, "/game.properties", 100);
@@ -88,7 +87,7 @@ GameInfo* GameManager::parseInfo(const char* infoFilePath, const char* dirName, 
 	strncat(iconPath, "/", 100);
 	strncat(iconPath, icon.c_str(), 100);
 
-	if(checkBinary && !SD.exists(path)) return nullptr;
+	if(checkBinary && !ByteBoi.SD_exists(path)) return nullptr;
 
 	std::string author = props.GetProperty("Author", "");
 	if(author == "CM Team") author = "CM team";
@@ -97,9 +96,9 @@ GameInfo* GameManager::parseInfo(const char* infoFilePath, const char* dirName, 
 		getValueOrDefault(props, "Name", gameDefaults.name),
 		author,
 		props.GetProperty("Description", ""),
-		(SD.exists(iconPath) ? iconPath : ""),
+		(ByteBoi.SD_exists(iconPath) ? iconPath : ""),
 		path,
-		(SD.exists(resourcesPath) ? resourcesPath : ""),
+		(ByteBoi.SD_exists(resourcesPath) ? resourcesPath : ""),
 		dirName
 	});
 }

@@ -3,7 +3,7 @@
 #include "SPIFFSChecksums.hpp"
 #include <ByteBoi.h>
 #include <SPI.h>
-#include <SD.h>
+#include <SD_MMC.h>
 #include "Wire.h"
 #include <SPIFFS.h>
 #include <Audio/Notes.hpp>
@@ -182,12 +182,12 @@ bool JigHWTest::SDtest(){
 	}
 
 	for(const auto& f : SDSizes){
-		fs::File file = SD.open(f.name, "r");
+		fs::File file = SD_MMC.open(f.name, "r");
 		if(!file){
 			test->log("missing", f.name);
 
 			file.close();
-			SD.end();
+			SD_MMC.end();
 			return false;
 		}
 
@@ -198,14 +198,14 @@ bool JigHWTest::SDtest(){
 			test->log("got", size);
 
 			file.close();
-			SD.end();
+			SD_MMC.end();
 			return false;
 		}
 
 		file.close();
 	}
 
-	SD.end();
+	SD_MMC.end();
 	return true;
 }
 

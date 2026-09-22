@@ -43,7 +43,7 @@ private:
 
 	static uint32_t calcChecksum(fs::File& file);
 
-	static constexpr uint8_t CurrentVersion = 1;
+	static constexpr uint8_t CurrentVersion = 2;
 	static constexpr auto ButtonCount = 6;
 	static constexpr uint32_t USBVoltageMinimum = 3300; //[mV]
 

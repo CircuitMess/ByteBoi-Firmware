@@ -5,8 +5,6 @@
 #include "GameManagement/GameManager.h"
 #include <SPIFFS.h>
 #include "GameInfo.hpp"
-#include <SD.h>
-
 
 
 GameScroller::GameScroller(Sprite* canvas, std::vector<LauncherItem>& items) : canvas(canvas), items(items),
