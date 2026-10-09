@@ -49,7 +49,7 @@ SettingsScreen::SettingsScreen::SettingsScreen(Display& display) : Context(displ
 
 	elements.fill(nullptr);
 
-	if(version == ByteBoiImpl::v2_0){
+	if(version == ByteBoiImpl::v2_0 || version == ByteBoiImpl::v2_6){
 		NumElements = 3;
 		elements = { shutDownSlider, volumeSlider, save };
 	}else{
@@ -172,7 +172,7 @@ void SettingsScreen::SettingsScreen::buttonPressed(uint id){
 
 			selectedSetting--;
 			if(selectedSetting < 0){
-				selectedSetting = 4;
+				selectedSetting = NumElements - 1;
 			}
 
 			elements[selectedSetting]->setIsSelected(true);
@@ -184,7 +184,7 @@ void SettingsScreen::SettingsScreen::buttonPressed(uint id){
 
 
 			selectedSetting++;
-			if(selectedSetting > 4){
+			if(selectedSetting >= NumElements){
 				selectedSetting = 0;
 			}
 
