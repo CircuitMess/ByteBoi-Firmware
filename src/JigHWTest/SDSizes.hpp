@@ -34,7 +34,7 @@ struct {
 		{ "/Bonk/Bonk.raw",                          8192 },
 		{ "/Blocks/Music/Twister.aac",               1400261 },
 		{ "/Blocks/Music/GameOver.aac",              429571 },
-		{ "/Blocks/Blocks.bin",                      1161728 },
+		{ "/Blocks/Blocks.bin",                      1161136 },
 		{ "/Blocks/game.properties",                 129 },
 		{ "/Blocks/Blocks.raw",                      8192 },
 		{ "/Blocks/data/BlocksMenuBg.raw.hs",        590 },
